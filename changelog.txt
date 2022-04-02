@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2022-04-02
+  Bugfixes:
+    - Placing Blueprints with Tiles in a Planetary Lab would revert the Tiles to Empty Space
+---------------------------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 2022-03-29
   Changes:

@@ -101,6 +101,8 @@ script.on_event(defines.events.on_marked_for_upgrade, God.OnMarkedForUpgrade)
 script.on_event(defines.events.on_built_entity, God.OnBuiltEntity)
 script.on_event(defines.events.on_player_crafted_item, God.OnPlayerCraftedItem)
 
+-- TODO: on_entity_settings_pasted
+
 script.on_event(defines.events.on_player_selected_area, function(event)
     Resources.OnAreaSelected(event, true)
 end)

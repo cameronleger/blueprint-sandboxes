@@ -10,6 +10,13 @@ function SpaceExploration.IsSandbox(surface)
             and global.seSurfaces[surface.name]
 end
 
+-- Whether the Surface has been taken as a Planetary Lab Sandbox
+function SpaceExploration.IsPlanetarySandbox(surface)
+    return SpaceExploration.enabled
+            and global.seSurfaces[surface.name]
+            and not global.seSurfaces[surface.name].orbital
+end
+
 -- Chooses a non-home-system Star for a Force's Space Sandbox, if necessary
 -- Notably, Star _Orbits_ are "usable" Zones, but not Stars themselves
 -- In other words, these should be completely safe and invisible outside of this mod!
