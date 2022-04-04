@@ -64,17 +64,9 @@ function Init.MergeForce(oldForceName, newForce)
     global.sandboxForces[sandboxForceName] = nil
 end
 
--- Create Sandbox Force, if necessary
-function Init.GetOrCreateSandboxForce(force)
-    local sandboxForceName = global.forces[force.name].sandboxForceName
-    local sandboxForce = game.forces[sandboxForceName]
-    if sandboxForce then
-        return sandboxForce
-    end
-
-    Debug.log("Creating Sandbox Force: " .. sandboxForceName)
-    sandboxForce = game.create_force(sandboxForceName)
-
+-- Configure Sandbox Force
+function Init.ConfigureSandboxForce(force, sandboxForce)
+    -- Ensure the two Forces don't attack each other
     force.set_cease_fire(sandboxForce, true)
     sandboxForce.set_cease_fire(force, true)
 
@@ -84,6 +76,21 @@ function Init.GetOrCreateSandboxForce(force)
     -- Why should you Research in here?
     sandboxForce.laboratory_speed_modifier = -0.999
 
+    return sandboxForce
+end
+
+-- Create Sandbox Force, if necessary
+function Init.GetOrCreateSandboxForce(force)
+    local sandboxForceName = global.forces[force.name].sandboxForceName
+    local sandboxForce = game.forces[sandboxForceName]
+    if sandboxForce then
+        Init.ConfigureSandboxForce(force, sandboxForce)
+        return sandboxForce
+    end
+
+    Debug.log("Creating Sandbox Force: " .. sandboxForceName)
+    sandboxForce = game.create_force(sandboxForceName)
+    Init.ConfigureSandboxForce(force, sandboxForce)
     Research.Sync(force, sandboxForce)
     return sandboxForce
 end
