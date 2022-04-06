@@ -124,11 +124,7 @@ function Sandbox.Exit(player)
     Debug.log("Exiting Sandbox: " .. player.surface.name)
 
     player.force = playerData.preSandboxForceName
-    player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
-    player.set_controller({
-        type = playerData.preSandboxController,
-        character = playerData.preSandboxCharacter
-    })
+    Sandbox.RecoverPlayerCharacter(player, playerData)
     player.cheat_mode = false
 
     playerData.insideSandbox = nil
@@ -137,6 +133,61 @@ function Sandbox.Exit(player)
     playerData.preSandboxController = nil
     playerData.preSandboxPosition = nil
     playerData.preSandboxSurfaceName = nil
+end
+
+-- Ensure the Player has a Character to go back to
+function Sandbox.RecoverPlayerCharacter(player, playerData)
+    -- Typical situation, there wasn't a Character, or there was a valid one
+    if (not playerData.preSandboxCharacter) or playerData.preSandboxCharacter.valid then
+        player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
+        player.set_controller({
+            type = playerData.preSandboxController,
+            character = playerData.preSandboxCharacter
+        })
+        return
+    end
+
+    -- Space Exploration deletes and recreates Characters; check that out next
+    local fromSpaceExploration = SpaceExploration.GetPlayerCharacter(player)
+    if fromSpaceExploration and fromSpaceExploration.valid then
+        player.teleport(fromSpaceExploration.position, fromSpaceExploration.surface.name)
+        player.set_controller({
+            type = defines.controllers.character,
+            character = fromSpaceExploration
+        })
+        return
+    end
+
+    -- We might at-least have a Surface to go back to
+    if playerData.preSandboxSurfaceName and game.surfaces[playerData.preSandboxSurfaceName] then
+        player.print("Unfortunately, your previous Character was lost, so it had to be recreated.")
+        player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
+        local recreated = game.surfaces[playerData.preSandboxSurfaceName].create_entity {
+            name = "character",
+            position = playerData.preSandboxPosition,
+            force = playerData.preSandboxForceName,
+            raise_built = true,
+        }
+        player.set_controller({
+            type = playerData.preSandboxController,
+            character = recreated
+        })
+        return
+    end
+
+    -- Otherwise, we need a completely clean slate :(
+    player.print("Unfortunately, your previous Character was completely lost, so you must start anew.")
+    player.teleport({ 0, 0 }, "nauvis")
+    local recreated = game.surfaces["nauvis"].create_entity {
+        name = "character",
+        position = { 0, 0 },
+        force = playerData.preSandboxForceName,
+        raise_built = true,
+    }
+    player.set_controller({
+        type = playerData.preSandboxController,
+        character = recreated
+    })
 end
 
 -- Keep a Player's God-state, but change between Selected Sandboxes

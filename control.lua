@@ -7,6 +7,7 @@ Debug = require("scripts.debug")
 Init = require("scripts.init")
 God = require("scripts.god")
 Lab = require("scripts.lab")
+Migrate = require("scripts.migrate")
 Research = require("scripts.research")
 Resources = require("scripts.resources")
 ToggleGUI = require("scripts.toggle-gui")
@@ -64,6 +65,7 @@ script.on_configuration_changed(function(event)
             Currently, if that same code is used here, the flag will be true,
             but the Recipes are still hidden, so they'll be stuck hidden!
     ]]
+    Migrate.Run()
 end)
 
 script.on_event(defines.events.on_player_changed_force, function(event)

@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2022-04-05
+  Changes:
+    - The Space Exploration Planetary Lab now uses a Moon instead of a Star
+    - Existing Space Exploration Planetary Labs will be deleted
+  Bugfixes:
+    - Passengers in Rockets that are launched while the Player is inside a Sandbox would crash
+    - Various fixes related to the Space Exploration Planetary Lab
+---------------------------------------------------------------------------------------------------
 Version: 1.0.2
 Date: 2022-04-03
   Bugfixes:

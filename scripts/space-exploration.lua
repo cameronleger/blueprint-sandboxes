@@ -17,16 +17,39 @@ function SpaceExploration.IsPlanetarySandbox(surface)
             and not global.seSurfaces[surface.name].orbital
 end
 
+-- Whether the Zone is Star
+function SpaceExploration.IsStar(zoneName)
+    if not SpaceExploration.enabled then
+        return false
+    end
+    return remote.call(SpaceExploration.name, "get_zone_from_name", {
+        zone_name = zoneName,
+    }).type == "star"
+end
+
+-- Ask Space Exploration for the Player's current Character
+function SpaceExploration.GetPlayerCharacter(player)
+    if not SpaceExploration.enabled then
+        return
+    end
+    return remote.call(SpaceExploration.name, "get_player_character", {
+        player = player,
+    })
+end
+
 -- Chooses a non-home-system Star for a Force's Space Sandbox, if necessary
 -- Notably, Star _Orbits_ are "usable" Zones, but not Stars themselves
 -- In other words, these should be completely safe and invisible outside of this mod!
-function SpaceExploration.ChooseZoneForForce(player, sandboxForce)
+function SpaceExploration.ChooseZoneForForce(player, sandboxForce, type)
     if not SpaceExploration.enabled then
         return
     end
 
     for _, zone in pairs(remote.call(SpaceExploration.name, "get_zone_index", {})) do
-        if zone.type == "star"
+        if zone.type == type
+                and not zone.is_homeworld
+                and not zone.ruins
+                and not zone.glyph
                 and zone.special_type ~= "homesystem"
                 and not global.seSurfaces[zone.name]
         then
@@ -64,7 +87,7 @@ function SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxFor
 
     local zoneName = global.sandboxForces[sandboxForce.name].sePlanetaryLabZoneName
     if zoneName == nil then
-        zoneName = SpaceExploration.ChooseZoneForForce(player, sandboxForce)
+        zoneName = SpaceExploration.ChooseZoneForForce(player, sandboxForce, "moon")
         global.sandboxForces[sandboxForce.name].sePlanetaryLabZoneName = zoneName
         global.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
@@ -86,7 +109,7 @@ function SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce
 
     local zoneName = global.sandboxForces[sandboxForce.name].seOrbitalSandboxZoneName
     if zoneName == nil then
-        zoneName = SpaceExploration.ChooseZoneForForce(player, sandboxForce)
+        zoneName = SpaceExploration.ChooseZoneForForce(player, sandboxForce, "star")
         global.sandboxForces[sandboxForce.name].seOrbitalSandboxZoneName = zoneName
         global.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
@@ -118,7 +141,7 @@ function SpaceExploration.Reset(player)
 end
 
 -- Delete a Space Sandbox and return it to the available Zones
-function SpaceExploration.DeleteSandbox(zoneName)
+function SpaceExploration.DeleteSandbox(sandboxForceData, zoneName)
     if not SpaceExploration.enabled or not zoneName then
         return
     end
@@ -126,6 +149,12 @@ function SpaceExploration.DeleteSandbox(zoneName)
     if global.seSurfaces[zoneName] then
         Debug.log("Deleting SE Sandbox: " .. zoneName)
         global.seSurfaces[zoneName] = nil
+        if sandboxForceData.sePlanetaryLabZoneName == zoneName then
+            sandboxForceData.sePlanetaryLabZoneName = nil
+        end
+        if sandboxForceData.seOrbitalSandboxZoneName == zoneName then
+            sandboxForceData.seOrbitalSandboxZoneName = nil
+        end
         game.delete_surface(zoneName)
         return true
     else

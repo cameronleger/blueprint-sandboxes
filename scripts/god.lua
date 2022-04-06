@@ -40,13 +40,8 @@ end
 function God.Revive(entity)
     if entity.valid then
         if entity.type == "tile-ghost" then
-            -- Tiles are simple Revives (outside of SE)
-            local shouldRaiseRevive = true
-            if SpaceExploration.IsPlanetarySandbox(entity.surface) then
-                -- Otherwise
-                shouldRaiseRevive = false
-            end
-            entity.revive({ raise_revive = shouldRaiseRevive })
+            -- Tiles are simple Revives
+            entity.revive({ raise_revive = true })
         elseif entity.type == "entity-ghost" then
             -- Entities might also want Items after Reviving
             _, revived, request = entity.silent_revive({

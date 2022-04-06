@@ -52,8 +52,8 @@ function Init.MergeForce(oldForceName, newForce)
 
     -- Delete the old Force-related Surfaces/Forces
     Lab.DeleteLab(oldSandboxForceData.labName)
-    SpaceExploration.DeleteSandbox(oldSandboxForceData.sePlanetaryLabZoneName)
-    SpaceExploration.DeleteSandbox(oldSandboxForceData.seOrbitalSandboxZoneName)
+    SpaceExploration.DeleteSandbox(oldSandboxForceData, oldSandboxForceData.sePlanetaryLabZoneName)
+    SpaceExploration.DeleteSandbox(oldSandboxForceData, oldSandboxForceData.seOrbitalSandboxZoneName)
     if oldSandboxForce then
         Debug.log("Init.MergeForce must merge Sandbox Forces: " .. oldSandboxForce.name .. " -> " .. newForceData.sandboxForceName)
         game.merge_forces(oldSandboxForce, newForceData.sandboxForceName)
