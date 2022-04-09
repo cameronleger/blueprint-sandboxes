@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 010003
+Migrate.version = 010100
 
 function Migrate.Run()
     if not global.version then
@@ -9,6 +9,7 @@ function Migrate.Run()
 
     if global.version < Migrate.version then
         if global.version < 010003 then Migrate.v1_0_3() end
+        if global.version < 010100 then Migrate.v1_1_0() end
     end
 
     global.version = Migrate.version
@@ -64,6 +65,25 @@ function Migrate.v1_0_3()
     end
 
     Debug.log("Migration 1.0.3 Finished")
+end
+
+function Migrate.v1_1_0()
+    --[[
+    A "persistent" Sandbox Inventory was created for each Player.
+    ]]
+
+    Debug.log("Migration 1.1.0 Starting")
+
+    for index, player in pairs(game.players) do
+        local playerData = global.players[index]
+        playerData.sandboxInventory = game.create_inventory(#player.get_main_inventory())
+        if playerData.insideSandbox ~= nil then
+            Debug.log("Player inside Sandbox, fully-syncing the inventory.")
+            God.StoreInventory(player)
+        end
+    end
+
+    Debug.log("Migration 1.1.0 Finished")
 end
 
 return Migrate

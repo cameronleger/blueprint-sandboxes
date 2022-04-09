@@ -97,6 +97,35 @@ function God.Upgrade(entity)
     end
 end
 
+-- Ensure the God's Inventory is kept in-sync
+function God.OnInventoryChanged(event)
+    local player = game.players[event.player_index]
+    local playerData = global.players[event.player_index]
+    if playerData.insideSandbox ~= nil then
+        God.StoreInventory(player)
+    end
+end
+
+-- Sync the God's Inventory
+function God.StoreInventory(player)
+    local playerData = global.players[player.index]
+    local inventory = player.get_main_inventory()
+    playerData.sandboxInventory.resize(#inventory)
+    for i = 1, #inventory do
+        playerData.sandboxInventory[i].set_stack(inventory[i])
+    end
+end
+
+-- Load the God's Inventory
+function God.RestoreInventory(player)
+    local playerData = global.players[player.index]
+    local inventory = player.get_main_inventory()
+    playerData.sandboxInventory.resize(#inventory)
+    for i = 1, #inventory do
+        inventory[i].set_stack(playerData.sandboxInventory[i])
+    end
+end
+
 -- Ensure newly-crafted Items are put into the Cursor for use
 function God.OnPlayerCraftedItem(event)
     local player = game.players[event.player_index]
@@ -221,7 +250,6 @@ function God.HandleSandboxRequests(surfaces)
                 God.Revive(request)
             end
 
-            Debug.log("Handled Requests: " .. surfaceName .. " = " .. requestsHandled)
             if requestsHandled == 0 then
                 surfaceData.hasRequests = false
             end

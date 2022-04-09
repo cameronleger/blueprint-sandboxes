@@ -110,6 +110,7 @@ function Init.Player(player)
         labName = playerLabName,
         sandboxForceName = sandboxForceName,
         selectedSandbox = Sandbox.player,
+        sandboxInventory = game.create_inventory(#player.get_main_inventory()),
         insideSandbox = nil,
     }
     ToggleGUI.Init(player)

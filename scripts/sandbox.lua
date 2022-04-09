@@ -105,6 +105,7 @@ function Sandbox.Enter(player)
     playerData.preSandboxSurfaceName = player.surface.name
 
     player.set_controller({ type = defines.controllers.god })
+    God.RestoreInventory(player)
     player.teleport({ 0, 0 }, surface)
     player.cheat_mode = true
     player.force = sandboxForce
