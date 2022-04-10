@@ -110,6 +110,12 @@ end
 function God.StoreInventory(player)
     local playerData = global.players[player.index]
     local inventory = player.get_main_inventory()
+    if not inventory then
+        return
+    end
+    if not playerData.sandboxInventory then
+        playerData.sandboxInventory = game.create_inventory(#inventory)
+    end
     playerData.sandboxInventory.resize(#inventory)
     for i = 1, #inventory do
         playerData.sandboxInventory[i].set_stack(inventory[i])
@@ -120,6 +126,12 @@ end
 function God.RestoreInventory(player)
     local playerData = global.players[player.index]
     local inventory = player.get_main_inventory()
+    if not inventory then
+        return
+    end
+    if not playerData.sandboxInventory then
+        playerData.sandboxInventory = game.create_inventory(#inventory)
+    end
     playerData.sandboxInventory.resize(#inventory)
     for i = 1, #inventory do
         inventory[i].set_stack(playerData.sandboxInventory[i])

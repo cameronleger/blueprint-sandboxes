@@ -110,7 +110,7 @@ function Init.Player(player)
         labName = playerLabName,
         sandboxForceName = sandboxForceName,
         selectedSandbox = Sandbox.player,
-        sandboxInventory = game.create_inventory(#player.get_main_inventory()),
+        sandboxInventory = nil,
         insideSandbox = nil,
     }
     ToggleGUI.Init(player)
@@ -118,6 +118,7 @@ end
 
 -- Reset all Mod data
 function Init.FirstTimeInit()
+    global.version = Migrate.version
     global.forces = {}
     global.players = {}
     global.labSurfaces = {}
