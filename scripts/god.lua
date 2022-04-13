@@ -41,7 +41,7 @@ function God.Revive(entity)
     if entity.valid then
         if entity.type == "tile-ghost" then
             -- Tiles are simple Revives
-            entity.revive({ raise_revive = true })
+            entity.silent_revive({ raise_revive = true })
         elseif entity.type == "entity-ghost" then
             -- Entities might also want Items after Reviving
             _, revived, request = entity.silent_revive({

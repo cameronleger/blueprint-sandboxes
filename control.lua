@@ -81,6 +81,7 @@ end)
 
 script.on_event(defines.events.on_research_finished, Research.OnResearched)
 script.on_event(defines.events.on_research_reversed, Research.OnResearched)
+script.on_event(defines.events.on_research_started, Research.OnResearchStarted)
 
 script.on_event(defines.events.on_player_changed_surface, function(event)
     local player = game.players[event.player_index]

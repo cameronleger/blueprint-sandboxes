@@ -14,6 +14,21 @@ function Research.Sync(originalForce, sandboxForce)
     end
 end
 
+-- Set a Force's Sandboxes Research Queue equal to that of the Force's
+function Research.SyncQueue(originalForce, sandboxForce)
+    if settings.global[Settings.allowAllTech].value then
+        sandboxForce.research_queue = nil
+        Debug.log("Emptying Research Queue for: " .. sandboxForce.name)
+    else
+        local newQueue = {}
+        for _, tech in pairs(originalForce.research_queue) do
+            table.insert(newQueue, tech.name)
+        end
+        sandboxForce.research_queue = newQueue
+        Debug.log("Copied Research Queue from: " .. originalForce.name .. " -> " .. sandboxForce.name)
+    end
+end
+
 -- Enable the Infinity Input/Output Recipes
 function Research.EnableSandboxSpecificResearch(force)
     if global.sandboxForces[force.name].hiddenItemsUnlocked == true then
@@ -41,6 +56,7 @@ function Research.SyncAllForces()
             local sandboxForce = game.forces[Sandbox.NameFromForce(force)]
             if sandboxForce then
                 Research.Sync(force, sandboxForce)
+                Research.SyncQueue(force, sandboxForce)
             end
         end
     end
@@ -55,6 +71,22 @@ function Research.OnResearched(event)
             if sandboxForce then
                 Debug.log("New Research: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
                 sandboxForce.technologies[event.research.name].researched = force.technologies[event.research.name].researched
+                sandboxForce.play_sound { path = "utility/research_completed" }
+                Research.SyncQueue(force, sandboxForce)
+            end
+        end
+    end
+end
+
+-- As a Force's Research Queue changes, show it in the Force's Sandboxes
+function Research.OnResearchStarted(event)
+    if not settings.global[Settings.allowAllTech].value then
+        local force = event.research.force
+        if not Sandbox.IsSandboxForce(force) then
+            local sandboxForce = game.forces[Sandbox.NameFromForce(force)]
+            if sandboxForce then
+                Debug.log("New Research Queued: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
+                Research.SyncQueue(force, sandboxForce)
             end
         end
     end
