@@ -142,7 +142,10 @@ end
 function God.OnPlayerCraftedItem(event)
     local player = game.players[event.player_index]
     local playerData = global.players[event.player_index]
-    if playerData.insideSandbox ~= nil and player.cursor_stack then
+    if playerData.insideSandbox ~= nil
+            and player.cursor_stack
+            and player.mod_settings[Settings.craftToCursor].value
+    then
         event.item_stack.count = event.item_stack.prototype.stack_size
         player.cursor_stack.clear()
         player.cursor_stack.transfer_stack(event.item_stack)

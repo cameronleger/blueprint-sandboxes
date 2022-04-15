@@ -2,6 +2,7 @@ local Settings = {}
 
 Settings.scanSandboxes = BPSB.pfx .. "scan-all-chunks"
 Settings.allowAllTech = BPSB.pfx .. "allow-all-technology"
+Settings.craftToCursor = BPSB.pfx .. "craft-to-cursor"
 Settings.godAsyncTick = BPSB.pfx .. "god-async-tick"
 Settings.godAsyncCreateRequestsPerTick = BPSB.pfx .. "god-async-create-per-tick"
 Settings.godAsyncUpgradeRequestsPerTick = BPSB.pfx .. "god-async-upgrade-per-tick"
