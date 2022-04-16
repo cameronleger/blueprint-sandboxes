@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2022-04-16
+  Changes:
+    - Loaders will only be "owned" by this Mod if no other Mod has already activated them in the data stage
+    - More Item Requests can be automatically handled within Sandboxes
+  Bugfixes:
+    - Entering a Sandbox with the Editor Extensions Mod loaded would give the Player too many capabilities outside of the Sandbox (but not within)
+---------------------------------------------------------------------------------------------------
 Version: 1.3.0
 Date: 2022-04-15
   Changes:

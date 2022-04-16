@@ -107,8 +107,8 @@ function Sandbox.Enter(player)
     player.set_controller({ type = defines.controllers.god })
     God.RestoreInventory(player)
     player.teleport({ 0, 0 }, surface)
-    player.cheat_mode = true
     player.force = sandboxForce
+    player.cheat_mode = true
 
     -- TODO: It's unclear why this must happen _after_ the above code
     Research.EnableSandboxSpecificResearch(sandboxForce)

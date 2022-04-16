@@ -2,9 +2,11 @@
 local God = {}
 
 -- Whether the Entity or Tile is a Ghost (can be revived)
-function God.IsGhost(entity)
+function God.IsCreatable(entity)
     return entity.valid
-            and (entity.type == "tile-ghost" or entity.type == "entity-ghost")
+            and (entity.type == "tile-ghost"
+            or entity.type == "entity-ghost"
+            or entity.type == "item-request-proxy")
 end
 
 -- Immediately destroy an Entity (and perhaps related Entities)
@@ -36,31 +38,40 @@ function God.Destroy(entity)
     end
 end
 
+-- Immediately Insert an Entity's Requests
+function God.InsertRequests(entity)
+    if entity.valid
+            and entity.type == "item-request-proxy" then
+        -- Insert any Requested Items (like Modules, Fuel)
+        for name, count in pairs(entity.item_requests) do
+            entity.proxy_target.insert({
+                name = name,
+                count = count,
+            })
+        end
+        entity.destroy()
+    end
+end
+
 -- Immediately Revive a Ghost Entity
-function God.Revive(entity)
+function God.Create(entity)
     if entity.valid then
         if entity.type == "tile-ghost" then
             -- Tiles are simple Revives
             entity.silent_revive({ raise_revive = true })
+        elseif entity.type == "item-request-proxy" then
+            -- Requests are simple
+            God.InsertRequests(entity)
         elseif entity.type == "entity-ghost" then
             -- Entities might also want Items after Reviving
-            _, revived, request = entity.silent_revive({
+            local _, revived, request = entity.silent_revive({
                 return_item_request_proxy = true,
                 raise_revive = true
             })
 
-            if not revived then return end
+            if not revived or not request then return end
 
-            -- Insert any Requested Items (like Modules, Fuel)
-            if request then
-                for name, count in pairs(request.item_requests) do
-                    request.proxy_target.insert({
-                        name = name,
-                        count = count,
-                    })
-                end
-                request.destroy()
-            end
+            God.InsertRequests(request)
         end
     end
 end
@@ -161,6 +172,7 @@ end
 
 -- Ensure new Orders are handled
 function God.OnMarkedForDeconstruct(event)
+    -- Debug.log("Entity Deconstructing: " .. event.entity.unit_number .. " " .. event.entity.type)
     if Lab.IsLab(event.entity.surface) then
         God.HandlerWrapper(
                 Settings.godAsyncDeleteRequestsPerTick,
@@ -180,6 +192,7 @@ end
 
 -- Ensure new Orders are handled
 function God.OnMarkedForUpgrade(event)
+    -- Debug.log("Entity Upgrading: " .. event.entity.unit_number .. " " .. event.entity.type)
     if Lab.IsLab(event.entity.surface) then
         God.HandlerWrapper(
                 Settings.godAsyncUpgradeRequestsPerTick,
@@ -199,21 +212,22 @@ end
 
 -- Ensure new Ghosts are handled
 function God.OnBuiltEntity(event)
-    if not God.IsGhost(event.created_entity) then
+    -- Debug.log("Entity Creating: " .. event.created_entity.unit_number .. " " .. event.created_entity.type)
+    if not God.IsCreatable(event.created_entity) then
         return
     end
     if Lab.IsLab(event.created_entity.surface) then
         God.HandlerWrapper(
                 Settings.godAsyncCreateRequestsPerTick,
                 global.labSurfaces,
-                God.Revive,
+                God.Create,
                 event.created_entity
         )
     elseif SpaceExploration.IsSandbox(event.created_entity.surface) then
         God.HandlerWrapper(
                 Settings.godAsyncCreateRequestsPerTick,
                 global.seSurfaces,
-                God.Revive,
+                God.Create,
                 event.created_entity
         )
     end
@@ -253,7 +267,7 @@ function God.HandleSandboxRequests(surfaces)
             })
             for _, request in pairs(requestedRevives) do
                 requestsHandled = requestsHandled + 1
-                God.Revive(request)
+                God.Create(request)
             end
 
             requestedRevives = surface.find_entities_filtered({
@@ -262,7 +276,16 @@ function God.HandleSandboxRequests(surfaces)
             })
             for _, request in pairs(requestedRevives) do
                 requestsHandled = requestsHandled + 1
-                God.Revive(request)
+                God.Create(request)
+            end
+
+            local requestedInserts = surface.find_entities_filtered({
+                type = "item-request-proxy",
+                limit = createRequestsPerTick,
+            })
+            for _, request in pairs(requestedInserts) do
+                requestsHandled = requestsHandled + 1
+                God.Create(request)
             end
 
             if requestsHandled == 0 then

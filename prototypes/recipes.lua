@@ -1,3 +1,5 @@
+Resources = require("scripts.resources")
+
 -- New Group for New Recipes
 data:extend({
     {
@@ -20,26 +22,10 @@ data:extend({
         group = BPSB.name,
         order = "b[infinity]",
     },
-})
-
-function createLockedRecipeForHiddenItem(name)
-    return
     {
-        type = "recipe",
-        name = BPSB.pfx .. name,
-        energy_required = 1,
-        enabled = false,
-        ingredients = {},
-        result = name,
-    }
-end
-
--- Recipes for hidden/infinity items, only unlocked in Lab
-data:extend({
-    createLockedRecipeForHiddenItem("loader"),
-    createLockedRecipeForHiddenItem("fast-loader"),
-    createLockedRecipeForHiddenItem("express-loader"),
-    createLockedRecipeForHiddenItem("electric-energy-interface"),
-    createLockedRecipeForHiddenItem("infinity-chest"),
-    createLockedRecipeForHiddenItem("infinity-pipe"),
+        type = "item-subgroup",
+        name = Resources.name,
+        group = BPSB.name,
+        order = "c[resources]",
+    },
 })

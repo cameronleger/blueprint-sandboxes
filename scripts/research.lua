@@ -35,17 +35,23 @@ function Research.EnableSandboxSpecificResearch(force)
         return
     end
     Debug.log("Unlocking hidden Recipes for: " .. force.name)
+
+    if force.recipes[BPSB.pfx .. "loader"] then
+        force.recipes[BPSB.pfx .. "loader"].enabled = true
+        force.recipes[BPSB.pfx .. "fast-loader"].enabled = true
+        force.recipes[BPSB.pfx .. "express-loader"].enabled = true
+    end
+
     force.recipes[BPSB.pfx .. "electric-energy-interface"].enabled = true
     force.recipes[BPSB.pfx .. "infinity-chest"].enabled = true
     force.recipes[BPSB.pfx .. "infinity-pipe"].enabled = true
-    force.recipes[BPSB.pfx .. "loader"].enabled = true
-    force.recipes[BPSB.pfx .. "fast-loader"].enabled = true
-    force.recipes[BPSB.pfx .. "express-loader"].enabled = true
+
     for name, recipe in pairs(force.recipes) do
         if Resources.IsResourcePlanner(name) then
             recipe.enabled = true
         end
     end
+
     global.sandboxForces[force.name].hiddenItemsUnlocked = true
 end
 
