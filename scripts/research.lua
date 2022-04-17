@@ -9,6 +9,7 @@ function Research.Sync(originalForce, sandboxForce)
     else
         for tech, _ in pairs(game.technology_prototypes) do
             sandboxForce.technologies[tech].researched = originalForce.technologies[tech].researched
+            sandboxForce.technologies[tech].level = originalForce.technologies[tech].level
         end
         Debug.log("Copied all Research from: " .. originalForce.name .. " -> " .. sandboxForce.name)
     end
@@ -77,6 +78,7 @@ function Research.OnResearched(event)
             if sandboxForce then
                 Debug.log("New Research: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
                 sandboxForce.technologies[event.research.name].researched = force.technologies[event.research.name].researched
+                sandboxForce.technologies[event.research.name].level = force.technologies[event.research.name].level
                 sandboxForce.play_sound { path = "utility/research_completed" }
                 Research.SyncQueue(force, sandboxForce)
             end

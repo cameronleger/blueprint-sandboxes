@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 010101
+Migrate.version = 010401
 
 function Migrate.Run()
     if not global.version then
@@ -10,6 +10,7 @@ function Migrate.Run()
     if global.version < Migrate.version then
         if global.version < 010003 then Migrate.v1_0_3() end
         if global.version < 010100 then Migrate.v1_1_0() end
+        if global.version < 010401 then Migrate.v1_4_1() end
     end
 
     global.version = Migrate.version
@@ -84,6 +85,18 @@ function Migrate.v1_1_0()
     end
 
     Debug.log("Migration 1.1.0 Finished")
+end
+
+function Migrate.v1_4_1()
+    --[[
+    The levels for level-based Research wasn't being synchronized.
+    ]]
+
+    Debug.log("Migration 1.4.1 Starting")
+
+    Research.SyncAllForces()
+
+    Debug.log("Migration 1.4.1 Finished")
 end
 
 return Migrate
