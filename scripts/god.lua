@@ -41,7 +41,8 @@ end
 -- Immediately Insert an Entity's Requests
 function God.InsertRequests(entity)
     if entity.valid
-            and entity.type == "item-request-proxy" then
+            and entity.type == "item-request-proxy"
+            and entity.proxy_target then
         -- Insert any Requested Items (like Modules, Fuel)
         for name, count in pairs(entity.item_requests) do
             entity.proxy_target.insert({
