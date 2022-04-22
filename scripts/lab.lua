@@ -108,6 +108,14 @@ function Lab.Equip(surface)
     }
     bigPole.minable = true
 
+    trashCan = surface.create_entity {
+        name = "infinity-chest",
+        position = { 0, 2 },
+        force = surfaceData.sandboxForceName,
+    }
+    trashCan.remove_unfiltered_items = true
+    trashCan.minable = true
+
     return true
 end
 

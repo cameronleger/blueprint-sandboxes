@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.5.0
+Date: 2022-04-21
+  Changes:
+    - Bonus Inventory Slots for Sandboxes Setting
+    - Prevent Sandbox Inventories from becoming full by spilling their last slot
+    - Provide a "Trash can" in new Sandboxes
+---------------------------------------------------------------------------------------------------
 Version: 1.4.2
 Date: 2022-04-18
   Bugfixes:

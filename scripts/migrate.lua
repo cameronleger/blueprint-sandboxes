@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 010402
+Migrate.version = 010500
 
 function Migrate.Run()
     if not global.version then
@@ -11,6 +11,7 @@ function Migrate.Run()
         if global.version < 010003 then Migrate.v1_0_3() end
         if global.version < 010100 then Migrate.v1_1_0() end
         if global.version < 010401 then Migrate.v1_4_1() end
+        if global.version < 010500 then Migrate.v1_5_0() end
     end
 
     global.version = Migrate.version
@@ -97,6 +98,18 @@ function Migrate.v1_4_1()
     Research.SyncAllForces()
 
     Debug.log("Migration 1.4.1 Finished")
+end
+
+function Migrate.v1_5_0()
+    --[[
+    Bonus Slots for Sandbox Force Inventories were added.
+    ]]
+
+    Debug.log("Migration 1.5.0 Starting")
+
+    Force.SyncAllForces()
+
+    Debug.log("Migration 1.5.0 Finished")
 end
 
 return Migrate

@@ -114,7 +114,22 @@ function God.OnInventoryChanged(event)
     local player = game.players[event.player_index]
     local playerData = global.players[event.player_index]
     if playerData.insideSandbox ~= nil then
+        God.PruneInventory(player)
         God.StoreInventory(player)
+    end
+end
+
+-- Ensure the God's Inventory isn't full
+function God.PruneInventory(player)
+    local inventory = player.get_main_inventory()
+    if not inventory then
+        return
+    end
+
+    if inventory.count_empty_stacks() == 0 then
+        player.print("Your inventory is almost full. Please throw some items away.")
+        player.surface.spill_item_stack(player.position, inventory[#inventory])
+        inventory[#inventory].clear()
     end
 end
 

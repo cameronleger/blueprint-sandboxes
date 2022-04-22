@@ -17,6 +17,15 @@ data:extend({
         default_value = false,
     },
     {
+        type = "int-setting",
+        name = Settings.bonusInventorySlots,
+        setting_type = "runtime-global",
+        order = "a[common]-c",
+        default_value = 30,
+        minimum_value = 0,
+        maximum_value = 300,
+    },
+    {
         type = "bool-setting",
         name = Settings.craftToCursor,
         setting_type = "runtime-per-user",

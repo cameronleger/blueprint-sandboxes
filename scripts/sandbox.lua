@@ -89,7 +89,7 @@ function Sandbox.Enter(player)
 
     SpaceExploration.ExitRemoteView(player)
 
-    local sandboxForce = Init.GetOrCreateSandboxForce(game.forces[playerData.forceName])
+    local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
     local surface = Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     if surface == nil then
         Debug.log("Completely Unknown Sandbox Surface, cannot use")
@@ -97,6 +97,7 @@ function Sandbox.Enter(player)
     end
     Debug.log("Entering Sandbox: " .. surface.name)
 
+    -- Store the Player's previous State (that must be referenced to Exit)
     playerData.insideSandbox = playerData.selectedSandbox
     playerData.preSandboxForceName = player.force.name
     playerData.preSandboxCharacter = player.character
@@ -104,14 +105,24 @@ function Sandbox.Enter(player)
     playerData.preSandboxPosition = player.position
     playerData.preSandboxSurfaceName = player.surface.name
 
+    -- Harmlessly detach the Player from their Character
     player.set_controller({ type = defines.controllers.god })
-    God.RestoreInventory(player)
+
+    -- Harmlessly teleport their God-body to the Sandbox
     player.teleport({ 0, 0 }, surface)
+
+    -- Swap to the new Force; it has different bonuses!
     player.force = sandboxForce
+
+    -- Enable Cheat mode _afterwards_, since EditorExtensions will alter the Force (now the Sandbox Force) based on this
     player.cheat_mode = true
 
+    -- Harmlessly ensure our own Recipes are enabled
     -- TODO: It's unclear why this must happen _after_ the above code
     Research.EnableSandboxSpecificResearch(sandboxForce)
+
+    -- Now that everything has taken effect, restoring the Inventory is safe
+    God.RestoreInventory(player)
 end
 
 -- Convert the Player to their previous State, and leave Selected Sandbox
@@ -124,10 +135,16 @@ function Sandbox.Exit(player)
     end
     Debug.log("Exiting Sandbox: " .. player.surface.name)
 
-    player.force = playerData.preSandboxForceName
+    -- Attach the Player back to their original Character (temporarily with _more_ permissions)
     Sandbox.RecoverPlayerCharacter(player, playerData)
+
+    -- Swap to their original Force; bonuses will be smaller now
+    player.force = playerData.preSandboxForceName
+
+    -- Disable Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
     player.cheat_mode = false
 
+    -- Reset the Player's previous State
     playerData.insideSandbox = nil
     playerData.preSandboxForceName = nil
     playerData.preSandboxCharacter = nil
@@ -200,7 +217,7 @@ function Sandbox.Transfer(player)
         return
     end
 
-    local sandboxForce = Init.GetOrCreateSandboxForce(game.forces[playerData.forceName])
+    local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
     local surface = Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     if surface == nil then
         Debug.log("Completely Unknown Sandbox Surface, cannot use")

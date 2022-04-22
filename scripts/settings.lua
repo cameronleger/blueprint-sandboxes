@@ -3,6 +3,7 @@ local Settings = {}
 Settings.scanSandboxes = BPSB.pfx .. "scan-all-chunks"
 Settings.allowAllTech = BPSB.pfx .. "allow-all-technology"
 Settings.craftToCursor = BPSB.pfx .. "craft-to-cursor"
+Settings.bonusInventorySlots = BPSB.pfx .. "bonus-inventory-slots"
 Settings.godAsyncTick = BPSB.pfx .. "god-async-tick"
 Settings.godAsyncCreateRequestsPerTick = BPSB.pfx .. "god-async-create-per-tick"
 Settings.godAsyncUpgradeRequestsPerTick = BPSB.pfx .. "god-async-upgrade-per-tick"
@@ -26,6 +27,8 @@ function Settings.OnRuntimeSettingChanged(event)
         Settings.SetupScanSandboxes()
     elseif event.setting == Settings.allowAllTech then
         Research.SyncAllForces()
+    elseif event.setting == Settings.bonusInventorySlots then
+        Force.SyncAllForces()
     elseif event.setting == Settings.godAsyncTick then
         local newValue = settings.global[Settings.godAsyncTick].value
         script.on_nth_tick(global.lastSettingForAsyncGodTick, nil)

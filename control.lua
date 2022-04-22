@@ -5,6 +5,7 @@ Debug = require("scripts.debug")
 
 -- Required, but not ordered importantly
 Init = require("scripts.init")
+Force = require("scripts.force")
 God = require("scripts.god")
 Lab = require("scripts.lab")
 Migrate = require("scripts.migrate")
@@ -27,7 +28,7 @@ end)
 
 script.on_event(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
-    Init.Force(player.force)
+    Force.Init(player.force)
     Init.Player(player)
 end)
 
@@ -37,7 +38,7 @@ script.on_event(defines.events.on_player_removed, function(event)
 end)
 
 script.on_event(defines.events.on_force_created, function(event)
-    Init.Force(event.force)
+    Force.Init(event.force)
 end)
 
 -- Conditional Event Listeners
@@ -70,13 +71,13 @@ end)
 
 script.on_event(defines.events.on_player_changed_force, function(event)
     local player = game.players[event.player_index]
-    Init.Force(player.force)
+    Force.Init(player.force)
     Sandbox.OnPlayerForceChanged(player)
 end)
 
 script.on_event(defines.events.on_forces_merged, function(event)
-    Init.Force(event.destination)
-    Init.MergeForce(event.source_name, event.destination)
+    Force.Init(event.destination)
+    Force.Merge(event.source_name, event.destination)
 end)
 
 script.on_event(defines.events.on_research_finished, Research.OnResearched)
