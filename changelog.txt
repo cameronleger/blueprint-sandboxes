@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.5.1
+Date: 2022-04-25
+  Changes:
+    - Craft-to-Cursor is smarter about exactly which Item ends up in the Cursor for Recipes with multiple Products
+  Bugfixes:
+    - Crafting a Recipe in a Sandbox that produces a Liquid would crash
+---------------------------------------------------------------------------------------------------
 Version: 1.5.0
 Date: 2022-04-21
   Changes:

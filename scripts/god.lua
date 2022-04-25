@@ -171,6 +171,17 @@ function God.OnPlayerCraftedItem(event)
     local playerData = global.players[event.player_index]
     if playerData.insideSandbox ~= nil
             and player.cursor_stack
+            and player.cursor_stack.valid
+            and event.item_stack.valid
+            and event.item_stack.valid_for_read
+            and event.recipe.valid
+            and (
+                #event.recipe.products == 1
+                or (
+                    event.recipe.prototype.main_product
+                    and event.recipe.prototype.main_product.name == event.item_stack.name
+                )
+            )
             and player.mod_settings[Settings.craftToCursor].value
     then
         event.item_stack.count = event.item_stack.prototype.stack_size
