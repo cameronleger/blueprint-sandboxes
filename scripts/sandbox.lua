@@ -89,6 +89,13 @@ function Sandbox.Enter(player)
 
     SpaceExploration.ExitRemoteView(player)
 
+    if player.stashed_controller_type
+            and player.stashed_controller_type ~= defines.controllers.editor
+    then
+        player.print("You are already detached from your Character, so you cannot enter a Sandbox. Return to your Character first.")
+        return
+    end
+
     local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
     local surface = Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     if surface == nil then
@@ -104,12 +111,26 @@ function Sandbox.Enter(player)
     playerData.preSandboxController = player.controller_type
     playerData.preSandboxPosition = player.position
     playerData.preSandboxSurfaceName = player.surface.name
+    playerData.preSandboxCheatMode = player.cheat_mode
+
+    -- Sometimes a Player has a volatile Inventory that needs restoring later
+    if Inventory.ShouldPersist(playerData.preSandboxController) then
+        playerData.preSandboxInventory = Inventory.Persist(
+                player.get_main_inventory(),
+                playerData.preSandboxInventory
+        )
+    else
+        if playerData.preSandboxInventory then
+            playerData.preSandboxInventory.destroy()
+            playerData.preSandboxInventory = nil
+        end
+    end
 
     -- Harmlessly detach the Player from their Character
     player.set_controller({ type = defines.controllers.god })
 
     -- Harmlessly teleport their God-body to the Sandbox
-    player.teleport({ 0, 0 }, surface)
+    player.teleport(playerData.lastSandboxPositions[surface.name] or { 0, 0 }, surface)
 
     -- Swap to the new Force; it has different bonuses!
     player.force = sandboxForce
@@ -122,7 +143,10 @@ function Sandbox.Enter(player)
     Research.EnableSandboxSpecificResearch(sandboxForce)
 
     -- Now that everything has taken effect, restoring the Inventory is safe
-    God.RestoreInventory(player)
+    Inventory.Restore(
+        playerData.sandboxInventory,
+        player.get_main_inventory()
+    )
 end
 
 -- Convert the Player to their previous State, and leave Selected Sandbox
@@ -135,14 +159,25 @@ function Sandbox.Exit(player)
     end
     Debug.log("Exiting Sandbox: " .. player.surface.name)
 
+    -- Remember where they left off
+    playerData.lastSandboxPositions[player.surface.name] = player.position
+
     -- Attach the Player back to their original Character (temporarily with _more_ permissions)
     Sandbox.RecoverPlayerCharacter(player, playerData)
 
     -- Swap to their original Force; bonuses will be smaller now
     player.force = playerData.preSandboxForceName
 
-    -- Disable Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
-    player.cheat_mode = false
+    -- Toggle Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
+    player.cheat_mode = playerData.preSandboxCheatMode or false
+
+    -- Sometimes a Player is already a God (like in Sandbox), and their Inventory wasn't on a body
+    if Inventory.ShouldPersist(playerData.preSandboxController) then
+        Inventory.Restore(
+                playerData.preSandboxInventory,
+                player.get_main_inventory()
+        )
+    end
 
     -- Reset the Player's previous State
     playerData.insideSandbox = nil
@@ -151,6 +186,11 @@ function Sandbox.Exit(player)
     playerData.preSandboxController = nil
     playerData.preSandboxPosition = nil
     playerData.preSandboxSurfaceName = nil
+    playerData.preSandboxCheatMode = nil
+    if playerData.preSandboxInventory then
+        playerData.preSandboxInventory.destroy()
+        playerData.preSandboxInventory = nil
+    end
 end
 
 -- Ensure the Player has a Character to go back to
@@ -223,8 +263,10 @@ function Sandbox.Transfer(player)
         Debug.log("Completely Unknown Sandbox Surface, cannot use")
         return
     end
+
     Debug.log("Transferring to Sandbox: " .. surface.name)
-    player.teleport({ 0, 0 }, surface)
+    playerData.lastSandboxPositions[player.surface.name] = player.position
+    player.teleport(playerData.lastSandboxPositions[surface.name] or { 0, 0 }, surface)
 
     playerData.insideSandbox = playerData.selectedSandbox
 end

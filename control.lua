@@ -7,6 +7,7 @@ Debug = require("scripts.debug")
 Init = require("scripts.init")
 Force = require("scripts.force")
 God = require("scripts.god")
+Inventory = require("scripts.inventory")
 Lab = require("scripts.lab")
 Migrate = require("scripts.migrate")
 Research = require("scripts.research")
@@ -33,7 +34,14 @@ script.on_event(defines.events.on_player_created, function(event)
 end)
 
 script.on_event(defines.events.on_player_removed, function(event)
-    Lab.DeleteLab(global.players[event.player_index].labName)
+    local playerData = global.players[event.player_index]
+    Lab.DeleteLab(playerData.labName)
+    if playerData.sandboxInventory then
+        playerData.sandboxInventory.destroy()
+    end
+    if playerData.preSandboxInventory then
+        playerData.preSandboxInventory.destroy()
+    end
     global.players[event.player_index] = nil
 end)
 

@@ -114,54 +114,11 @@ function God.OnInventoryChanged(event)
     local player = game.players[event.player_index]
     local playerData = global.players[event.player_index]
     if playerData.insideSandbox ~= nil then
-        God.PruneInventory(player)
-        God.StoreInventory(player)
-    end
-end
-
--- Ensure the God's Inventory isn't full
-function God.PruneInventory(player)
-    local inventory = player.get_main_inventory()
-    if not inventory then
-        return
-    end
-
-    if inventory.count_empty_stacks() == 0 then
-        player.print("Your inventory is almost full. Please throw some items away.")
-        player.surface.spill_item_stack(player.position, inventory[#inventory])
-        inventory[#inventory].clear()
-    end
-end
-
--- Sync the God's Inventory
-function God.StoreInventory(player)
-    local playerData = global.players[player.index]
-    local inventory = player.get_main_inventory()
-    if not inventory then
-        return
-    end
-    if not playerData.sandboxInventory then
-        playerData.sandboxInventory = game.create_inventory(#inventory)
-    end
-    playerData.sandboxInventory.resize(#inventory)
-    for i = 1, #inventory do
-        playerData.sandboxInventory[i].set_stack(inventory[i])
-    end
-end
-
--- Load the God's Inventory
-function God.RestoreInventory(player)
-    local playerData = global.players[player.index]
-    local inventory = player.get_main_inventory()
-    if not inventory then
-        return
-    end
-    if not playerData.sandboxInventory then
-        playerData.sandboxInventory = game.create_inventory(#inventory)
-    end
-    playerData.sandboxInventory.resize(#inventory)
-    for i = 1, #inventory do
-        inventory[i].set_stack(playerData.sandboxInventory[i])
+        Inventory.Prune(player)
+        playerData.sandboxInventory = Inventory.Persist(
+                player.get_main_inventory(),
+                playerData.sandboxInventory
+        )
     end
 end
 

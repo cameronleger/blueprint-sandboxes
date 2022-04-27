@@ -18,6 +18,7 @@ function Init.Player(player)
         selectedSandbox = Sandbox.player,
         sandboxInventory = nil,
         insideSandbox = nil,
+        lastSandboxPositions = {},
     }
     ToggleGUI.Init(player)
 end
