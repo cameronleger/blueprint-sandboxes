@@ -1,6 +1,12 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.6.0
+Version: 1.6.1
 Date: 2022-04-25
+  Changes:
+    - Resource Planners consider the Map Generator's Richness and Resource-specific values when determining how much to place
+    - Resource Planners consider the Bounding Box of the Resource when determining how often to place
+---------------------------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 2022-05-03
   Changes:
     - Last-known-Positions within Sandboxes are persisted so that they can be returned to when swapping between Sandboxes and other Surfaces
     - Cheat-mode is toggled between the previous state and true, instead of reverting back to false

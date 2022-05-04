@@ -5,6 +5,17 @@ Resources.name = BPSB.pfx .. "sandbox-resources"
 Resources.pfx = BPSB.pfx .. "sbr-"
 local pfxLength = string.len(Resources.pfx)
 
+Resources.nameScalar = { default = 1 }
+Resources.nameScalar["crude-oil"] = 1
+Resources.nameScalar["mineral-water"] = 5
+
+Resources.categoryScalar = { default = 1 }
+Resources.categoryScalar["basic-fluid"] = 1
+Resources.categoryScalar["basic-solid"] = 10000
+Resources.categoryScalar["oil"] = 1
+Resources.categoryScalar["hard-resource"] = 8000
+Resources.categoryScalar["kr-quarry"] = 1500
+
 -- Whether the Thing is a Resource Planner
 function Resources.IsResourcePlanner(name)
     return string.sub(name, 1, pfxLength) == Resources.pfx
@@ -15,15 +26,44 @@ function Resources.GetResourceName(name)
     return string.sub(name, pfxLength + 1)
 end
 
+-- Determine the amount to spawn for a Resource Planner
+function Resources.GetResourceAmount(resourceName)
+    local resourcePrototype = game.entity_prototypes[resourceName]
+
+    local nameScalar = Resources.nameScalar[resourceName] or Resources.nameScalar["default"]
+    local categoryScalar = Resources.categoryScalar[resourcePrototype.resource_category] or Resources.categoryScalar["default"]
+
+    local richness = game.surfaces["nauvis"].map_gen_settings.autoplace_controls[resourceName].richness
+    if richness < 0 then richness = 1
+    else richness = math.max(0.5, richness)
+    end
+
+    local normal = resourcePrototype.normal_resource_amount
+    local minimum = resourcePrototype.minimum_resource_amount
+
+    return nameScalar * categoryScalar * richness * math.max(normal, minimum)
+end
+
+-- Determine how often to spawn for a Resource Planner
+function Resources.GetResourceSpacing(resourceName)
+    local box = game.entity_prototypes[resourceName].map_generator_bounding_box
+    return {
+        x = math.max(1, math.ceil(box.right_bottom.x - box.left_top.x)),
+        y = math.max(1, math.ceil(box.right_bottom.y - box.left_top.y)),
+    }
+end
+
 -- Add Resources when a Resource Planner is used
 function Resources.OnAreaSelectedForAdd(event)
     local resourceName = Resources.GetResourceName(event.item)
-    for x = event.area.left_top.x, event.area.right_bottom.x do
-        for y = event.area.left_top.y, event.area.right_bottom.y do
+    local density = Resources.GetResourceAmount(resourceName)
+    local spacing = Resources.GetResourceSpacing(resourceName)
+    for x = event.area.left_top.x, event.area.right_bottom.x, spacing.x do
+        for y = event.area.left_top.y, event.area.right_bottom.y, spacing.y do
             event.surface.create_entity({
                 name = resourceName,
                 position = { x = x, y = y },
-                amount = 100000,
+                amount = density,
                 raise_built = true,
             })
         end
