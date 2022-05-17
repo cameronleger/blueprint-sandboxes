@@ -1,3 +1,3 @@
 BPSB = require("scripts.bpsb")
 
-require("prototypes.recipes-updates")
+require("prototypes.recipes.hidden-vanilla-updates")

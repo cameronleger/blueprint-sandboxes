@@ -1,3 +1,5 @@
 BPSB = require("scripts.bpsb")
 
-require("prototypes.recipes-final-fixes")
+require("prototypes.recipes.hidden-vanilla-final-fixes")
+require("prototypes.recipes.resources-final-fixes")
+require("prototypes.recipes.tiles-final-fixes")

@@ -12,6 +12,7 @@ Lab = require("scripts.lab")
 Migrate = require("scripts.migrate")
 Research = require("scripts.research")
 Resources = require("scripts.resources")
+Tiles = require("scripts.tiles")
 ToggleGUI = require("scripts.toggle-gui")
 
 -- Required by Sandbox
