@@ -51,11 +51,24 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
         pcall(remote.call, "AbandonedRuins", "exclude_surface", labName)
     end
 
-    surface.always_day = true
+    surface.freeze_daytime = true
+    surface.daytime = 0.95
     surface.show_clouds = false
     surface.generate_with_lab_tiles = true
 
     return surface
+end
+
+-- Set a Lab's Daytime to a specific value
+function Lab.SetDayTime(player, surface, daytime)
+    if Lab.IsLab(surface) then
+        surface.freeze_daytime = true
+        surface.daytime = daytime
+        Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
+        return true
+    else
+        return false
+    end
 end
 
 -- Delete a Lab Surface, if present

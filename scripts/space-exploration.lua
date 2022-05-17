@@ -74,7 +74,8 @@ function SpaceExploration.GetOrCreateSurface(zoneName)
             zone_name = zoneName,
         }).index,
     })
-    surface.always_day = true
+    surface.freeze_daytime = true
+    surface.daytime = 0.95
     surface.show_clouds = false
     return surface
 end
@@ -121,6 +122,18 @@ function SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce
     surface.generate_with_lab_tiles = false
 
     return surface
+end
+
+-- Set a Sandbox's Daytime to a specific value
+function SpaceExploration.SetDayTime(player, surface, daytime)
+    if SpaceExploration.IsSandbox(surface) then
+        surface.freeze_daytime = true
+        surface.daytime = daytime
+        Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
+        return true
+    else
+        return false
+    end
 end
 
 -- Reset the Space Sandbox a Player is currently in

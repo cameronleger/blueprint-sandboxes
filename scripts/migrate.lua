@@ -13,9 +13,17 @@ function Migrate.Run()
         if global.version < 010401 then Migrate.v1_4_1() end
         if global.version < 010500 then Migrate.v1_5_0() end
         if global.version < 010600 then Migrate.v1_6_0() end
+        if global.version < 010700 then Migrate.v1_7_0() end
     end
 
     global.version = Migrate.version
+end
+
+function Migrate.RecreateGuis()
+    for _, player in pairs(game.players) do
+        ToggleGUI.Destroy(player)
+        ToggleGUI.Init(player)
+    end
 end
 
 function Migrate.v1_0_3()
@@ -129,6 +137,36 @@ function Migrate.v1_6_0()
     end
 
     Debug.log("Migration 1.6.0 Finished")
+end
+
+function Migrate.v1_7_0()
+    --[[
+    Configurable-per-Sandbox daytime was added.
+    ]]
+
+    Debug.log("Migration 1.7.0 Starting")
+
+    for surfaceName, _ in pairs(global.labSurfaces) do
+        local surface = game.surfaces[surfaceName]
+        if surface then
+            surface.always_day = false
+            surface.freeze_daytime = true
+            surface.daytime = 0.95
+        end
+    end
+
+    for surfaceName, _ in pairs(global.seSurfaces) do
+        local surface = game.surfaces[surfaceName]
+        if surface then
+            surface.always_day = false
+            surface.freeze_daytime = true
+            surface.daytime = 0.95
+        end
+    end
+
+    Migrate.RecreateGuis()
+
+    Debug.log("Migration 1.7.0 Finished")
 end
 
 return Migrate

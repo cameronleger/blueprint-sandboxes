@@ -1,5 +1,6 @@
 -- Required by basically everything immediately
 BPSB = require("scripts.bpsb")
+Events = require("scripts.events")
 Settings = require("scripts.settings")
 Debug = require("scripts.debug")
 
@@ -124,6 +125,19 @@ script.on_event(defines.events.on_player_alt_selected_area, function(event)
     Resources.OnAreaSelected(event, false)
 end)
 
+-- Internal
+
+script.on_event(Events.on_daylight_changed_event, function(event)
+    Debug.log("on_daylight_changed_event from player: " .. event.player_index)
+    for _, player in pairs(game.players) do
+        if player.index ~= event.player_index
+                and player.surface.name == event.surface_name
+        then
+            ToggleGUI.Update(player)
+        end
+    end
+end)
+
 -- Shortcuts
 
 script.on_event(ToggleGUI.toggleShortcut, ToggleGUI.OnToggleShortcut)
@@ -132,4 +146,5 @@ script.on_event(defines.events.on_lua_shortcut, ToggleGUI.OnToggleShortcut)
 -- GUI
 
 script.on_event(defines.events.on_gui_click, ToggleGUI.OnGuiClick)
+script.on_event(defines.events.on_gui_value_changed, ToggleGUI.OnGuiValueChanged)
 script.on_event(defines.events.on_gui_selection_state_changed, ToggleGUI.OnGuiDropdown)

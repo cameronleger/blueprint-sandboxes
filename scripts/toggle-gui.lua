@@ -5,6 +5,7 @@ ToggleGUI.pfx = ToggleGUI.name .. "-"
 ToggleGUI.toggleShortcut = ToggleGUI.pfx .. "sb-toggle-shortcut"
 ToggleGUI.selectedSandboxDropdown = ToggleGUI.pfx .. "selected-sandbox-dropdown"
 ToggleGUI.resetButton = ToggleGUI.pfx .. "reset-button"
+ToggleGUI.daytimeSlider = ToggleGUI.pfx .. "daytime-slider"
 
 function ToggleGUI.Init(player)
     if player.gui.left[ToggleGUI.name] then
@@ -29,6 +30,7 @@ function ToggleGUI.Init(player)
         type = "flow",
         name = "topLineFlow",
         direction = "horizontal",
+        style = BPSB.pfx .. "centered-horizontal-flow",
     }
 
     topLineFlow.add {
@@ -45,36 +47,79 @@ function ToggleGUI.Init(player)
         tooltip = { "gui-description." .. ToggleGUI.selectedSandboxDropdown },
         items = Sandbox.choices,
         selected_index = global.players[player.index].selectedSandbox,
+    }.style.horizontally_stretchable = true
+
+    local daylightFlow = innerFrame.add {
+        type = "flow",
+        name = "daylightFlow",
+        direction = "horizontal",
+        style = BPSB.pfx .. "centered-horizontal-flow",
     }
+
+    daylightFlow.add {
+        type = "sprite",
+        name = ToggleGUI.resetButton,
+        tooltip = { "gui-description." .. ToggleGUI.daytimeSlider },
+        sprite = "utility/select_icon_white",
+        resize_to_sprite = false,
+        style = BPSB.pfx .. "sprite-like-tool-button",
+    }
+
+    daylightFlow.add {
+        type = "slider",
+        name = ToggleGUI.daytimeSlider,
+        value = 0.0,
+        minimum_value = 0.5,
+        maximum_value = 0.975,
+        value_step = 0.025,
+        style = "notched_slider",
+    }.style.horizontally_stretchable = true
 
     ToggleGUI.Update(player)
 end
 
-function ToggleGUI.findDescendantByName(instance, name)
+function ToggleGUI.Destroy(player)
+    if not player.gui.left[ToggleGUI.name] then
+        return
+    end
+    player.gui.left[ToggleGUI.name].destroy()
+end
+
+function ToggleGUI.FindDescendantByName(instance, name)
     for _, child in pairs(instance.children) do
         if child.name == name then
             return child
         end
-        local found = ToggleGUI.findDescendantByName(child, name)
+        local found = ToggleGUI.FindDescendantByName(child, name)
         if found then return found end
     end
 end
 
-function ToggleGUI.findByName(player, name)
-    return ToggleGUI.findDescendantByName(player.gui.left[ToggleGUI.name], name)
+function ToggleGUI.FindByName(player, name)
+    return ToggleGUI.FindDescendantByName(player.gui.left[ToggleGUI.name], name)
 end
 
 function ToggleGUI.Update(player)
-    ToggleGUI.findByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = global.players[player.index].selectedSandbox
+    ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = global.players[player.index].selectedSandbox
 
     if Sandbox.IsSandbox(player.surface) then
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, true)
         player.gui.left[ToggleGUI.name].visible = true
-        ToggleGUI.findByName(player, ToggleGUI.resetButton).enabled = true
+        ToggleGUI.FindByName(player, ToggleGUI.resetButton).enabled = true
+        ToggleGUI.FindByName(player, ToggleGUI.daytimeSlider).slider_value = player.surface.daytime
     else
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, false)
         player.gui.left[ToggleGUI.name].visible = false
-        ToggleGUI.findByName(player, ToggleGUI.resetButton).enabled = false
+        ToggleGUI.FindByName(player, ToggleGUI.resetButton).enabled = false
+    end
+end
+
+function ToggleGUI.OnGuiValueChanged(event)
+    local player = game.players[event.player_index]
+    if event.element.name == ToggleGUI.daytimeSlider then
+        local daytime = event.element.slider_value
+        return Lab.SetDayTime(player, player.surface, daytime)
+                or SpaceExploration.SetDayTime(player, player.surface, daytime)
     end
 end
 

@@ -1,8 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.0
-Date: 2022-05-15
+Date: 2022-05-17
   Changes:
     - New Tile Planners for creating Tiles that might not otherwise be possible, only within Sandboxes
+    - New daylight slider within Sandboxes to alter the daytime on the Sandbox Surface
 ---------------------------------------------------------------------------------------------------
 Version: 1.6.1
 Date: 2022-04-25
