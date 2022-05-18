@@ -38,6 +38,7 @@ data:extend({
     {
         type = "tips-and-tricks-item",
         category = category,
+        tag = "[img=utility/reset_white]",
         name = pfxCategory .. "reset",
         indent = 1,
         order = pfxOrder .. "c",
@@ -46,13 +47,28 @@ data:extend({
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
         },
+        image = BPSB.path .. "/graphics/reset-sandbox.png",
+    },
+    {
+        type = "tips-and-tricks-item",
+        category = category,
+        tag = "[img=utility/select_icon_white]",
+        name = pfxCategory .. "daylight",
+        indent = 1,
+        order = pfxOrder .. "d",
+        dependencies = { pfxCategory .. "introduction" },
+        trigger = {
+            type = "unlock-recipe",
+            recipe = BPSB.pfx .. "electric-energy-interface",
+        },
+        image = BPSB.path .. "/graphics/daylight-slider.png",
     },
     {
         type = "tips-and-tricks-item",
         category = category,
         name = pfxCategory .. "sandbox-force",
         indent = 1,
-        order = pfxOrder .. "d",
+        order = pfxOrder .. "e",
         dependencies = { pfxCategory .. "introduction" },
         trigger = {
             type = "unlock-recipe",
@@ -64,7 +80,7 @@ data:extend({
         category = category,
         name = pfxCategory .. "new-recipes",
         indent = 1,
-        order = pfxOrder .. "e",
+        order = pfxOrder .. "f",
         dependencies = { pfxCategory .. "introduction" },
         trigger = {
             type = "unlock-recipe",
@@ -77,7 +93,7 @@ data:extend({
         category = category,
         name = pfxCategory .. "god-mode",
         indent = 1,
-        order = pfxOrder .. "f",
+        order = pfxOrder .. "g",
         dependencies = { pfxCategory .. "introduction" },
         trigger = {
             type = "unlock-recipe",
@@ -89,7 +105,7 @@ data:extend({
         category = category,
         name = pfxCategory .. "auto-building",
         indent = 1,
-        order = pfxOrder .. "g",
+        order = pfxOrder .. "h",
         dependencies = { pfxCategory .. "introduction" },
         trigger = {
             type = "unlock-recipe",

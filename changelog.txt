@@ -4,6 +4,9 @@ Date: 2022-05-17
   Changes:
     - New Tile Planners for creating Tiles that might not otherwise be possible, only within Sandboxes
     - New daylight slider within Sandboxes to alter the daytime on the Sandbox Surface
+    - Performance improvements related to any built Entities
+  Bugfixes:
+    - When paired with Editor Extensions, if Cheat Mode was already enabled outside of the Sandboxes, it would not be "re-enabled" within the Sandboxes, preventing the use of the additional Recipes within Sandboxes
 ---------------------------------------------------------------------------------------------------
 Version: 1.6.1
 Date: 2022-04-25

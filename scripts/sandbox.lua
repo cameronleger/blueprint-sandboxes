@@ -135,6 +135,11 @@ function Sandbox.Enter(player)
     -- Swap to the new Force; it has different bonuses!
     player.force = sandboxForce
 
+    -- Since the Sandbox might have Cheat Mode enabled, EditorExtensions won't receive an Event for this otherwise
+    if player.cheat_mode then
+        player.cheat_mode = false
+    end
+
     -- Enable Cheat mode _afterwards_, since EditorExtensions will alter the Force (now the Sandbox Force) based on this
     player.cheat_mode = true
 

@@ -1,6 +1,12 @@
 -- Custom Extensions to the God-Controller
 local God = {}
 
+God.onBuiltEntityFilters = {
+    { filter = "type", type = "tile-ghost" },
+    { filter = "type", type = "entity-ghost" },
+    { filter = "type", type = "item-request-proxy" },
+}
+
 -- Whether the Entity or Tile is a Ghost (can be revived)
 function God.IsCreatable(entity)
     return entity.valid
@@ -197,9 +203,6 @@ end
 -- Ensure new Ghosts are handled
 function God.OnBuiltEntity(event)
     -- Debug.log("Entity Creating: " .. event.created_entity.unit_number .. " " .. event.created_entity.type)
-    if not God.IsCreatable(event.created_entity) then
-        return
-    end
     if Lab.IsLab(event.created_entity.surface) then
         God.HandlerWrapper(
                 Settings.godAsyncCreateRequestsPerTick,
