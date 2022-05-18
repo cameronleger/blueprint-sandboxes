@@ -37,6 +37,7 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
     Debug.log("Creating Lab: " .. labName)
     global.labSurfaces[labName] = {
         sandboxForceName = sandboxForce.name,
+        daytime = 0.95,
     }
     surface = game.create_surface(labName, {
         default_enable_all_autoplace_controls = false,
@@ -64,6 +65,7 @@ function Lab.SetDayTime(player, surface, daytime)
     if Lab.IsLab(surface) then
         surface.freeze_daytime = true
         surface.daytime = daytime
+        global.labSurfaces[surface.name].daytime = daytime
         Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
         return true
     else

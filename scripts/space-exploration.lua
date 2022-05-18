@@ -75,7 +75,7 @@ function SpaceExploration.GetOrCreateSurface(zoneName)
         }).index,
     })
     surface.freeze_daytime = true
-    surface.daytime = 0.95
+    surface.daytime = global.seSurfaces[zoneName].daytime
     surface.show_clouds = false
     return surface
 end
@@ -92,6 +92,7 @@ function SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxFor
         global.sandboxForces[sandboxForce.name].sePlanetaryLabZoneName = zoneName
         global.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
+            daytime = 0.95,
             orbital = false,
         }
     end
@@ -114,6 +115,7 @@ function SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce
         global.sandboxForces[sandboxForce.name].seOrbitalSandboxZoneName = zoneName
         global.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
+            daytime = 0.95,
             orbital = true,
         }
     end
@@ -129,6 +131,7 @@ function SpaceExploration.SetDayTime(player, surface, daytime)
     if SpaceExploration.IsSandbox(surface) then
         surface.freeze_daytime = true
         surface.daytime = daytime
+        global.seSurfaces[surface.name].daytime = daytime
         Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
         return true
     else

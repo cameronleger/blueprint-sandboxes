@@ -152,6 +152,7 @@ function Migrate.v1_7_0()
             surface.always_day = false
             surface.freeze_daytime = true
             surface.daytime = 0.95
+            global.labSurfaces[surfaceName].daytime = 0.95
         end
     end
 
@@ -161,6 +162,7 @@ function Migrate.v1_7_0()
             surface.always_day = false
             surface.freeze_daytime = true
             surface.daytime = 0.95
+            global.seSurfaces[surfaceName].daytime = 0.95
         end
     end
 
