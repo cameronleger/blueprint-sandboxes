@@ -9,7 +9,7 @@ Resources.nameScalar = { default = 1 }
 Resources.nameScalar["crude-oil"] = 1
 Resources.nameScalar["mineral-water"] = 5
 
-Resources.categoryScalar = { default = 1 }
+Resources.categoryScalar = { default = 10000 }
 Resources.categoryScalar["basic-fluid"] = 1
 Resources.categoryScalar["basic-solid"] = 10000
 Resources.categoryScalar["oil"] = 1
