@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 010701
+Migrate.version = 010702
 
 function Migrate.Run()
     if not global.version then

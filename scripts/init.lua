@@ -25,6 +25,7 @@ end
 
 -- Reset all Mod data
 function Init.FirstTimeInit()
+    Debug.log("Init.FirstTimeInit")
     global.version = Migrate.version
     global.forces = {}
     global.players = {}

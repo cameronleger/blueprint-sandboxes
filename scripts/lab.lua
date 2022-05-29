@@ -25,13 +25,17 @@ end
 -- Create a new Lab Surface, if necessary
 function Lab.GetOrCreateSurface(labName, sandboxForce)
     local surface = game.surfaces[labName]
-    if surface then
-        return surface
-    end
 
     if not Lab.IsLab({ name = labName }) then
         Debug.log("Not a Lab, won't Create: " .. labName)
         return
+    end
+
+    if surface then
+        if global.labSurfaces[labName] then
+            return surface
+        end
+        Debug.log("Found a Lab Surface, but not the Data; recreating it for safety")
     end
 
     Debug.log("Creating Lab: " .. labName)
@@ -39,10 +43,12 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
         sandboxForceName = sandboxForce.name,
         daytime = 0.95,
     }
-    surface = game.create_surface(labName, {
-        default_enable_all_autoplace_controls = false,
-        cliff_settings = { cliff_elevation_0 = 1024 },
-    })
+    if not surface then
+        surface = game.create_surface(labName, {
+            default_enable_all_autoplace_controls = false,
+            cliff_settings = { cliff_elevation_0 = 1024 },
+        })
+    end
 
     if remote.interfaces["RSO"] then
         pcall(remote.call, "RSO", "ignoreSurface", labName)
