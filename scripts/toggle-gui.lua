@@ -58,7 +58,6 @@ function ToggleGUI.Init(player)
 
     daylightFlow.add {
         type = "sprite",
-        name = ToggleGUI.resetButton,
         tooltip = { "gui-description." .. ToggleGUI.daytimeSlider },
         sprite = "utility/select_icon_white",
         resize_to_sprite = false,

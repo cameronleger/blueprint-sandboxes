@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 010702
+Migrate.version = 010703
 
 function Migrate.Run()
     if not global.version then
@@ -14,6 +14,7 @@ function Migrate.Run()
         if global.version < 010500 then Migrate.v1_5_0() end
         if global.version < 010600 then Migrate.v1_6_0() end
         if global.version < 010700 then Migrate.v1_7_0() end
+        if global.version < 010700 then Migrate.v1_7_3() end
     end
 
     global.version = Migrate.version
@@ -169,6 +170,18 @@ function Migrate.v1_7_0()
     Migrate.RecreateGuis()
 
     Debug.log("Migration 1.7.0 Finished")
+end
+
+function Migrate.v1_7_3()
+    --[[
+    The daylight portrait icon had the same name as the Reset Button.
+    ]]
+
+    Debug.log("Migration 1.7.3 Starting")
+
+    Migrate.RecreateGuis()
+
+    Debug.log("Migration 1.7.3 Finished")
 end
 
 return Migrate
