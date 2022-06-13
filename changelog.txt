@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.7.4
+Date: 2022-06-13
+  Bugfixes:
+    - The migration for 1.7.3 wasn't always applied
+    - The Unlock-all-Technology setting was sometimes reverting gained bonuses
+---------------------------------------------------------------------------------------------------
 Version: 1.7.3
 Date: 2022-05-30
   Bugfixes:

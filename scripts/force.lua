@@ -1,6 +1,7 @@
 -- Managing Forces and their Sandbox Forces
 local Force = {}
 
+-- Properties from the original Force that are synced to the Sandbox Force (in not-all-tech mode)
 Force.syncedProperties = {
     -- "manual_mining_speed_modifier", Forcibly set
     "manual_crafting_speed_modifier",
@@ -97,9 +98,11 @@ function Force.ConfigureSandboxForce(force, sandboxForce)
     force.set_cease_fire(sandboxForce, true)
     sandboxForce.set_cease_fire(force, true)
 
-    -- Sync a few properties just in case
-    for _, property in pairs(Force.syncedProperties) do
-        sandboxForce[property] = force[property]
+    -- Sync a few properties just in case, but only if they should be linked
+    if not settings.global[Settings.allowAllTech].value then
+        for _, property in pairs(Force.syncedProperties) do
+            sandboxForce[property] = force[property]
+        end
     end
 
     -- Counteract Space Exploration's slow Mining Speed for Gods

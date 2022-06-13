@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 010703
+Migrate.version = 010704
 
 function Migrate.Run()
     if not global.version then
@@ -14,7 +14,8 @@ function Migrate.Run()
         if global.version < 010500 then Migrate.v1_5_0() end
         if global.version < 010600 then Migrate.v1_6_0() end
         if global.version < 010700 then Migrate.v1_7_0() end
-        if global.version < 010700 then Migrate.v1_7_3() end
+        if global.version < 010703 then Migrate.v1_7_3() end
+        if global.version < 010704 then Migrate.v1_7_4() end
     end
 
     global.version = Migrate.version
@@ -182,6 +183,26 @@ function Migrate.v1_7_3()
     Migrate.RecreateGuis()
 
     Debug.log("Migration 1.7.3 Finished")
+end
+
+function Migrate.v1_7_4()
+    --[[
+    The 1.7.3 migration wasn't correctly applied to 1.7.x
+    Allow-all-Tech was incorrectly applying the existing Force's bonuses
+    ]]
+
+    Migrate.v1_7_3()
+
+    Debug.log("Migration 1.7.4 Starting")
+
+    if settings.global[Settings.allowAllTech].value then
+        game.print("Blueprint Sandboxes Notice: You had the Unlock-all-Technologies " ..
+                "Setting enabled, but there was a bug pre-1.7.4 that was incorrectly " ..
+                "overriding some of the bonuses from leveled-research. You should " ..
+                "disable, then re-enable this setting in order to fix that.")
+    end
+
+    Debug.log("Migration 1.7.4 Finished")
 end
 
 return Migrate
