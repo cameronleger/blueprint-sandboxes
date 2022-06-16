@@ -99,6 +99,10 @@ function ToggleGUI.FindByName(player, name)
 end
 
 function ToggleGUI.Update(player)
+    if not player.gui.left[ToggleGUI.name] then
+        return
+    end
+
     ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = global.players[player.index].selectedSandbox
 
     if Sandbox.IsSandbox(player.surface) then
