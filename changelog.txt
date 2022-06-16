@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.8.0
+Date: 2022-06-15
+  Changes:
+    - New Setting to prevent non-Admins from Resetting Force-wide Sandboxes in Multiplayer games
+---------------------------------------------------------------------------------------------------
 Version: 1.7.4
 Date: 2022-06-13
   Bugfixes:

@@ -102,9 +102,24 @@ function ToggleGUI.Update(player)
     ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = global.players[player.index].selectedSandbox
 
     if Sandbox.IsSandbox(player.surface) then
+        local playerData = global.players[player.index]
+
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, true)
         player.gui.left[ToggleGUI.name].visible = true
-        ToggleGUI.FindByName(player, ToggleGUI.resetButton).enabled = true
+
+        local resetButton = ToggleGUI.FindByName(player, ToggleGUI.resetButton)
+        if game.is_multiplayer
+                and not player.admin
+                and playerData.selectedSandbox ~= Sandbox.player
+                and settings.global[Settings.onlyAdminsForceReset].value
+        then
+            resetButton.enabled = false
+            resetButton.tooltip = { "gui-description." .. ToggleGUI.resetButton .. "-only-admins" }
+        else
+            resetButton.enabled = true
+            resetButton.tooltip = { "gui-description." .. ToggleGUI.resetButton }
+        end
+
         ToggleGUI.FindByName(player, ToggleGUI.daytimeSlider).slider_value = player.surface.daytime
     else
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, false)

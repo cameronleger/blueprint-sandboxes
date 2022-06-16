@@ -2,6 +2,7 @@ local Settings = {}
 
 Settings.scanSandboxes = BPSB.pfx .. "scan-all-chunks"
 Settings.allowAllTech = BPSB.pfx .. "allow-all-technology"
+Settings.onlyAdminsForceReset = BPSB.pfx .. "only-admins-force-reset"
 Settings.craftToCursor = BPSB.pfx .. "craft-to-cursor"
 Settings.bonusInventorySlots = BPSB.pfx .. "bonus-inventory-slots"
 Settings.godAsyncTick = BPSB.pfx .. "god-async-tick"
@@ -27,6 +28,10 @@ function Settings.OnRuntimeSettingChanged(event)
         Settings.SetupScanSandboxes()
     elseif event.setting == Settings.allowAllTech then
         Research.SyncAllForces()
+    elseif event.setting == Settings.onlyAdminsForceReset then
+        for _, player in pairs(game.players) do
+            ToggleGUI.Update(player)
+        end
     elseif event.setting == Settings.bonusInventorySlots then
         Force.SyncAllForces()
     elseif event.setting == Settings.godAsyncTick then

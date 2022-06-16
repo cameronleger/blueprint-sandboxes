@@ -93,6 +93,16 @@ script.on_event(defines.events.on_forces_merged, function(event)
     Force.Merge(event.source_name, event.destination)
 end)
 
+script.on_event(defines.events.on_player_promoted, function(event)
+    local player = game.players[event.player_index]
+    ToggleGUI.Update(player)
+end)
+
+script.on_event(defines.events.on_player_demoted, function(event)
+    local player = game.players[event.player_index]
+    ToggleGUI.Update(player)
+end)
+
 script.on_event(defines.events.on_research_finished, Research.OnResearched)
 script.on_event(defines.events.on_research_reversed, Research.OnResearched)
 script.on_event(defines.events.on_research_started, Research.OnResearchStarted)
