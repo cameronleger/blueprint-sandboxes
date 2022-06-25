@@ -33,9 +33,13 @@ function Resources.GetResourceAmount(resourceName)
     local nameScalar = Resources.nameScalar[resourceName] or Resources.nameScalar["default"]
     local categoryScalar = Resources.categoryScalar[resourcePrototype.resource_category] or Resources.categoryScalar["default"]
 
-    local richness = game.surfaces["nauvis"].map_gen_settings.autoplace_controls[resourceName].richness
-    if richness < 0 then richness = 1
-    else richness = math.max(0.5, richness)
+    local richness = 1
+    local autoplace_controls = game.surfaces["nauvis"].map_gen_settings.autoplace_controls[resourceName]
+    if autoplace_controls then
+        richness = autoplace_controls.richness
+        if richness < 0 then richness = 1
+        else richness = math.max(0.5, richness)
+        end
     end
 
     local normal = resourcePrototype.normal_resource_amount

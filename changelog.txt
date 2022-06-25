@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.8.2
+Date: 2022-06-24
+  Bugfixes:
+    - Crash when combined with other mods that remove some Autoplace Controls from Nauvis
+---------------------------------------------------------------------------------------------------
 Version: 1.8.1
 Date: 2022-06-16
   Bugfixes:
