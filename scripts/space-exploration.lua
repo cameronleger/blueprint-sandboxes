@@ -54,11 +54,6 @@ function SpaceExploration.ChooseZoneForForce(player, sandboxForce, type)
                 and not global.seSurfaces[zone.name]
         then
             Debug.log("Choosing SE Zone " .. zone.name .. " as Sandbox for " .. sandboxForce.name)
-            remote.call(SpaceExploration.name, "discover_zone", {
-                force_name = sandboxForce.name,
-                zone_name = zone.name,
-                surface = "force-satellite-failures",
-            })
             return zone.name
         end
     end

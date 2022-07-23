@@ -53,7 +53,7 @@ data:extend({
         name = Settings.godAsyncCreateRequestsPerTick,
         setting_type = "runtime-global",
         order = "b[god]-b",
-        default_value = 1000,
+        default_value = 0,
         minimum_value = 0,
         maximum_value = 10000,
     },

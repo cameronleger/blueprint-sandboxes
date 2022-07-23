@@ -1,3 +1,11 @@
+s---------------------------------------------------------------------------------------------------
+Version: 1.8.3
+Date: 2022-07-23
+  Changes:
+    - Space Exploration Core Seams are now exposed as Resource Planners
+    - Creations in Sandboxes are no longer async by default, since Factorio 1.1.61
+  Bugfixes:
+    - Crash with 1.6.x versions of Space Exploration
 ---------------------------------------------------------------------------------------------------
 Version: 1.8.2
 Date: 2022-06-24

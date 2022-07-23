@@ -1,14 +1,18 @@
 PlannerIcons = require("scripts.planner-icons")
 Resources = require("scripts.resources")
 
+local function endsWith(str, ending)
+   return ending == "" or str:sub(-#ending) == ending
+end
+
 -- Helpers for Resource Planners
 function shouldSkipResourcePlanner(resource)
-    return resource.category == "se-core-mining"
+    return (resource.category == "se-core-mining" and endsWith(resource.name, "-sealed"))
 end
 
 function createResourcePlannerPrototypes(resource)
     -- First, find a way to name the Planner based on the mining result
-    local localisedName
+    local localisedName = resource.localised_name
     if resource.minable.result then
         localisedName = { "item-name." .. resource.minable.result }
     elseif resource.minable.results then
