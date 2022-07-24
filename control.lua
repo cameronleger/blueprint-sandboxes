@@ -6,6 +6,7 @@ Debug = require("scripts.debug")
 
 -- Required, but not ordered importantly
 Init = require("scripts.init")
+Chat = require("scripts.chat")
 Force = require("scripts.force")
 God = require("scripts.god")
 Inventory = require("scripts.inventory")
@@ -102,6 +103,8 @@ script.on_event(defines.events.on_player_demoted, function(event)
     local player = game.players[event.player_index]
     ToggleGUI.Update(player)
 end)
+
+script.on_event(defines.events.on_console_chat, Chat.OnChat)
 
 script.on_event(defines.events.on_research_finished, Research.OnResearched)
 script.on_event(defines.events.on_research_reversed, Research.OnResearched)

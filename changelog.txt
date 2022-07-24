@@ -1,4 +1,11 @@
-s---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+Version: 1.9.0
+Date: 2022-07-23
+  Changes:
+    - Proxy chats between Players inside Sandboxes and those outside of Sandboxes
+  Bugfixes:
+    - Space Exploration Core Seams are not exposed as Resource Planners in <= 0.5
+---------------------------------------------------------------------------------------------------
 Version: 1.8.3
 Date: 2022-07-23
   Changes:

@@ -1,13 +1,24 @@
 PlannerIcons = require("scripts.planner-icons")
 Resources = require("scripts.resources")
 
+local function startsWith(str, beginning)
+    return str:sub(1, #beginning) == beginning
+end
+
 local function endsWith(str, ending)
-   return ending == "" or str:sub(-#ending) == ending
+    return ending == "" or str:sub(-#ending) == ending
 end
 
 -- Helpers for Resource Planners
 function shouldSkipResourcePlanner(resource)
-    return (resource.category == "se-core-mining" and endsWith(resource.name, "-sealed"))
+    local skipCoreMining = true
+    if mods["space-exploration"]
+            and startsWith(mods["space-exploration"], "0.6")
+    then
+        skipCoreMining = false
+    end
+    return (resource.category == "se-core-mining" and skipCoreMining)
+            or (resource.category == "se-core-mining" and endsWith(resource.name, "-sealed"))
 end
 
 function createResourcePlannerPrototypes(resource)
