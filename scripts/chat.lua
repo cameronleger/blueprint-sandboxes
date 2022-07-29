@@ -12,7 +12,10 @@ function Chat.OnChat(event)
     if playerData.insideSandbox ~= nil then
         game.forces[playerData.forceName].print(player.name .. ": " .. event.message, player.chat_color)
     else
-        game.forces[playerData.sandboxForceName].print(player.name .. ": " .. event.message, player.chat_color)
+        local sandboxForce = game.forces[playerData.sandboxForceName]
+        if sandboxForce ~= nil then
+            sandboxForce.print(player.name .. ": " .. event.message, player.chat_color)
+        end
     end
 end
 
