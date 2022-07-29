@@ -1,8 +1,8 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.9.1
+Version: 1.9.2
 Date: 2022-07-29
   Bugfixes:
-    - Crash when chatting without ever entering a Sandbox
+    - Non-Admins could not set Filters on Infinity Chests/Pipes
 ---------------------------------------------------------------------------------------------------
 Version: 1.9.0
 Date: 2022-07-23

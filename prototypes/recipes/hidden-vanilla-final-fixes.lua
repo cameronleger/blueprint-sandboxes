@@ -19,3 +19,8 @@ data.raw.item["infinity-chest"].order = "a-b"
 
 data.raw.item["infinity-pipe"].subgroup = BPSB.pfx .. "infinity"
 data.raw.item["infinity-pipe"].order = "a-c"
+
+-- Allow anyone to use Infinity Filters
+data.raw["electric-energy-interface"]["electric-energy-interface"].gui_mode = "all"
+data.raw["infinity-container"]["infinity-chest"].gui_mode = "all"
+data.raw["infinity-pipe"]["infinity-pipe"].gui_mode = "all"
