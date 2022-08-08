@@ -80,7 +80,9 @@ script.on_configuration_changed(function(event)
             Currently, if that same code is used here, the flag will be true,
             but the Recipes are still hidden, so they'll be stuck hidden!
     ]]
+
     Migrate.Run()
+    Research.SyncAllForces()
 end)
 
 script.on_event(defines.events.on_player_changed_force, function(event)
