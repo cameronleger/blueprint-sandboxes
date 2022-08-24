@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 010903
+Migrate.version = 011000
 
 function Migrate.Run()
     if not global.version then
@@ -16,6 +16,7 @@ function Migrate.Run()
         if global.version < 010700 then Migrate.v1_7_0() end
         if global.version < 010703 then Migrate.v1_7_3() end
         if global.version < 010704 then Migrate.v1_7_4() end
+        if global.version < 011000 then Migrate.v1_10_0() end
     end
 
     global.version = Migrate.version
@@ -203,6 +204,29 @@ function Migrate.v1_7_4()
     end
 
     Debug.log("Migration 1.7.4 Finished")
+end
+
+function Migrate.v1_10_0()
+    --[[
+    Internal Queues for Asynchronous Sandbox requests
+    replace the old find_entities_filtered
+    ]]
+
+    Debug.log("Migration 1.10.0 Starting")
+
+    global.asyncCreateQueue = Queue.New()
+    global.asyncUpgradeQueue = Queue.New()
+    global.asyncDestroyQueue = Queue.New()
+
+    for _, surfaceData in pairs(global.labSurfaces) do
+        surfaceData.hasRequests = nil
+    end
+
+    for _, surfaceData in pairs(global.seSurfaces) do
+        surfaceData.hasRequests = nil
+    end
+
+    Debug.log("Migration 1.10.0 Finished")
 end
 
 return Migrate

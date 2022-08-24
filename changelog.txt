@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.10.0
+Date: 2022-08-23
+  Changes:
+    - Asynchronous Sandbox Operations are now maintained in an internal Queue
+    - Factorissimo Factories within Sandboxes are treated similarly to Sandboxes
+  Bugfixes:
+    - Crash with a combination of entering/existing Factorissimo Factories within Sandboxes
+    - Crash after renaming or deleting certain Surfaces in the middle of asynchronous operations
+---------------------------------------------------------------------------------------------------
 Version: 1.9.3
 Date: 2022-08-08
   Bugfixes:

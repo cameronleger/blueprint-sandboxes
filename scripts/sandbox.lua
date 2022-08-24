@@ -87,8 +87,6 @@ function Sandbox.Enter(player)
         return
     end
 
-    SpaceExploration.ExitRemoteView(player)
-
     if player.stashed_controller_type
             and player.stashed_controller_type ~= defines.controllers.editor
     then
@@ -149,8 +147,8 @@ function Sandbox.Enter(player)
 
     -- Now that everything has taken effect, restoring the Inventory is safe
     Inventory.Restore(
-        playerData.sandboxInventory,
-        player.get_main_inventory()
+            playerData.sandboxInventory,
+            player.get_main_inventory()
     )
 end
 
@@ -303,27 +301,44 @@ function Sandbox.OnPlayerForceChanged(player)
     end
 end
 
+-- Determine whether the Player is inside a known Sandbox
+function Sandbox.GetSandboxChoiceFor(player, surface)
+    local playerData = global.players[player.index]
+    if surface.name == playerData.labName then
+        return Sandbox.player
+    elseif surface.name == global.sandboxForces[playerData.sandboxForceName].labName then
+        return Sandbox.force
+    elseif surface.name == global.sandboxForces[playerData.sandboxForceName].seOrbitalSandboxZoneName then
+        return Sandbox.forceOrbitalSandbox
+    elseif surface.name == global.sandboxForces[playerData.sandboxForceName].sePlanetaryLabZoneName then
+        return Sandbox.forcePlanetaryLab
+    elseif Factorissimo.IsFactory(surface) then
+        local outsideSurface = Factorissimo.GetOutsideSurfaceForFactory(
+                Factorissimo.GetAllFactories(),
+                surface,
+                player.position
+        )
+        if outsideSurface then
+            return Sandbox.GetSandboxChoiceFor(player, outsideSurface)
+        end
+    end
+    return nil
+end
+
 -- Update whether the Player is inside a known Sandbox
 function Sandbox.OnPlayerSurfaceChanged(player)
-    local playerData = global.players[player.index]
-    local surfaceName = player.surface.name
-    if surfaceName == playerData.labName then
-        playerData.insideSandbox = Sandbox.player
-    elseif surfaceName == global.sandboxForces[playerData.sandboxForceName].labName then
-        playerData.insideSandbox = Sandbox.force
-    elseif surfaceName == global.sandboxForces[playerData.sandboxForceName].seOrbitalSandboxZoneName then
-        playerData.insideSandbox = Sandbox.forceOrbitalSandbox
-    elseif surfaceName == global.sandboxForces[playerData.sandboxForceName].sePlanetaryLabZoneName then
-        playerData.insideSandbox = Sandbox.forcePlanetaryLab
-    else
-        playerData.insideSandbox = nil
-    end
+    global.players[player.index].insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
 end
 
 -- Enter, Exit, or Transfer a Player across Sandboxes
 function Sandbox.Toggle(player_index)
     local player = game.players[player_index]
     local playerData = global.players[player.index]
+
+    if Factorissimo.IsFactoryInsideSandbox(player.surface, player.position) then
+        player.print("You are inside of a Factory, so you cannot change Sandboxes")
+        return
+    end
 
     if not Sandbox.IsEnabled(playerData.selectedSandbox) then
         playerData.selectedSandbox = Sandbox.player
@@ -336,6 +351,7 @@ function Sandbox.Toggle(player_index)
     elseif playerData.insideSandbox ~= nil then
         Sandbox.Exit(player)
     else
+        SpaceExploration.ExitRemoteView(player)
         Sandbox.Enter(player)
     end
 end

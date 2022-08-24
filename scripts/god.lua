@@ -7,14 +7,6 @@ God.onBuiltEntityFilters = {
     { filter = "type", type = "item-request-proxy" },
 }
 
--- Whether the Entity or Tile is a Ghost (can be revived)
-function God.IsCreatable(entity)
-    return entity.valid
-            and (entity.type == "tile-ghost"
-            or entity.type == "entity-ghost"
-            or entity.type == "item-request-proxy")
-end
-
 -- Immediately destroy an Entity (and perhaps related Entities)
 function God.Destroy(entity)
     if entity.valid
@@ -76,9 +68,9 @@ function God.Create(entity)
                 raise_revive = true
             })
 
-            if not revived or not request then return end
-
-            God.InsertRequests(request)
+            if revived and request then
+                God.InsertRequests(request)
+            end
         end
     end
 end
@@ -139,12 +131,12 @@ function God.OnPlayerCraftedItem(event)
             and event.item_stack.valid_for_read
             and event.recipe.valid
             and (
-                #event.recipe.products == 1
-                or (
+            #event.recipe.products == 1
+                    or (
                     event.recipe.prototype.main_product
-                    and event.recipe.prototype.main_product.name == event.item_stack.name
-                )
+                            and event.recipe.prototype.main_product.name == event.item_stack.name
             )
+    )
             and player.mod_settings[Settings.craftToCursor].value
     then
         event.item_stack.count = event.item_stack.prototype.stack_size
@@ -153,27 +145,28 @@ function God.OnPlayerCraftedItem(event)
     end
 end
 
-function God.HandlerWrapper(setting, surfaceGroup, handler, entity)
-    surfaceGroup[entity.surface.name].hasRequests = true
+function God.AsyncWrapper(setting, queue, handler, entity)
     if settings.global[setting].value == 0 then
         handler(entity)
+    else
+        Queue.Push(queue, entity)
     end
+end
+
+function God.ShouldHandleEntity(entity)
+    return Lab.IsLab(entity.surface)
+            or SpaceExploration.IsSandbox(entity.surface)
+            or (Factorissimo.IsFactory(entity.surface)
+            and Factorissimo.IsFactoryInsideSandbox(entity.surface, entity.position))
 end
 
 -- Ensure new Orders are handled
 function God.OnMarkedForDeconstruct(event)
     -- Debug.log("Entity Deconstructing: " .. event.entity.unit_number .. " " .. event.entity.type)
-    if Lab.IsLab(event.entity.surface) then
-        God.HandlerWrapper(
+    if God.ShouldHandleEntity(event.entity) then
+        God.AsyncWrapper(
                 Settings.godAsyncDeleteRequestsPerTick,
-                global.labSurfaces,
-                God.Destroy,
-                event.entity
-        )
-    elseif SpaceExploration.IsSandbox(event.entity.surface) then
-        God.HandlerWrapper(
-                Settings.godAsyncDeleteRequestsPerTick,
-                global.seSurfaces,
+                global.asyncDestroyQueue,
                 God.Destroy,
                 event.entity
         )
@@ -183,17 +176,10 @@ end
 -- Ensure new Orders are handled
 function God.OnMarkedForUpgrade(event)
     -- Debug.log("Entity Upgrading: " .. event.entity.unit_number .. " " .. event.entity.type)
-    if Lab.IsLab(event.entity.surface) then
-        God.HandlerWrapper(
+    if God.ShouldHandleEntity(event.entity) then
+        God.AsyncWrapper(
                 Settings.godAsyncUpgradeRequestsPerTick,
-                global.labSurfaces,
-                God.Upgrade,
-                event.entity
-        )
-    elseif SpaceExploration.IsSandbox(event.entity.surface) then
-        God.HandlerWrapper(
-                Settings.godAsyncUpgradeRequestsPerTick,
-                global.seSurfaces,
+                global.asyncUpgradeQueue,
                 God.Upgrade,
                 event.entity
         )
@@ -203,17 +189,10 @@ end
 -- Ensure new Ghosts are handled
 function God.OnBuiltEntity(event)
     -- Debug.log("Entity Creating: " .. event.created_entity.unit_number .. " " .. event.created_entity.type)
-    if Lab.IsLab(event.created_entity.surface) then
-        God.HandlerWrapper(
+    if God.ShouldHandleEntity(event.created_entity) then
+        God.AsyncWrapper(
                 Settings.godAsyncCreateRequestsPerTick,
-                global.labSurfaces,
-                God.Create,
-                event.created_entity
-        )
-    elseif SpaceExploration.IsSandbox(event.created_entity.surface) then
-        God.HandlerWrapper(
-                Settings.godAsyncCreateRequestsPerTick,
-                global.seSurfaces,
+                global.asyncCreateQueue,
                 God.Create,
                 event.created_entity
         )
@@ -221,71 +200,52 @@ function God.OnBuiltEntity(event)
 end
 
 -- For each known Sandbox Surface, handle any async God functionality
-function God.HandleSandboxRequests(surfaces)
+function God.HandleAllSandboxRequests(event)
     local createRequestsPerTick = settings.global[Settings.godAsyncCreateRequestsPerTick].value
     local upgradeRequestsPerTick = settings.global[Settings.godAsyncUpgradeRequestsPerTick].value
     local deleteRequestsPerTick = settings.global[Settings.godAsyncDeleteRequestsPerTick].value
-    for surfaceName, surfaceData in pairs(surfaces) do
-        if surfaceData.hasRequests then
-            local surface = game.surfaces[surfaceName]
-            local requestsHandled = 0
 
-            local requestedDeconstructions = surface.find_entities_filtered({
-                to_be_deconstructed = true,
-                limit = deleteRequestsPerTick,
-            })
-            for _, request in pairs(requestedDeconstructions) do
-                requestsHandled = requestsHandled + 1
-                God.Destroy(request)
-            end
-
-            local requestedUpgrades = surface.find_entities_filtered({
-                to_be_upgraded = true,
-                limit = upgradeRequestsPerTick,
-            })
-            for _, request in pairs(requestedUpgrades) do
-                requestsHandled = requestsHandled + 1
-                God.Upgrade(request)
-            end
-
-            local requestedRevives = surface.find_entities_filtered({
-                type = "entity-ghost",
-                limit = createRequestsPerTick,
-            })
-            for _, request in pairs(requestedRevives) do
-                requestsHandled = requestsHandled + 1
-                God.Create(request)
-            end
-
-            requestedRevives = surface.find_entities_filtered({
-                type = "tile-ghost",
-                limit = createRequestsPerTick,
-            })
-            for _, request in pairs(requestedRevives) do
-                requestsHandled = requestsHandled + 1
-                God.Create(request)
-            end
-
-            local requestedInserts = surface.find_entities_filtered({
-                type = "item-request-proxy",
-                limit = createRequestsPerTick,
-            })
-            for _, request in pairs(requestedInserts) do
-                requestsHandled = requestsHandled + 1
-                God.Create(request)
-            end
-
-            if requestsHandled == 0 then
-                surfaceData.hasRequests = false
-            end
-        end
+    local destroyRequestsHandled = 0
+    while Queue.Size(global.asyncDestroyQueue) > 0
+            and deleteRequestsPerTick > 0
+    do
+        God.Destroy(Queue.Pop(global.asyncDestroyQueue))
+        destroyRequestsHandled = destroyRequestsHandled + 1
+        deleteRequestsPerTick = deleteRequestsPerTick - 1
     end
-end
+    if Queue.Size(global.asyncDestroyQueue) == 0
+            and destroyRequestsHandled > 0
+    then
+        global.asyncDestroyQueue = Queue.New()
+    end
 
--- Wrapper for Event Handlers
-function God.HandleAllSandboxRequests(event)
-    God.HandleSandboxRequests(global.labSurfaces)
-    God.HandleSandboxRequests(global.seSurfaces)
+    local upgradeRequestsHandled = 0
+    while Queue.Size(global.asyncUpgradeQueue) > 0
+            and upgradeRequestsPerTick > 0
+    do
+        God.Upgrade(Queue.Pop(global.asyncUpgradeQueue))
+        upgradeRequestsHandled = upgradeRequestsHandled + 1
+        upgradeRequestsPerTick = upgradeRequestsPerTick - 1
+    end
+    if Queue.Size(global.asyncUpgradeQueue) == 0
+            and upgradeRequestsHandled > 0
+    then
+        global.asyncUpgradeQueue = Queue.New()
+    end
+
+    local createRequestsHandled = 0
+    while Queue.Size(global.asyncCreateQueue) > 0
+            and createRequestsPerTick > 0
+    do
+        God.Create(Queue.Pop(global.asyncCreateQueue))
+        createRequestsHandled = createRequestsHandled + 1
+        createRequestsPerTick = createRequestsPerTick - 1
+    end
+    if Queue.Size(global.asyncCreateQueue) == 0
+            and createRequestsHandled > 0
+    then
+        global.asyncCreateQueue = Queue.New()
+    end
 end
 
 -- Charts each Sandbox that a Player is currently inside of

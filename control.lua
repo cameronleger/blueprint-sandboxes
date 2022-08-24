@@ -3,10 +3,12 @@ BPSB = require("scripts.bpsb")
 Events = require("scripts.events")
 Settings = require("scripts.settings")
 Debug = require("scripts.debug")
+Queue = require("scripts.queue")
 
 -- Required, but not ordered importantly
 Init = require("scripts.init")
 Chat = require("scripts.chat")
+Factorissimo = require("scripts.factorissimo")
 Force = require("scripts.force")
 God = require("scripts.god")
 Inventory = require("scripts.inventory")
@@ -126,6 +128,27 @@ end)
 script.on_event(defines.events.on_surface_cleared, function(event)
     return Lab.Equip(game.surfaces[event.surface_index])
             or SpaceExploration.Equip(game.surfaces[event.surface_index])
+end)
+
+script.on_event(defines.events.on_pre_surface_deleted, function(event)
+    local surface = game.surfaces[event.surface_index]
+    if global.labSurfaces[surface.name] then
+        global.labSurfaces[surface.name] = nil
+    end
+    if global.seSurfaces[surface.name] then
+        global.seSurfaces[surface.name] = nil
+    end
+end)
+
+script.on_event(defines.events.on_surface_renamed, function(event)
+    if global.labSurfaces[event.old_name] then
+        global.labSurfaces[event.new_name] = global.labSurfaces[event.old_name]
+        global.labSurfaces[event.old_name] = nil
+    end
+    if global.seSurfaces[event.old_name] then
+        global.seSurfaces[event.new_name] = global.seSurfaces[event.old_name]
+        global.seSurfaces[event.old_name] = nil
+    end
 end)
 
 script.on_event(defines.events.on_marked_for_deconstruction, God.OnMarkedForDeconstruct)

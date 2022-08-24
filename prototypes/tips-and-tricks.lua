@@ -235,3 +235,35 @@ if mods["space-exploration"] then
         },
     })
 end
+
+if mods["factorissimo-2-notnotmelon"] then
+    category = BPSB.pfx .. "factorissimo"
+    pfxCategory = category .. "-"
+    data:extend({
+        {
+            type = "tips-and-tricks-item-category",
+            name = category,
+            order = pfxOrder .. "c",
+        },
+        {
+            type = "tips-and-tricks-item",
+            category = category,
+            tag = "[img=item.factory-1] [img=item-group." .. BPSB.name .. "]",
+            name = pfxCategory .. "introduction",
+            order = pfxOrder .. "a",
+            is_title = true,
+            trigger = {
+                type = "and",
+                triggers = {
+                    {
+                        type = "unlock-recipe",
+                        recipe = BPSB.pfx .. "electric-energy-interface",
+                    }, {
+                        type = "unlock-recipe",
+                        recipe = "factory-1",
+                    }
+                },
+            },
+        },
+    })
+end

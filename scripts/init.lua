@@ -32,6 +32,9 @@ function Init.FirstTimeInit()
     global.labSurfaces = {}
     global.sandboxForces = {}
     global.seSurfaces = {}
+    global.asyncCreateQueue = Queue.New()
+    global.asyncUpgradeQueue = Queue.New()
+    global.asyncDestroyQueue = Queue.New()
     global.lastSettingForAsyncGodTick = settings.global[Settings.godAsyncTick].value
 
     -- Warning: do not rely on this alone; new Saves have no Players/Forces yet
