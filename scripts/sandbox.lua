@@ -38,6 +38,12 @@ function Sandbox.IsSandbox(thingWithName)
             or SpaceExploration.IsSandbox(thingWithName)
 end
 
+-- Whether something is any type of Sandbox
+function Sandbox.IsPlayerInsideSandbox(player)
+    return global.players[player.index].preSandboxPosition ~= nil
+            and Sandbox.IsSandbox(player.surface)
+end
+
 -- Whether a Sandbox choice is allowed
 function Sandbox.IsEnabled(selectedSandbox)
     if selectedSandbox == Sandbox.player then
@@ -82,7 +88,7 @@ end
 function Sandbox.Enter(player)
     local playerData = global.players[player.index]
 
-    if playerData.insideSandbox ~= nil then
+    if Sandbox.IsPlayerInsideSandbox(player) then
         Debug.log("Already inside Sandbox: " .. playerData.insideSandbox)
         return
     end
@@ -156,7 +162,7 @@ end
 function Sandbox.Exit(player)
     local playerData = global.players[player.index]
 
-    if playerData.insideSandbox == nil then
+    if not Sandbox.IsPlayerInsideSandbox(player) then
         Debug.log("Already outside Sandbox")
         return
     end
@@ -255,7 +261,7 @@ end
 function Sandbox.Transfer(player)
     local playerData = global.players[player.index]
 
-    if playerData.insideSandbox == nil then
+    if not Sandbox.IsPlayerInsideSandbox(player) then
         Debug.log("Outside Sandbox, cannot transfer")
         return
     end
@@ -292,7 +298,7 @@ function Sandbox.OnPlayerForceChanged(player)
             labData.sandboxForceName = sandboxForceName
         end
 
-        if playerData.insideSandbox ~= nil then
+        if Sandbox.IsPlayerInsideSandbox(player) then
             player.print("Your Force changed, so you have been removed from your Sandbox")
             playerData.preSandboxForceName = force.name
             Sandbox.Exit(player)
@@ -327,7 +333,9 @@ end
 
 -- Update whether the Player is inside a known Sandbox
 function Sandbox.OnPlayerSurfaceChanged(player)
-    global.players[player.index].insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
+    if Sandbox.IsPlayerInsideSandbox(player) then
+        global.players[player.index].insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
+    end
 end
 
 -- Enter, Exit, or Transfer a Player across Sandboxes
@@ -344,11 +352,11 @@ function Sandbox.Toggle(player_index)
         playerData.selectedSandbox = Sandbox.player
     end
 
-    if playerData.insideSandbox ~= nil
+    if Sandbox.IsPlayerInsideSandbox(player)
             and playerData.insideSandbox ~= playerData.selectedSandbox
     then
         Sandbox.Transfer(player)
-    elseif playerData.insideSandbox ~= nil then
+    elseif Sandbox.IsPlayerInsideSandbox(player) then
         Sandbox.Exit(player)
     else
         SpaceExploration.ExitRemoteView(player)

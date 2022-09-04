@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 011000
+Migrate.version = 011001
 
 function Migrate.Run()
     if not global.version then
@@ -17,6 +17,7 @@ function Migrate.Run()
         if global.version < 010703 then Migrate.v1_7_3() end
         if global.version < 010704 then Migrate.v1_7_4() end
         if global.version < 011000 then Migrate.v1_10_0() end
+        if global.version < 011001 then Migrate.v1_10_1() end
     end
 
     global.version = Migrate.version
@@ -91,7 +92,7 @@ function Migrate.v1_1_0()
     for index, player in pairs(game.players) do
         local playerData = global.players[index]
         playerData.sandboxInventory = game.create_inventory(#player.get_main_inventory())
-        if playerData.insideSandbox ~= nil then
+        if Sandbox.IsPlayerInsideSandbox(player) then
             Debug.log("Player inside Sandbox, fully-syncing the inventory.")
             Inventory.Persist(
                     player.get_main_inventory(),
@@ -227,6 +228,69 @@ function Migrate.v1_10_0()
     end
 
     Debug.log("Migration 1.10.0 Finished")
+end
+
+function Migrate.v1_10_1()
+    --[[
+    Planetary Labs were possibly created within a Player's Home System
+    and on Planets that could be dangerous.
+    ]]
+
+    Debug.log("Migration 1.10.1 Starting")
+
+    if SpaceExploration.enabled then
+        local planetaryLabId = 3
+        local badPlanetaryLabs = {}
+        local badPlanetaryLabNames = {}
+        local playersToKickFromPlanetaryLabs = {}
+        local zoneIndex = remote.call(SpaceExploration.name, "get_zone_index", {})
+
+        for name, surfaceData in pairs(global.seSurfaces) do
+            if not surfaceData.orbital then
+                local zone = remote.call(SpaceExploration.name, "get_zone_from_name", {
+                    zone_name = name,
+                })
+                local rootZone = SpaceExploration.GetRootZone(zoneIndex, zone)
+                if SpaceExploration.IsZoneThreatening(zone)
+                        or rootZone.special_type == "homesystem" then
+                    table.insert(badPlanetaryLabs, {
+                        zoneName = name,
+                        sandboxForceName = surfaceData.sandboxForceName,
+                    })
+                    badPlanetaryLabNames[name] = true
+                end
+            end
+        end
+
+        for index, player in pairs(game.players) do
+            local playerData = global.players[index]
+            if playerData.insideSandbox == planetaryLabId
+                    and badPlanetaryLabNames[player.surface.name]
+            then
+                table.insert(playersToKickFromPlanetaryLabs, player)
+            end
+        end
+
+        for _, player in pairs(playersToKickFromPlanetaryLabs) do
+            Debug.log("Kicking Player out of Planetary Lab: " .. player.name)
+            Sandbox.Exit(player)
+        end
+
+        for _, surfaceData in pairs(badPlanetaryLabs) do
+            Debug.log("Destroying Planetary Lab: " .. surfaceData.zoneName)
+            SpaceExploration.DeleteSandbox(
+                    global.sandboxForces[surfaceData.sandboxForceName],
+                    surfaceData.zoneName
+            )
+            local message = "Unfortunately, your Planetary Sandbox was generated in a " ..
+                    "non-ideal or dangerous location, so it was destroyed. Accessing " ..
+                    "the Sandbox again will create a new one in a safer location."
+            game.forces[surfaceData.sandboxForceName].print(message)
+            game.forces[global.sandboxForces[surfaceData.sandboxForceName].forceName].print(message)
+        end
+    end
+
+    Debug.log("Migration 1.10.1 Finished")
 end
 
 return Migrate

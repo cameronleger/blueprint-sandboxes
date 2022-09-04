@@ -70,8 +70,7 @@ function Force.Merge(oldForceName, newForce)
     -- Bounce any Players currently using the older Sandboxes
     if oldSandboxForce then
         for _, player in pairs(oldSandboxForce.players) do
-            local playerData = global.players[player.index]
-            if playerData.insideSandbox then
+            if Sandbox.IsPlayerInsideSandbox(player) then
                 Debug.log("Force.Merge must manually change Sandbox Player's Force: " .. player.name .. " -> " .. newForce.name)
                 player.force = newForce
             end

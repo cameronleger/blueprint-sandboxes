@@ -37,15 +37,36 @@ function SpaceExploration.GetPlayerCharacter(player)
     })
 end
 
--- Chooses a non-home-system Star for a Force's Space Sandbox, if necessary
+-- Whether the Sandbox might have Biters falling
+function SpaceExploration.IsZoneThreatening(zone)
+    return (zone.type == "planet" or zone.type == "moon")
+            and zone.controls
+            and zone.controls["se-vitamelange"]
+            and zone.controls["se-vitamelange"].richness > 0
+end
+
+-- Walk Parent Indexes to find the Root Zone (Star)
+function SpaceExploration.GetRootZone(zoneIndex, zone)
+    local rootZone = zone
+    while rootZone.parent_index do
+        rootZone = zoneIndex[rootZone.parent_index]
+    end
+    return rootZone
+end
+
+-- Chooses a non-home-system Star or Moon for a Force's Space Sandbox, if necessary
 -- Notably, Star _Orbits_ are "usable" Zones, but not Stars themselves
 -- In other words, these should be completely safe and invisible outside of this mod!
+-- Moons, on the other hand, will take a valuable resource away from the player
+-- We also carefully choose Moons in order to not take away too much from them,
+-- and to not be too dangerous.
 function SpaceExploration.ChooseZoneForForce(player, sandboxForce, type)
     if not SpaceExploration.enabled then
         return
     end
 
-    for _, zone in pairs(remote.call(SpaceExploration.name, "get_zone_index", {})) do
+    local zoneIndex = remote.call(SpaceExploration.name, "get_zone_index", {})
+    for _, zone in pairs(zoneIndex) do
         if zone.type == type
                 and not zone.is_homeworld
                 and not zone.ruins
@@ -53,8 +74,13 @@ function SpaceExploration.ChooseZoneForForce(player, sandboxForce, type)
                 and zone.special_type ~= "homesystem"
                 and not global.seSurfaces[zone.name]
         then
-            Debug.log("Choosing SE Zone " .. zone.name .. " as Sandbox for " .. sandboxForce.name)
-            return zone.name
+            local rootZone = SpaceExploration.GetRootZone(zoneIndex, zone)
+            if not SpaceExploration.IsZoneThreatening(zone)
+                    and rootZone.special_type ~= "homesystem"
+            then
+                Debug.log("Choosing SE Zone " .. zone.name .. " as Sandbox for " .. sandboxForce.name)
+                return zone.name
+            end
         end
     end
 end

@@ -105,7 +105,7 @@ function ToggleGUI.Update(player)
 
     ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = global.players[player.index].selectedSandbox
 
-    if Sandbox.IsSandbox(player.surface) then
+    if Sandbox.IsPlayerInsideSandbox(player) then
         local playerData = global.players[player.index]
 
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, true)

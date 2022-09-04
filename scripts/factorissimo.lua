@@ -4,6 +4,9 @@ local Factorissimo = {}
 Factorissimo.name = "factorissimo"
 Factorissimo.enabled = not not remote.interfaces[Factorissimo.name]
 
+Factorissimo.surfacePfx = "factory-floor-"
+local surfacePfxLength = string.len(Factorissimo.surfacePfx)
+
 function Factorissimo.GetAllFactories()
     if Factorissimo.enabled then
         return remote.call(Factorissimo.name, "get_global", { "factories" })
@@ -13,22 +16,12 @@ function Factorissimo.GetAllFactories()
 end
 
 -- Whether the Surface is a Factory
-function Factorissimo.IsFactory(surface)
+function Factorissimo.IsFactory(thingWithName)
     if not Factorissimo.enabled then
         return false
     end
 
-    if Lab.IsLab(surface) or SpaceExploration.IsSandbox(surface) then
-        return false
-    end
-
-    local factories = Factorissimo.GetAllFactories()
-    for _, factory in pairs(factories) do
-        if factory.inside_surface.name == surface.name then
-            return true
-        end
-    end
-    return false
+    return string.sub(thingWithName.name, 1, surfacePfxLength) == Factorissimo.surfacePfx
 end
 
 -- Whether the Surface is a Factory inside of a Sandbox

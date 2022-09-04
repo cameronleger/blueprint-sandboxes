@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.10.1
+Date: 2022-09-04
+  Changes:
+    - Moons within the Calidus system and Moons with Threats are no longer chosen for Planetary Sandboxes. Existing Planetary Sandboxes fitting this criteria will be destroyed
+    - Performance improvements related to some cases of creating Entities with the Factorissimo integration
+  Bugfixes:
+    - Crash when something other than this mod lets the Planer enter then leave a Sandbox
+---------------------------------------------------------------------------------------------------
 Version: 1.10.0
 Date: 2022-08-23
   Changes:

@@ -111,7 +111,7 @@ end
 function God.OnInventoryChanged(event)
     local player = game.players[event.player_index]
     local playerData = global.players[event.player_index]
-    if playerData.insideSandbox ~= nil then
+    if Sandbox.IsPlayerInsideSandbox(player) then
         Inventory.Prune(player)
         playerData.sandboxInventory = Inventory.Persist(
                 player.get_main_inventory(),
@@ -123,8 +123,7 @@ end
 -- Ensure newly-crafted Items are put into the Cursor for use
 function God.OnPlayerCraftedItem(event)
     local player = game.players[event.player_index]
-    local playerData = global.players[event.player_index]
-    if playerData.insideSandbox ~= nil
+    if Sandbox.IsPlayerInsideSandbox(player)
             and player.cursor_stack
             and player.cursor_stack.valid
             and event.item_stack.valid

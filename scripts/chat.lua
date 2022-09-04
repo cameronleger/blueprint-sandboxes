@@ -9,7 +9,7 @@ function Chat.OnChat(event)
     local player = game.players[event.player_index]
     local playerData = global.players[event.player_index]
 
-    if playerData.insideSandbox ~= nil then
+    if Sandbox.IsPlayerInsideSandbox(player) then
         game.forces[playerData.forceName].print(player.name .. ": " .. event.message, player.chat_color)
     else
         local sandboxForce = game.forces[playerData.sandboxForceName]
