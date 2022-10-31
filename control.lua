@@ -5,6 +5,9 @@ Settings = require("scripts.settings")
 Debug = require("scripts.debug")
 Queue = require("scripts.queue")
 
+-- Required by some
+Illusion = require("scripts.illusion")
+
 -- Required, but not ordered importantly
 Init = require("scripts.init")
 Chat = require("scripts.chat")
@@ -156,6 +159,8 @@ script.on_event(defines.events.on_marked_for_upgrade, God.OnMarkedForUpgrade)
 script.on_event(defines.events.on_built_entity, God.OnBuiltEntity, God.onBuiltEntityFilters)
 script.on_event(defines.events.on_player_crafted_item, God.OnPlayerCraftedItem)
 script.on_event(defines.events.on_player_main_inventory_changed, God.OnInventoryChanged)
+
+script.on_event(defines.events.on_player_setup_blueprint, Illusion.OnBlueprintSetup)
 
 -- TODO: on_entity_settings_pasted
 

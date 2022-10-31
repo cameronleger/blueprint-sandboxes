@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.11.0
+Date: 2022-10-31
+  Changes:
+    - New Illusions framework: Entities that are swapped to cardboard-cutouts inside of Sandboxes to avoid issues or cheating
+    - Nearly all script-driven Space Exploration Entities are now Illusions in the Sandboxes
+---------------------------------------------------------------------------------------------------
 Version: 1.10.1
 Date: 2022-09-04
   Changes:

@@ -138,6 +138,18 @@ data:extend({
             ]]
         },
     },
+    {
+        type = "tips-and-tricks-item",
+        category = category,
+        name = pfxCategory .. "illusions",
+        indent = 1,
+        order = pfxOrder .. "i",
+        dependencies = { pfxCategory .. "introduction" },
+        trigger = {
+            type = "unlock-recipe",
+            recipe = BPSB.pfx .. "electric-energy-interface",
+        },
+    },
 })
 
 if mods["space-exploration"] then

@@ -7,6 +7,13 @@ God.onBuiltEntityFilters = {
     { filter = "type", type = "item-request-proxy" },
 }
 
+for realEntityName, illusionName in pairs(Illusion.realToIllusionMap) do
+    table.insert(
+        God.onBuiltEntityFilters,
+        { filter = "name", name = realEntityName }
+    )
+end
+
 -- Immediately destroy an Entity (and perhaps related Entities)
 function God.Destroy(entity)
     if entity.valid
@@ -54,6 +61,7 @@ end
 
 -- Immediately Revive a Ghost Entity
 function God.Create(entity)
+    Illusion.ReplaceIfNecessary(entity)
     if entity.valid then
         if entity.type == "tile-ghost" then
             -- Tiles are simple Revives
