@@ -54,6 +54,10 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
         pcall(remote.call, "RSO", "ignoreSurface", labName)
     end
 
+    if remote.interfaces["dangOreus"] then
+        pcall(remote.call, "dangOreus", "toggle", labName)
+    end
+
     if remote.interfaces["AbandonedRuins"] then
         pcall(remote.call, "AbandonedRuins", "exclude_surface", labName)
     end

@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 011100
+Migrate.version = 011101
 
 function Migrate.Run()
     if not global.version then
@@ -18,6 +18,7 @@ function Migrate.Run()
         if global.version < 010704 then Migrate.v1_7_4() end
         if global.version < 011000 then Migrate.v1_10_0() end
         if global.version < 011001 then Migrate.v1_10_1() end
+        if global.version < 011101 then Migrate.v1_11_1() end
     end
 
     global.version = Migrate.version
@@ -291,6 +292,22 @@ function Migrate.v1_10_1()
     end
 
     Debug.log("Migration 1.10.1 Finished")
+end
+
+function Migrate.v1_11_1()
+    --[[
+    dangOreus was applying to Labs and causing significant lag
+    ]]
+
+    Debug.log("Migration 1.11.1 Starting")
+
+    if remote.interfaces["dangOreus"] then
+        for labName, _ in pairs(global.labSurfaces) do
+            pcall(remote.call, "dangOreus", "toggle", labName)
+        end
+    end
+
+    Debug.log("Migration 1.11.1 Finished")
 end
 
 return Migrate
