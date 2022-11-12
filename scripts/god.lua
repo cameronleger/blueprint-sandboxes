@@ -91,6 +91,14 @@ function God.Upgrade(entity)
         local target = entity.get_upgrade_target()
         local direction = entity.get_upgrade_direction()
 
+        if Illusion.IsIllusion(entity.name) and
+            Illusion.GetActualName(entity.name) == target.name
+         then
+            Debug.log("Cancelling an Upgrade from an Illusion to its Real Entity: " .. entity.name)
+            entity.cancel_upgrade(entity.force)
+            return
+        end
+
         local options = {
             name = target.name,
             position = entity.position,
@@ -108,9 +116,11 @@ function God.Upgrade(entity)
 
         local result = entity.surface.create_entity(options)
 
-        if result == nil then
+        if result == nil and entity.valid then
             Debug.log("Upgrade Failed, Cancelling: " .. entity.name)
             entity.cancel_upgrade(entity.force)
+        else
+            Debug.log("Upgrade Failed, Old Entity Gone too!")
         end
     end
 end

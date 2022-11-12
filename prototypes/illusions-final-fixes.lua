@@ -16,6 +16,11 @@ for _, mapping in pairs(Illusion.mappings) do
         local illusion = table.deepcopy(entity)
         illusion.name = Illusion.realToIllusionMap[name]
         illusion.placeable_by = { item = item, count = 1 }
+        if illusion.flags ~= nil then
+            table.insert(illusion.flags, "not-in-made-in")
+        else
+            illusion.flags = { "not-in-made-in" }
+        end
 
         illusion.localised_description = { "entity-description." .. name }
         if entity.localised_name ~= nil then

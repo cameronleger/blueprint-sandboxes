@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.11.2
+Date: 2022-11-12
+  Changes:
+    - Illusions no longer appear in the "Made in" tooltips
+  Bugfixes:
+    - Crash when Ghost-building an Illusion over an Illusion
+---------------------------------------------------------------------------------------------------
 Version: 1.11.1
 Date: 2022-11-09
   Changes:
