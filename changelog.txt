@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.11.2
-Date: 2022-11-12
+Date: 2022-11-22
   Changes:
     - Illusions no longer appear in the "Made in" tooltips
   Bugfixes:
