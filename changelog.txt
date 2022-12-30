@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.11.3
+Date: 2022-12-30
+  Bugfixes:
+    - Crash after Space Exploration deletes a Surface that was used by this mod
+    - Crash after a Space Exploration update from 0.5 to 0.6 and certain Entities were used inside a Sandbox
+---------------------------------------------------------------------------------------------------
 Version: 1.11.2
 Date: 2022-11-22
   Changes:

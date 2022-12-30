@@ -26,6 +26,11 @@ for _, mapping in ipairs(Illusion.mappings) do
     Illusion.realToIllusionMap[mapping[2]] = Illusion.pfx .. mapping[2]
 end
 
+Illusion.realNameFilters = {}
+for realEntityName, illusionName in pairs(Illusion.realToIllusionMap) do
+    table.insert(Illusion.realNameFilters, realEntityName)
+end
+
 -- Whether the Thing is an Illusion
 function Illusion.IsIllusion(name)
     return string.sub(name, 1, pfxLength) == Illusion.pfx

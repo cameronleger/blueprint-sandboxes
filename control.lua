@@ -28,6 +28,8 @@ SpaceExploration = require("scripts.space-exploration")
 -- Requires SpaceExploration method immediately
 Sandbox = require("scripts.sandbox")
 
+require('scripts.remote-interface')
+
 -- Initializations
 
 script.on_init(function()
@@ -138,17 +140,28 @@ script.on_event(defines.events.on_pre_surface_deleted, function(event)
     if global.labSurfaces[surface.name] then
         global.labSurfaces[surface.name] = nil
     end
-    if global.seSurfaces[surface.name] then
-        global.seSurfaces[surface.name] = nil
+    local surfaceData = global.seSurfaces[surface.name]
+    if surfaceData then
+        local sandboxForceData = global.sandboxForces[surfaceData.sandboxForceName]
+        SpaceExploration.PreDeleteSandbox(sandboxForceData, surface.name)
     end
 end)
 
 script.on_event(defines.events.on_surface_renamed, function(event)
+    -- TODO: Renaming surfaces likely doesn't really work
     if global.labSurfaces[event.old_name] then
         global.labSurfaces[event.new_name] = global.labSurfaces[event.old_name]
         global.labSurfaces[event.old_name] = nil
     end
-    if global.seSurfaces[event.old_name] then
+    local surfaceData = global.seSurfaces[event.old_name]
+    if surfaceData then
+        local sandboxForceData = global.sandboxForces[surfaceData.sandboxForceName]
+        if sandboxForceData.sePlanetaryLabZoneName == event.old_name then
+            sandboxForceData.sePlanetaryLabZoneName = event.new_name
+        end
+        if sandboxForceData.seOrbitalSandboxZoneName == event.old_name then
+            sandboxForceData.seOrbitalSandboxZoneName = event.new_name
+        end
         global.seSurfaces[event.new_name] = global.seSurfaces[event.old_name]
         global.seSurfaces[event.old_name] = nil
     end

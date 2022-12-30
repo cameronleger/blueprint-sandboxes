@@ -177,14 +177,14 @@ function SpaceExploration.Reset(player)
     end
 end
 
--- Delete a Space Sandbox and return it to the available Zones
-function SpaceExploration.DeleteSandbox(sandboxForceData, zoneName)
+-- Return a Sandbox to the available Zones
+function SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
     if not SpaceExploration.enabled or not zoneName then
         return
     end
 
     if global.seSurfaces[zoneName] then
-        Debug.log("Deleting SE Sandbox: " .. zoneName)
+        Debug.log("Pre-Deleting SE Sandbox: " .. zoneName)
         global.seSurfaces[zoneName] = nil
         if sandboxForceData.sePlanetaryLabZoneName == zoneName then
             sandboxForceData.sePlanetaryLabZoneName = nil
@@ -192,6 +192,20 @@ function SpaceExploration.DeleteSandbox(sandboxForceData, zoneName)
         if sandboxForceData.seOrbitalSandboxZoneName == zoneName then
             sandboxForceData.seOrbitalSandboxZoneName = nil
         end
+    else
+        Debug.log("Not a SE Sandbox, won't Pre-Delete: " .. zoneName)
+    end
+end
+
+-- Delete a Space Sandbox and return it to the available Zones
+function SpaceExploration.DeleteSandbox(sandboxForceData, zoneName)
+    if not SpaceExploration.enabled or not zoneName then
+        return
+    end
+
+    if global.seSurfaces[zoneName] then
+        SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
+        Debug.log("Deleting SE Sandbox: " .. zoneName)
         game.delete_surface(zoneName)
         return true
     else
