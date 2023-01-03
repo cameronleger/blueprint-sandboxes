@@ -14,9 +14,11 @@ for realEntityName, illusionName in pairs(Illusion.realToIllusionMap) do
     )
 end
 
+-- TODO: Perhaps this can be determined by flags?
 God.skipHandlingEntities = {
     ["logistic-train-stop-input"] = true,
     ["logistic-train-stop-output"] = true,
+    ["tl-dummy-entity"] = true,
 }
 
 -- Immediately destroy an Entity (and perhaps related Entities)
