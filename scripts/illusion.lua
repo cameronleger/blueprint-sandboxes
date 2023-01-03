@@ -41,17 +41,22 @@ function Illusion.GetActualName(name)
     return string.sub(name, pfxLength + 1)
 end
 
+-- Extract the Name from an Entity
+function Illusion.GhostOrRealName(entity)
+    local realName = entity.name
+    if entity.type == "entity-ghost" then
+        realName = entity.ghost_name
+    end
+    return realName
+end
+
 -- Convert a built Entity into an Illusion (if possible)
 function Illusion.ReplaceIfNecessary(entity)
     if not entity.valid then
         return
     end
 
-    local realName = entity.name
-    if entity.type == "entity-ghost" then
-        realName = entity.ghost_name
-    end
-
+    local realName = Illusion.GhostOrRealName(entity)
     local illusionName = Illusion.realToIllusionMap[realName]
     if illusionName == nil then
         return

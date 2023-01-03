@@ -14,6 +14,11 @@ for realEntityName, illusionName in pairs(Illusion.realToIllusionMap) do
     )
 end
 
+God.skipHandlingEntities = {
+    ["logistic-train-stop-input"] = true,
+    ["logistic-train-stop-output"] = true,
+}
+
 -- Immediately destroy an Entity (and perhaps related Entities)
 function God.Destroy(entity)
     if entity.valid
@@ -171,6 +176,11 @@ function God.AsyncWrapper(setting, queue, handler, entity)
 end
 
 function God.ShouldHandleEntity(entity)
+    local name = Illusion.GhostOrRealName(entity)
+    if God.skipHandlingEntities[name] then
+        return false
+    end
+
     return Lab.IsLab(entity.surface)
             or SpaceExploration.IsSandbox(entity.surface)
             or (Factorissimo.IsFactory(entity.surface)
