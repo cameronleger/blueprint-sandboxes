@@ -33,6 +33,15 @@ data:extend({
         maximum_value = 300,
     },
     {
+        type = "int-setting",
+        name = Settings.extraMiningSpeed,
+        setting_type = "runtime-global",
+        order = "a[common]-e",
+        default_value = 1000000000,
+        minimum_value = 0,
+        maximum_value = 1000000000,
+    },
+    {
         type = "bool-setting",
         name = Settings.craftToCursor,
         setting_type = "runtime-per-user",
