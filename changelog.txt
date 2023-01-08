@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.12.1
+Date: 2023-01-07
+  Changes:
+    - Adding a warning for selecting new contents for a Blueprint in your Blueprint Library, since Factorio does not allow mods to handle this situation
+  Bugfixes:
+    - Selecting new contents for a Blueprint in your Inventory was not always replacing Illusions with Real Entities
+---------------------------------------------------------------------------------------------------
 Version: 1.12.0
 Date: 2023-01-04
   Changes:

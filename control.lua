@@ -207,3 +207,12 @@ script.on_event(defines.events.on_lua_shortcut, ToggleGUI.OnToggleShortcut)
 script.on_event(defines.events.on_gui_click, ToggleGUI.OnGuiClick)
 script.on_event(defines.events.on_gui_value_changed, ToggleGUI.OnGuiValueChanged)
 script.on_event(defines.events.on_gui_selection_state_changed, ToggleGUI.OnGuiDropdown)
+
+script.on_event(defines.events.on_gui_closed, function(event)
+    if (event.gui_type == defines.gui_type.blueprint_library) then
+        -- We know this won't work, but we'll do it to print a message anyway
+        Illusion.OnBlueprintGUIClosed(event)
+    elseif (event.gui_type == defines.gui_type.item) then
+        Illusion.OnBlueprintGUIClosed(event)
+    end
+end)
