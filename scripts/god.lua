@@ -14,6 +14,13 @@ for realEntityName, illusionName in pairs(Illusion.realToIllusionMap) do
     )
 end
 
+-- TODO: Perhaps this can be determined by flags?
+God.skipHandlingEntities = {
+    ["logistic-train-stop-input"] = true,
+    ["logistic-train-stop-output"] = true,
+    ["tl-dummy-entity"] = true,
+}
+
 -- Immediately destroy an Entity (and perhaps related Entities)
 function God.Destroy(entity)
     if entity.valid
@@ -171,6 +178,15 @@ function God.AsyncWrapper(setting, queue, handler, entity)
 end
 
 function God.ShouldHandleEntity(entity)
+    if not Sandbox.IsSandboxForce(entity.force) then
+        return false
+    end
+
+    local name = Illusion.GhostOrRealName(entity)
+    if God.skipHandlingEntities[name] then
+        return false
+    end
+
     return Lab.IsLab(entity.surface)
             or SpaceExploration.IsSandbox(entity.surface)
             or (Factorissimo.IsFactory(entity.surface)

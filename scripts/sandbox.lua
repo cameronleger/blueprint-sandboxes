@@ -320,7 +320,6 @@ function Sandbox.GetSandboxChoiceFor(player, surface)
         return Sandbox.forcePlanetaryLab
     elseif Factorissimo.IsFactory(surface) then
         local outsideSurface = Factorissimo.GetOutsideSurfaceForFactory(
-                Factorissimo.GetAllFactories(),
                 surface,
                 player.position
         )
