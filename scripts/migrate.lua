@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 011102
+Migrate.version = 011201
 
 function Migrate.Run()
     if not global.version then
@@ -19,6 +19,7 @@ function Migrate.Run()
         if global.version < 011000 then Migrate.v1_10_0() end
         if global.version < 011001 then Migrate.v1_10_1() end
         if global.version < 011101 then Migrate.v1_11_1() end
+        if global.version < 011103 then Migrate.v1_11_3() end
     end
 
     global.version = Migrate.version
@@ -308,6 +309,43 @@ function Migrate.v1_11_1()
     end
 
     Debug.log("Migration 1.11.1 Finished")
+end
+
+function Migrate.v1_11_3_surface(surfaceName)
+    local surface = game.surfaces[surfaceName]
+    if not surface then
+        return
+    end
+
+    local entitiesToSwap = surface.find_entities_filtered({ name = Illusion.realNameFilters, })
+    for _, entity in pairs(entitiesToSwap) do
+        Illusion.ReplaceIfNecessary(entity)
+    end
+
+    local ghostsToSwap = surface.find_entities_filtered({ ghost_name = Illusion.realNameFilters, })
+    for _, entity in pairs(ghostsToSwap) do
+        Illusion.ReplaceIfNecessary(entity)
+    end
+end
+
+function Migrate.v1_11_3()
+    --[[
+    1.11.0 did not include a migration of real-to-illusion Entities,
+    but it was found that some older Entities combined with Space Exploration 0.6
+    could cause a crash.
+    ]]
+
+    Debug.log("Migration 1.11.3 Starting")
+
+    for surfaceName, _ in pairs(global.labSurfaces) do
+        Migrate.v1_11_3_surface(surfaceName)
+    end
+
+    for surfaceName, _ in pairs(global.seSurfaces) do
+        Migrate.v1_11_3_surface(surfaceName)
+    end
+
+    Debug.log("Migration 1.11.3 Finished")
 end
 
 return Migrate

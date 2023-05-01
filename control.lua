@@ -28,6 +28,8 @@ SpaceExploration = require("scripts.space-exploration")
 -- Requires SpaceExploration method immediately
 Sandbox = require("scripts.sandbox")
 
+require('scripts.remote-interface')
+
 -- Initializations
 
 script.on_init(function()
@@ -138,17 +140,28 @@ script.on_event(defines.events.on_pre_surface_deleted, function(event)
     if global.labSurfaces[surface.name] then
         global.labSurfaces[surface.name] = nil
     end
-    if global.seSurfaces[surface.name] then
-        global.seSurfaces[surface.name] = nil
+    local surfaceData = global.seSurfaces[surface.name]
+    if surfaceData then
+        local sandboxForceData = global.sandboxForces[surfaceData.sandboxForceName]
+        SpaceExploration.PreDeleteSandbox(sandboxForceData, surface.name)
     end
 end)
 
 script.on_event(defines.events.on_surface_renamed, function(event)
+    -- TODO: Renaming surfaces likely doesn't really work
     if global.labSurfaces[event.old_name] then
         global.labSurfaces[event.new_name] = global.labSurfaces[event.old_name]
         global.labSurfaces[event.old_name] = nil
     end
-    if global.seSurfaces[event.old_name] then
+    local surfaceData = global.seSurfaces[event.old_name]
+    if surfaceData then
+        local sandboxForceData = global.sandboxForces[surfaceData.sandboxForceName]
+        if sandboxForceData.sePlanetaryLabZoneName == event.old_name then
+            sandboxForceData.sePlanetaryLabZoneName = event.new_name
+        end
+        if sandboxForceData.seOrbitalSandboxZoneName == event.old_name then
+            sandboxForceData.seOrbitalSandboxZoneName = event.new_name
+        end
         global.seSurfaces[event.new_name] = global.seSurfaces[event.old_name]
         global.seSurfaces[event.old_name] = nil
     end
@@ -194,3 +207,12 @@ script.on_event(defines.events.on_lua_shortcut, ToggleGUI.OnToggleShortcut)
 script.on_event(defines.events.on_gui_click, ToggleGUI.OnGuiClick)
 script.on_event(defines.events.on_gui_value_changed, ToggleGUI.OnGuiValueChanged)
 script.on_event(defines.events.on_gui_selection_state_changed, ToggleGUI.OnGuiDropdown)
+
+script.on_event(defines.events.on_gui_closed, function(event)
+    if (event.gui_type == defines.gui_type.blueprint_library) then
+        -- We know this won't work, but we'll do it to print a message anyway
+        Illusion.OnBlueprintGUIClosed(event)
+    elseif (event.gui_type == defines.gui_type.item) then
+        Illusion.OnBlueprintGUIClosed(event)
+    end
+end)

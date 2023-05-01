@@ -105,7 +105,7 @@ function Force.ConfigureSandboxForce(force, sandboxForce)
     end
 
     -- Counteract Space Exploration's slow Mining Speed for Gods
-    sandboxForce.manual_mining_speed_modifier = 1000000000
+    sandboxForce.manual_mining_speed_modifier = settings.global[Settings.extraMiningSpeed].value
 
     -- Why should you Research in here?
     sandboxForce.laboratory_speed_modifier = -0.999

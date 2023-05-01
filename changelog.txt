@@ -1,6 +1,34 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.12.1
+Date: 2023-01-07
+  Changes:
+    - Adding a warning for selecting new contents for a Blueprint in your Blueprint Library, since Factorio does not allow mods to handle this situation
+  Bugfixes:
+    - Selecting new contents for a Blueprint in your Inventory was not always replacing Illusions with Real Entities
+---------------------------------------------------------------------------------------------------
+Version: 1.12.0
+Date: 2023-01-04
+  Changes:
+    - The "Extra Mining Speed" applied in Sandboxes is now a Runtime Setting
+---------------------------------------------------------------------------------------------------
+Version: 1.11.5
+Date: 2023-01-03
+  Bugfixes:
+    - Tapelines were sometimes auto-built which prevents the intended use
+---------------------------------------------------------------------------------------------------
+Version: 1.11.4
+Date: 2023-01-02
+  Bugfixes:
+    - Logistic Train Stop Inputs/Outputs were sometimes auto-built resulting in circuit network issues
+---------------------------------------------------------------------------------------------------
+Version: 1.11.3
+Date: 2022-12-30
+  Bugfixes:
+    - Crash after Space Exploration deletes a Surface that was used by this mod
+    - Crash after a Space Exploration update from 0.5 to 0.6 and certain Entities were used inside a Sandbox
+---------------------------------------------------------------------------------------------------
 Version: 1.11.2
-Date: 2022-11-12
+Date: 2022-11-22
   Changes:
     - Illusions no longer appear in the "Made in" tooltips
   Bugfixes:
