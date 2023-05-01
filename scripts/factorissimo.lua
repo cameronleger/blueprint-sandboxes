@@ -30,7 +30,7 @@ function Factorissimo.IsFactoryInsideSandbox(surface, position)
         return false
     end
 
-    local factory = Factorissimo.GetFactory(Factorissimo.GetAllFactories(), surface, position)
+    local factory = Factorissimo.GetFactory(surface, position)
     if not factory then
         return false
     end
@@ -39,39 +39,23 @@ function Factorissimo.IsFactoryInsideSandbox(surface, position)
 end
 
 -- Find a Factory given a Surface and Position (if possible)
-function Factorissimo.GetFactory(factories, surface, position)
-    for _, factory in pairs(factories) do
-        local halfFactorySize = (factory.layout.inside_size / 2) + 1
-
-        if factory.inside_surface.name == surface.name and ((
-                position.x == (factory.inside_x + factory.layout.inside_door_x)
-                        and position.y == (factory.inside_y + factory.layout.inside_door_y)
-        ) or (
-                position.x >= factory.inside_x - halfFactorySize
-                        and position.x <= factory.inside_x + halfFactorySize
-                        and position.y >= factory.inside_y - halfFactorySize
-                        and position.y <= factory.inside_y + halfFactorySize
-        ))
-        then
-            return factory
-        end
-    end
-    return nil
+function Factorissimo.GetFactory(surface, position)
+    return remote.call(Factorissimo.name, "find_surrounding_factory", surface, position)
 end
 
 -- Find a Factory's Outside Surface recursively
-function Factorissimo.GetOutsideSurfaceForFactory(factories, surface, position)
+function Factorissimo.GetOutsideSurfaceForFactory(surface, position)
     if not Factorissimo.IsFactory(surface) then
         return nil
     end
 
-    local factory = Factorissimo.GetFactory(factories, surface, position)
+    local factory = Factorissimo.GetFactory(surface, position)
     if not factory then
         return nil
     end
 
     if Factorissimo.IsFactory(factory.outside_surface) then
-        return Factorissimo.GetOutsideSurfaceForFactory(factories, factory.outside_surface, {
+        return Factorissimo.GetOutsideSurfaceForFactory(factory.outside_surface, {
             x = factory.outside_door_x,
             y = factory.outside_door_y,
         })

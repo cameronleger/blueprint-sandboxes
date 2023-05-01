@@ -178,6 +178,10 @@ function God.AsyncWrapper(setting, queue, handler, entity)
 end
 
 function God.ShouldHandleEntity(entity)
+    if not Sandbox.IsSandboxForce(entity.force) then
+        return false
+    end
+
     local name = Illusion.GhostOrRealName(entity)
     if God.skipHandlingEntities[name] then
         return false
