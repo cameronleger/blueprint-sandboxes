@@ -7,3 +7,6 @@ Inspired by previous mods such as [Edit-Blueprints](https://mods.factorio.com/mo
 To that end, it supports personal and team Sandbox Surfaces which enable: God-mode, extra Recipes (and Technologies if you wish), and automated construction. Getting in and out of Sandboxes is immediate and toggle-able via shortcuts (defaults to Shift+B).
 
 To teach you the basics and provide many more details, the in-game Tips-and-Tricks are used; the first is visible after a few seconds, and the rest after you start using the Sandbox.
+
+## Credits
+* undermark5: Factorissimo Performance Improvements
