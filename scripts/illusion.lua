@@ -75,9 +75,9 @@ function Illusion.ReplaceIfNecessary(entity)
     local result = entity.surface.create_entity(options)
 
     if result == nil then
-        Debug.log("Could not replace " .. realName .. " with " .. illusionName)
+        log("Could not replace " .. realName .. " with " .. illusionName)
     else
-        Debug.log("Replaced " .. realName .. " with " .. illusionName)
+        log("Replaced " .. realName .. " with " .. illusionName)
     end
 end
 
@@ -161,7 +161,7 @@ function Illusion.HandleBlueprintEvent(player, potentialItemStacks)
     -- Some events won't have a functional Blueprint, so we're screwed!
     local entities = blueprint.get_blueprint_entities()
     if not entities then
-        Debug.log("Cannot handle Blueprint update: no entities in Blueprint (caused by selecting new contents)")
+        log("Cannot handle Blueprint update: no entities in Blueprint (caused by selecting new contents)")
         local playerData = global.players[player.index]
         local lastWarningForNewContents = playerData.lastWarningForNewContents or 0
         if game.tick - lastWarningForNewContents > (216000) then -- 1 hour
@@ -184,7 +184,7 @@ function Illusion.HandleBlueprintEvent(player, potentialItemStacks)
     if replaced > 0 then
         blueprint.set_blueprint_entities(entities)
     end
-    Debug.log("Replaced " .. replaced .. " entities in Sandbox Blueprint")
+    log("Replaced " .. replaced .. " entities in Sandbox Blueprint")
 end
 
 -- A Player is creating a new Blueprint from a selection

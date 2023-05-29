@@ -55,7 +55,7 @@ function Sandbox.IsEnabled(selectedSandbox)
     elseif selectedSandbox == Sandbox.forcePlanetaryLab then
         return SpaceExploration.enabled
     else
-        Debug.log("Impossible Choice for Sandbox: " .. selectedSandbox)
+        log("Impossible Choice for Sandbox: " .. selectedSandbox)
         return false
     end
 end
@@ -79,7 +79,7 @@ function Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     then
         return SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxForce)
     else
-        Debug.log("Impossible Choice for Sandbox: " .. playerData.selectedSandbox)
+        log("Impossible Choice for Sandbox: " .. playerData.selectedSandbox)
         return
     end
 end
@@ -89,7 +89,7 @@ function Sandbox.Enter(player)
     local playerData = global.players[player.index]
 
     if Sandbox.IsPlayerInsideSandbox(player) then
-        Debug.log("Already inside Sandbox: " .. playerData.insideSandbox)
+        log("Already inside Sandbox: " .. playerData.insideSandbox)
         return
     end
 
@@ -103,10 +103,10 @@ function Sandbox.Enter(player)
     local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
     local surface = Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     if surface == nil then
-        Debug.log("Completely Unknown Sandbox Surface, cannot use")
+        log("Completely Unknown Sandbox Surface, cannot use")
         return
     end
-    Debug.log("Entering Sandbox: " .. surface.name)
+    log("Entering Sandbox: " .. surface.name)
 
     -- Store the Player's previous State (that must be referenced to Exit)
     playerData.insideSandbox = playerData.selectedSandbox
@@ -163,19 +163,16 @@ function Sandbox.Exit(player)
     local playerData = global.players[player.index]
 
     if not Sandbox.IsPlayerInsideSandbox(player) then
-        Debug.log("Already outside Sandbox")
+        log("Already outside Sandbox")
         return
     end
-    Debug.log("Exiting Sandbox: " .. player.surface.name)
+    log("Exiting Sandbox: " .. player.surface.name)
 
     -- Remember where they left off
     playerData.lastSandboxPositions[player.surface.name] = player.position
 
-    -- Attach the Player back to their original Character (temporarily with _more_ permissions)
+    -- Attach the Player back to their original Character (also changes force)
     Sandbox.RecoverPlayerCharacter(player, playerData)
-
-    -- Swap to their original Force; bonuses will be smaller now
-    player.force = playerData.preSandboxForceName
 
     -- Toggle Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
     player.cheat_mode = playerData.preSandboxCheatMode or false
@@ -262,18 +259,18 @@ function Sandbox.Transfer(player)
     local playerData = global.players[player.index]
 
     if not Sandbox.IsPlayerInsideSandbox(player) then
-        Debug.log("Outside Sandbox, cannot transfer")
+        log("Outside Sandbox, cannot transfer")
         return
     end
 
     local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
     local surface = Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     if surface == nil then
-        Debug.log("Completely Unknown Sandbox Surface, cannot use")
+        log("Completely Unknown Sandbox Surface, cannot use")
         return
     end
 
-    Debug.log("Transferring to Sandbox: " .. surface.name)
+    log("Transferring to Sandbox: " .. surface.name)
     playerData.lastSandboxPositions[player.surface.name] = player.position
     player.teleport(playerData.lastSandboxPositions[surface.name] or { 0, 0 }, surface)
 
@@ -287,7 +284,7 @@ function Sandbox.OnPlayerForceChanged(player)
     if not Sandbox.IsSandboxForce(force)
             and playerData.forceName ~= force.name
     then
-        Debug.log("Storing changed Player's Force: " .. player.name .. " -> " .. force.name)
+        log("Storing changed Player's Force: " .. player.name .. " -> " .. force.name)
         playerData.forceName = force.name
 
         local sandboxForceName = Sandbox.NameFromForce(force)

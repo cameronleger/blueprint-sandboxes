@@ -35,11 +35,11 @@ function Force.Init(force)
             or Sandbox.IsSandboxForce(force)
             or #force.players < 1
     then
-        Debug.log("Skip Force.Init: " .. force.name)
+        log("Skip Force.Init: " .. force.name)
         return
     end
 
-    Debug.log("Force.Init: " .. force.name)
+    log("Force.Init: " .. force.name)
     local forceLabName = Lab.NameFromForce(force)
     local sandboxForceName = Sandbox.NameFromForce(force)
     global.forces[force.name] = {
@@ -60,7 +60,7 @@ function Force.Merge(oldForceName, newForce)
     local oldForceData = global.forces[oldForceName]
     local newForceData = global.forces[newForce.name]
     if not oldForceData or not newForceData then
-        Debug.log("Skip Force.Merge: " .. oldForceName .. " -> " .. newForce.name)
+        log("Skip Force.Merge: " .. oldForceName .. " -> " .. newForce.name)
         return
     end
     local sandboxForceName = oldForceData.sandboxForceName
@@ -71,7 +71,7 @@ function Force.Merge(oldForceName, newForce)
     if oldSandboxForce then
         for _, player in pairs(oldSandboxForce.players) do
             if Sandbox.IsPlayerInsideSandbox(player) then
-                Debug.log("Force.Merge must manually change Sandbox Player's Force: " .. player.name .. " -> " .. newForce.name)
+                log("Force.Merge must manually change Sandbox Player's Force: " .. player.name .. " -> " .. newForce.name)
                 player.force = newForce
             end
         end
@@ -82,7 +82,7 @@ function Force.Merge(oldForceName, newForce)
     SpaceExploration.DeleteSandbox(oldSandboxForceData, oldSandboxForceData.sePlanetaryLabZoneName)
     SpaceExploration.DeleteSandbox(oldSandboxForceData, oldSandboxForceData.seOrbitalSandboxZoneName)
     if oldSandboxForce then
-        Debug.log("Force.Merge must merge Sandbox Forces: " .. oldSandboxForce.name .. " -> " .. newForceData.sandboxForceName)
+        log("Force.Merge must merge Sandbox Forces: " .. oldSandboxForce.name .. " -> " .. newForceData.sandboxForceName)
         game.merge_forces(oldSandboxForce, newForceData.sandboxForceName)
     end
 
@@ -127,7 +127,7 @@ function Force.GetOrCreateSandboxForce(force)
         return sandboxForce
     end
 
-    Debug.log("Creating Sandbox Force: " .. sandboxForceName)
+    log("Creating Sandbox Force: " .. sandboxForceName)
     sandboxForce = game.create_force(sandboxForceName)
     Force.ConfigureSandboxForce(force, sandboxForce)
     Research.Sync(force, sandboxForce)

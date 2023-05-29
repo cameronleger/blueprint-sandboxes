@@ -4,11 +4,11 @@ local Init = {}
 -- Setup Player, if necessary
 function Init.Player(player)
     if global.players[player.index] then
-        Debug.log("Skip Init.Player: " .. player.name)
+        log("Skip Init.Player: " .. player.name)
         return
     end
 
-    Debug.log("Init.Player: " .. player.name)
+    log("Init.Player: " .. player.name)
     local playerLabName = Lab.NameFromPlayer(player)
     local sandboxForceName = Sandbox.NameFromForce(player.force)
     global.players[player.index] = {
@@ -25,7 +25,7 @@ end
 
 -- Reset all Mod data
 function Init.FirstTimeInit()
-    Debug.log("Init.FirstTimeInit")
+    log("Init.FirstTimeInit")
     global.version = Migrate.version
     global.forces = {}
     global.players = {}

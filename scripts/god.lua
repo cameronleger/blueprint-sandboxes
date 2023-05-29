@@ -101,7 +101,7 @@ function God.Upgrade(entity)
         if Illusion.IsIllusion(entity.name) and
             Illusion.GetActualName(entity.name) == target.name
          then
-            Debug.log("Cancelling an Upgrade from an Illusion to its Real Entity: " .. entity.name)
+            log("Cancelling an Upgrade from an Illusion to its Real Entity: " .. entity.name)
             entity.cancel_upgrade(entity.force)
             return
         end
@@ -124,10 +124,10 @@ function God.Upgrade(entity)
         local result = entity.surface.create_entity(options)
 
         if result == nil and entity.valid then
-            Debug.log("Upgrade Failed, Cancelling: " .. entity.name)
+            log("Upgrade Failed, Cancelling: " .. entity.name)
             entity.cancel_upgrade(entity.force)
         else
-            Debug.log("Upgrade Failed, Old Entity Gone too!")
+            log("Upgrade Failed, Old Entity Gone too!")
         end
     end
 end
@@ -195,7 +195,7 @@ end
 
 -- Ensure new Orders are handled
 function God.OnMarkedForDeconstruct(event)
-    -- Debug.log("Entity Deconstructing: " .. event.entity.unit_number .. " " .. event.entity.type)
+    -- log("Entity Deconstructing: " .. event.entity.unit_number .. " " .. event.entity.type)
     if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncDeleteRequestsPerTick,
@@ -208,7 +208,7 @@ end
 
 -- Ensure new Orders are handled
 function God.OnMarkedForUpgrade(event)
-    -- Debug.log("Entity Upgrading: " .. event.entity.unit_number .. " " .. event.entity.type)
+    -- log("Entity Upgrading: " .. event.entity.unit_number .. " " .. event.entity.type)
     if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncUpgradeRequestsPerTick,
@@ -221,7 +221,7 @@ end
 
 -- Ensure new Ghosts are handled
 function God.OnBuiltEntity(event)
-    -- Debug.log("Entity Creating: " .. event.created_entity.unit_number .. " " .. event.created_entity.type)
+    -- log("Entity Creating: " .. event.created_entity.unit_number .. " " .. event.created_entity.type)
     if God.ShouldHandleEntity(event.created_entity) then
         God.AsyncWrapper(
                 Settings.godAsyncCreateRequestsPerTick,

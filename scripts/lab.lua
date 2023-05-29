@@ -27,7 +27,7 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
     local surface = game.surfaces[labName]
 
     if not Lab.IsLab({ name = labName }) then
-        Debug.log("Not a Lab, won't Create: " .. labName)
+        log("Not a Lab, won't Create: " .. labName)
         return
     end
 
@@ -35,10 +35,10 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
         if global.labSurfaces[labName] then
             return surface
         end
-        Debug.log("Found a Lab Surface, but not the Data; recreating it for safety")
+        log("Found a Lab Surface, but not the Data; recreating it for safety")
     end
 
-    Debug.log("Creating Lab: " .. labName)
+    log("Creating Lab: " .. labName)
     global.labSurfaces[labName] = {
         sandboxForceName = sandboxForce.name,
         daytime = 0.95,
@@ -86,12 +86,12 @@ end
 -- Delete a Lab Surface, if present
 function Lab.DeleteLab(surfaceName)
     if game.surfaces[surfaceName] and global.labSurfaces[surfaceName] then
-        Debug.log("Deleting Lab: " .. surfaceName)
+        log("Deleting Lab: " .. surfaceName)
         global.labSurfaces[surfaceName] = nil
         game.delete_surface(surfaceName)
         return true
     else
-        Debug.log("Not a Lab, won't Delete: " .. surfaceName)
+        log("Not a Lab, won't Delete: " .. surfaceName)
         return false
     end
 end
@@ -99,12 +99,12 @@ end
 -- Reset the Lab a Player is currently in
 function Lab.Reset(player)
     if Lab.IsLab(player.surface) then
-        Debug.log("Resetting Lab: " .. player.surface.name)
+        log("Resetting Lab: " .. player.surface.name)
         player.teleport({ 0, 0 }, player.surface.name)
         player.surface.clear(false)
         return true
     else
-        Debug.log("Not a Lab, won't Reset: " .. player.surface.name)
+        log("Not a Lab, won't Reset: " .. player.surface.name)
         return false
     end
 end
@@ -113,11 +113,11 @@ end
 function Lab.Equip(surface)
     local surfaceData = global.labSurfaces[surface.name]
     if not surfaceData then
-        Debug.log("Not a Lab, won't Equip: " .. surface.name)
+        log("Not a Lab, won't Equip: " .. surface.name)
         return false
     end
 
-    Debug.log("Equipping Lab: " .. surface.name)
+    log("Equipping Lab: " .. surface.name)
 
     electricInterface = surface.create_entity {
         name = "electric-energy-interface",

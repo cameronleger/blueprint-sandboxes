@@ -5,13 +5,13 @@ local Research = {}
 function Research.Sync(originalForce, sandboxForce)
     if settings.global[Settings.allowAllTech].value then
         sandboxForce.research_all_technologies()
-        Debug.log("Researching everything for: " .. sandboxForce.name)
+        log("Researching everything for: " .. sandboxForce.name)
     else
         for tech, _ in pairs(game.technology_prototypes) do
             sandboxForce.technologies[tech].researched = originalForce.technologies[tech].researched
             sandboxForce.technologies[tech].level = originalForce.technologies[tech].level
         end
-        Debug.log("Copied all Research from: " .. originalForce.name .. " -> " .. sandboxForce.name)
+        log("Copied all Research from: " .. originalForce.name .. " -> " .. sandboxForce.name)
     end
 end
 
@@ -19,14 +19,14 @@ end
 function Research.SyncQueue(originalForce, sandboxForce)
     if settings.global[Settings.allowAllTech].value then
         sandboxForce.research_queue = nil
-        Debug.log("Emptying Research Queue for: " .. sandboxForce.name)
+        log("Emptying Research Queue for: " .. sandboxForce.name)
     else
         local newQueue = {}
         for _, tech in pairs(originalForce.research_queue) do
             table.insert(newQueue, tech.name)
         end
         sandboxForce.research_queue = newQueue
-        Debug.log("Copied Research Queue from: " .. originalForce.name .. " -> " .. sandboxForce.name)
+        log("Copied Research Queue from: " .. originalForce.name .. " -> " .. sandboxForce.name)
     end
 end
 
@@ -35,7 +35,7 @@ function Research.EnableSandboxSpecificResearch(force)
     if global.sandboxForces[force.name].hiddenItemsUnlocked == true then
         return
     end
-    Debug.log("Unlocking hidden Recipes for: " .. force.name)
+    log("Unlocking hidden Recipes for: " .. force.name)
 
     if force.recipes[BPSB.pfx .. "loader"] then
         force.recipes[BPSB.pfx .. "loader"].enabled = true
@@ -76,7 +76,7 @@ function Research.OnResearched(event)
         if not Sandbox.IsSandboxForce(force) then
             local sandboxForce = game.forces[Sandbox.NameFromForce(force)]
             if sandboxForce then
-                Debug.log("New Research: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
+                log("New Research: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
                 sandboxForce.technologies[event.research.name].researched = force.technologies[event.research.name].researched
                 sandboxForce.technologies[event.research.name].level = force.technologies[event.research.name].level
                 sandboxForce.play_sound { path = "utility/research_completed" }
@@ -93,7 +93,7 @@ function Research.OnResearchStarted(event)
         if not Sandbox.IsSandboxForce(force) then
             local sandboxForce = game.forces[Sandbox.NameFromForce(force)]
             if sandboxForce then
-                Debug.log("New Research Queued: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
+                log("New Research Queued: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
                 Research.SyncQueue(force, sandboxForce)
             end
         end

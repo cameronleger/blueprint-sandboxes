@@ -42,7 +42,7 @@ function Migrate.v1_0_3()
     triggered the complete-reset of that Surface anyway.
     ]]
 
-    Debug.log("Migration 1.0.3 Starting")
+    log("Migration 1.0.3 Starting")
 
     if SpaceExploration.enabled then
         local planetaryLabId = 3
@@ -68,12 +68,12 @@ function Migrate.v1_0_3()
         end
 
         for _, player in pairs(playersToKickFromPlanetaryLabs) do
-            Debug.log("Kicking Player out of Planetary Lab: " .. player.name)
+            log("Kicking Player out of Planetary Lab: " .. player.name)
             Sandbox.Exit(player)
         end
 
         for _, surfaceData in pairs(planetaryLabsOnStars) do
-            Debug.log("Destroying Planetary Lab inside Star: " .. surfaceData.zoneName)
+            log("Destroying Planetary Lab inside Star: " .. surfaceData.zoneName)
             SpaceExploration.DeleteSandbox(
                     global.sandboxForces[surfaceData.sandboxForceName],
                     surfaceData.zoneName
@@ -81,7 +81,7 @@ function Migrate.v1_0_3()
         end
     end
 
-    Debug.log("Migration 1.0.3 Finished")
+    log("Migration 1.0.3 Finished")
 end
 
 function Migrate.v1_1_0()
@@ -89,13 +89,13 @@ function Migrate.v1_1_0()
     A "persistent" Sandbox Inventory was created for each Player.
     ]]
 
-    Debug.log("Migration 1.1.0 Starting")
+    log("Migration 1.1.0 Starting")
 
     for index, player in pairs(game.players) do
         local playerData = global.players[index]
         playerData.sandboxInventory = game.create_inventory(#player.get_main_inventory())
         if Sandbox.IsPlayerInsideSandbox(player) then
-            Debug.log("Player inside Sandbox, fully-syncing the inventory.")
+            log("Player inside Sandbox, fully-syncing the inventory.")
             Inventory.Persist(
                     player.get_main_inventory(),
                     playerData.sandboxInventory
@@ -103,7 +103,7 @@ function Migrate.v1_1_0()
         end
     end
 
-    Debug.log("Migration 1.1.0 Finished")
+    log("Migration 1.1.0 Finished")
 end
 
 function Migrate.v1_4_1()
@@ -111,11 +111,11 @@ function Migrate.v1_4_1()
     The levels for level-based Research wasn't being synchronized.
     ]]
 
-    Debug.log("Migration 1.4.1 Starting")
+    log("Migration 1.4.1 Starting")
 
     Research.SyncAllForces()
 
-    Debug.log("Migration 1.4.1 Finished")
+    log("Migration 1.4.1 Finished")
 end
 
 function Migrate.v1_5_0()
@@ -123,11 +123,11 @@ function Migrate.v1_5_0()
     Bonus Slots for Sandbox Force Inventories were added.
     ]]
 
-    Debug.log("Migration 1.5.0 Starting")
+    log("Migration 1.5.0 Starting")
 
     Force.SyncAllForces()
 
-    Debug.log("Migration 1.5.0 Finished")
+    log("Migration 1.5.0 Finished")
 end
 
 function Migrate.v1_6_0()
@@ -135,14 +135,14 @@ function Migrate.v1_6_0()
     Last-known positions inside Sandboxes were added.
     ]]
 
-    Debug.log("Migration 1.6.0 Starting")
+    log("Migration 1.6.0 Starting")
 
     for index, _ in pairs(game.players) do
         local playerData = global.players[index]
         playerData.lastSandboxPositions = {}
     end
 
-    Debug.log("Migration 1.6.0 Finished")
+    log("Migration 1.6.0 Finished")
 end
 
 function Migrate.v1_7_0()
@@ -150,7 +150,7 @@ function Migrate.v1_7_0()
     Configurable-per-Sandbox daytime was added.
     ]]
 
-    Debug.log("Migration 1.7.0 Starting")
+    log("Migration 1.7.0 Starting")
 
     for surfaceName, _ in pairs(global.labSurfaces) do
         local surface = game.surfaces[surfaceName]
@@ -174,7 +174,7 @@ function Migrate.v1_7_0()
 
     Migrate.RecreateGuis()
 
-    Debug.log("Migration 1.7.0 Finished")
+    log("Migration 1.7.0 Finished")
 end
 
 function Migrate.v1_7_3()
@@ -182,11 +182,11 @@ function Migrate.v1_7_3()
     The daylight portrait icon had the same name as the Reset Button.
     ]]
 
-    Debug.log("Migration 1.7.3 Starting")
+    log("Migration 1.7.3 Starting")
 
     Migrate.RecreateGuis()
 
-    Debug.log("Migration 1.7.3 Finished")
+    log("Migration 1.7.3 Finished")
 end
 
 function Migrate.v1_7_4()
@@ -197,7 +197,7 @@ function Migrate.v1_7_4()
 
     Migrate.v1_7_3()
 
-    Debug.log("Migration 1.7.4 Starting")
+    log("Migration 1.7.4 Starting")
 
     if settings.global[Settings.allowAllTech].value then
         game.print("Blueprint Sandboxes Notice: You had the Unlock-all-Technologies " ..
@@ -206,7 +206,7 @@ function Migrate.v1_7_4()
                 "disable, then re-enable this setting in order to fix that.")
     end
 
-    Debug.log("Migration 1.7.4 Finished")
+    log("Migration 1.7.4 Finished")
 end
 
 function Migrate.v1_10_0()
@@ -215,7 +215,7 @@ function Migrate.v1_10_0()
     replace the old find_entities_filtered
     ]]
 
-    Debug.log("Migration 1.10.0 Starting")
+    log("Migration 1.10.0 Starting")
 
     global.asyncCreateQueue = Queue.New()
     global.asyncUpgradeQueue = Queue.New()
@@ -229,7 +229,7 @@ function Migrate.v1_10_0()
         surfaceData.hasRequests = nil
     end
 
-    Debug.log("Migration 1.10.0 Finished")
+    log("Migration 1.10.0 Finished")
 end
 
 function Migrate.v1_10_1()
@@ -238,7 +238,7 @@ function Migrate.v1_10_1()
     and on Planets that could be dangerous.
     ]]
 
-    Debug.log("Migration 1.10.1 Starting")
+    log("Migration 1.10.1 Starting")
 
     if SpaceExploration.enabled then
         local planetaryLabId = 3
@@ -274,12 +274,12 @@ function Migrate.v1_10_1()
         end
 
         for _, player in pairs(playersToKickFromPlanetaryLabs) do
-            Debug.log("Kicking Player out of Planetary Lab: " .. player.name)
+            log("Kicking Player out of Planetary Lab: " .. player.name)
             Sandbox.Exit(player)
         end
 
         for _, surfaceData in pairs(badPlanetaryLabs) do
-            Debug.log("Destroying Planetary Lab: " .. surfaceData.zoneName)
+            log("Destroying Planetary Lab: " .. surfaceData.zoneName)
             SpaceExploration.DeleteSandbox(
                     global.sandboxForces[surfaceData.sandboxForceName],
                     surfaceData.zoneName
@@ -292,7 +292,7 @@ function Migrate.v1_10_1()
         end
     end
 
-    Debug.log("Migration 1.10.1 Finished")
+    log("Migration 1.10.1 Finished")
 end
 
 function Migrate.v1_11_1()
@@ -300,7 +300,7 @@ function Migrate.v1_11_1()
     dangOreus was applying to Labs and causing significant lag
     ]]
 
-    Debug.log("Migration 1.11.1 Starting")
+    log("Migration 1.11.1 Starting")
 
     if remote.interfaces["dangOreus"] then
         for labName, _ in pairs(global.labSurfaces) do
@@ -308,7 +308,7 @@ function Migrate.v1_11_1()
         end
     end
 
-    Debug.log("Migration 1.11.1 Finished")
+    log("Migration 1.11.1 Finished")
 end
 
 function Migrate.v1_11_3_surface(surfaceName)
@@ -335,7 +335,7 @@ function Migrate.v1_11_3()
     could cause a crash.
     ]]
 
-    Debug.log("Migration 1.11.3 Starting")
+    log("Migration 1.11.3 Starting")
 
     for surfaceName, _ in pairs(global.labSurfaces) do
         Migrate.v1_11_3_surface(surfaceName)
@@ -345,7 +345,7 @@ function Migrate.v1_11_3()
         Migrate.v1_11_3_surface(surfaceName)
     end
 
-    Debug.log("Migration 1.11.3 Finished")
+    log("Migration 1.11.3 Finished")
 end
 
 return Migrate

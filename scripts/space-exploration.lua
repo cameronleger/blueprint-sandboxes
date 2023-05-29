@@ -78,7 +78,7 @@ function SpaceExploration.ChooseZoneForForce(player, sandboxForce, type)
             if not SpaceExploration.IsZoneThreatening(zone)
                     and rootZone.special_type ~= "homesystem"
             then
-                Debug.log("Choosing SE Zone " .. zone.name .. " as Sandbox for " .. sandboxForce.name)
+                log("Choosing SE Zone " .. zone.name .. " as Sandbox for " .. sandboxForce.name)
                 return zone.name
             end
         end
@@ -167,12 +167,12 @@ function SpaceExploration.Reset(player)
     end
 
     if SpaceExploration.IsSandbox(player.surface) then
-        Debug.log("Resetting SE Sandbox: " .. player.surface.name)
+        log("Resetting SE Sandbox: " .. player.surface.name)
         player.teleport({ 0, 0 }, player.surface.name)
         player.surface.clear(false)
         return true
     else
-        Debug.log("Not a SE Sandbox, won't Reset: " .. player.surface.name)
+        log("Not a SE Sandbox, won't Reset: " .. player.surface.name)
         return false
     end
 end
@@ -184,7 +184,7 @@ function SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
     end
 
     if global.seSurfaces[zoneName] then
-        Debug.log("Pre-Deleting SE Sandbox: " .. zoneName)
+        log("Pre-Deleting SE Sandbox: " .. zoneName)
         global.seSurfaces[zoneName] = nil
         if sandboxForceData.sePlanetaryLabZoneName == zoneName then
             sandboxForceData.sePlanetaryLabZoneName = nil
@@ -193,7 +193,7 @@ function SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
             sandboxForceData.seOrbitalSandboxZoneName = nil
         end
     else
-        Debug.log("Not a SE Sandbox, won't Pre-Delete: " .. zoneName)
+        log("Not a SE Sandbox, won't Pre-Delete: " .. zoneName)
     end
 end
 
@@ -205,11 +205,11 @@ function SpaceExploration.DeleteSandbox(sandboxForceData, zoneName)
 
     if global.seSurfaces[zoneName] then
         SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
-        Debug.log("Deleting SE Sandbox: " .. zoneName)
+        log("Deleting SE Sandbox: " .. zoneName)
         game.delete_surface(zoneName)
         return true
     else
-        Debug.log("Not a SE Sandbox, won't Delete: " .. zoneName)
+        log("Not a SE Sandbox, won't Delete: " .. zoneName)
         return false
     end
 end
@@ -222,11 +222,11 @@ function SpaceExploration.Equip(surface)
 
     local surfaceData = global.seSurfaces[surface.name]
     if not surfaceData then
-        Debug.log("Not a SE Sandbox, won't Equip: " .. surface.name)
+        log("Not a SE Sandbox, won't Equip: " .. surface.name)
         return false
     end
 
-    Debug.log("Equipping SE Sandbox: " .. surface.name)
+    log("Equipping SE Sandbox: " .. surface.name)
 
     if (surfaceData.orbital) then
         -- Otherwise it will fill with Empty Space on top of the Tiles
