@@ -107,8 +107,8 @@ function Force.ConfigureSandboxForce(force, sandboxForce)
     -- Counteract Space Exploration's slow Mining Speed for Gods
     sandboxForce.manual_mining_speed_modifier = settings.global[Settings.extraMiningSpeed].value
 
-    -- Why should you Research in here?
-    sandboxForce.laboratory_speed_modifier = -0.999
+    -- Make research faster/slower based on play-style
+    sandboxForce.laboratory_speed_modifier = settings.global[Settings.extraLabSpeed].value
 
     -- You should have a little more space too
     sandboxForce.character_inventory_slots_bonus =

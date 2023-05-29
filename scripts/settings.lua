@@ -6,6 +6,7 @@ Settings.onlyAdminsForceReset = BPSB.pfx .. "only-admins-force-reset"
 Settings.craftToCursor = BPSB.pfx .. "craft-to-cursor"
 Settings.bonusInventorySlots = BPSB.pfx .. "bonus-inventory-slots"
 Settings.extraMiningSpeed = BPSB.pfx .. "extra-mining-speed"
+Settings.extraLabSpeed = BPSB.pfx .. "extra-lab-speed"
 Settings.godAsyncTick = BPSB.pfx .. "god-async-tick"
 Settings.godAsyncCreateRequestsPerTick = BPSB.pfx .. "god-async-create-per-tick"
 Settings.godAsyncUpgradeRequestsPerTick = BPSB.pfx .. "god-async-upgrade-per-tick"
@@ -36,6 +37,8 @@ function Settings.OnRuntimeSettingChanged(event)
     elseif event.setting == Settings.bonusInventorySlots then
         Force.SyncAllForces()
     elseif event.setting == Settings.extraMiningSpeed then
+        Force.SyncAllForces()
+    elseif event.setting == Settings.extraLabSpeed then
         Force.SyncAllForces()
     elseif event.setting == Settings.godAsyncTick then
         local newValue = settings.global[Settings.godAsyncTick].value

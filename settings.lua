@@ -42,6 +42,15 @@ data:extend({
         maximum_value = 1000000000,
     },
     {
+        type = "double-setting",
+        name = Settings.extraLabSpeed,
+        setting_type = "runtime-global",
+        order = "a[common]-f",
+        default_value = -0.999,
+        minimum_value = -0.999,
+        maximum_value = 10.0,
+    },
+    {
         type = "bool-setting",
         name = Settings.craftToCursor,
         setting_type = "runtime-per-user",
