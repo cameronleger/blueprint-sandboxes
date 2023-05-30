@@ -19,11 +19,13 @@ function Debug.ItemStack(value)
         data["is_blueprint_setup"] = value.is_blueprint_setup()
     end
 
-    local entities = value.get_blueprint_entities()
-    if entities then
-        data["entities"] = #entities
-    else
-        data["entities"] = "nil"
+    if value.is_blueprint then
+        local entities = value.get_blueprint_entities()
+        if entities then
+            data["entities"] = #entities
+        else
+            data["entities"] = "nil"
+        end
     end
 
     return data

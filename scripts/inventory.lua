@@ -4,6 +4,48 @@ local Inventory = {}
 -- TODO: Consider the Cursor Inventory too (otherwise items can be lost during transition)
 -- TODO: Consider Filters (otherwise they are lost during transition)
 
+-- Extracts a Player Cursor's Blueprint as a string (if present)
+function Inventory.GetCursorBlueprintString(player)
+    local blueprint = nil
+    if player.is_cursor_blueprint() then
+        if player.character
+                and player.character.cursor_stack
+                and player.character.cursor_stack.valid
+                and player.character.cursor_stack.valid_for_read
+        then
+            blueprint = player.character.cursor_stack.export_stack()
+        elseif player.cursor_stack
+                and player.cursor_stack.valid
+                and player.cursor_stack.valid_for_read
+        then
+            blueprint = player.cursor_stack.export_stack()
+        else
+            player.print("There was a Blueprint in your cursor, but Factorio incorrectly describes it as invalid. This is most likely because it's currently in the Blueprint Library (a known bug in Factorio).")
+        end
+    end
+    return blueprint
+end
+
+-- Whether a Player's Cursor can non-destructively be replaced
+function Inventory.WasCursorSafelyCleared(player)
+    if not player or not player.cursor_stack.valid then
+        return false
+    end
+    if player.is_cursor_empty() then return true end
+    if player.is_cursor_blueprint() then return true end
+
+    --[[ TODO:
+    This doesn't usually happen, since the "source location" of the item
+    seems to be lost after swapping the character.
+    ]]
+    if not player.cursor_stack_temporary then
+        player.clear_cursor()
+        return true
+    end
+
+    return false
+end
+
 -- Whether a Player's Inventory is vulnerable to going missing due to lack of a body
 function Inventory.ShouldPersist(controller)
     return controller ~= defines.controllers.character

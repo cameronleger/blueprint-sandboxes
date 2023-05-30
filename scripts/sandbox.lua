@@ -108,6 +108,18 @@ function Sandbox.Enter(player)
     end
     log("Entering Sandbox: " .. surface.name)
 
+    -- Store some temporary State to use once inside the Sandbox
+    local inputBlueprint = Inventory.GetCursorBlueprintString(player)
+
+    --[[
+    Otherwise, there is a Factorio "bug" that can destroy what was in the Cursor.
+    It seems to happen with something from the Inventory being in the Stack, then
+    entering the Sandbox, then copying something from the Sandbox, then exiting the
+    Sandbox. At this point, the Cursor Stack is still fine and valid, but it seems
+    to have lost its original location, so "clearing" it out will destroy it.
+    ]]
+    player.clear_cursor()
+
     -- Store the Player's previous State (that must be referenced to Exit)
     playerData.insideSandbox = playerData.selectedSandbox
     playerData.preSandboxForceName = player.force.name
@@ -156,6 +168,12 @@ function Sandbox.Enter(player)
             playerData.sandboxInventory,
             player.get_main_inventory()
     )
+
+    -- Then, restore the Blueprint in the Cursor
+    if inputBlueprint then
+        player.cursor_stack.import_stack(inputBlueprint)
+        player.cursor_stack_temporary = true
+    end
 end
 
 -- Convert the Player to their previous State, and leave Selected Sandbox
@@ -167,6 +185,9 @@ function Sandbox.Exit(player)
         return
     end
     log("Exiting Sandbox: " .. player.surface.name)
+
+    -- Store some temporary State to use once outside the Sandbox
+    local outputBlueprint = Inventory.GetCursorBlueprintString(player)
 
     -- Remember where they left off
     playerData.lastSandboxPositions[player.surface.name] = player.position
@@ -196,6 +217,12 @@ function Sandbox.Exit(player)
     if playerData.preSandboxInventory then
         playerData.preSandboxInventory.destroy()
         playerData.preSandboxInventory = nil
+    end
+
+    -- Potentially, restore the Blueprint in the Cursor
+    if outputBlueprint and Inventory.WasCursorSafelyCleared(player) then
+        player.cursor_stack.import_stack(outputBlueprint)
+        player.cursor_stack_temporary = true
     end
 end
 
