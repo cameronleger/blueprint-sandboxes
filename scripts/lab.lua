@@ -6,6 +6,8 @@ local pfxLength = string.len(Lab.pfx)
 
 Lab.chartAllLabsTick = 300
 
+Lab.equipmentString = "0eNqNkd1ugzAMhd/F10kF6bq2eZVqQpAaZgkMSkI1hnj3OVRC1dT95M6x/Z2TkxmqdsTBE0ewM5DrOYC9zBCo4bJNd3EaECxQxA4UcNmlClt00ZPTyOibScs++rp0CIsC4it+gM0X9SenokZvrKFvH/fN8qYAOVIkvJtai6ngsavQi8AvGAVDH2Sz56QttEzBBFabJbn6BjL/eNcPwEz8VmNdoy8CfQoiz7bzRGm/KRHXxNLS7h1DfILfHVYBszuskdyni4AxEjchTXns+hsWo/RasYnXIoUrrehHXFJ6a9j24Y8V3NCHVcWc8pfj2RxfzyY77SWXL6PBsLw="
+
 -- A unique per-Player Lab Name
 function Lab.NameFromPlayer(player)
     return Lab.pfx .. "p-" .. player.name
@@ -41,6 +43,7 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
     log("Creating Lab: " .. labName)
     global.labSurfaces[labName] = {
         sandboxForceName = sandboxForce.name,
+        equipmentBlueprints = Equipment.Init(Lab.equipmentString),
         daytime = 0.95,
     }
     if not surface then
@@ -87,11 +90,44 @@ end
 function Lab.DeleteLab(surfaceName)
     if game.surfaces[surfaceName] and global.labSurfaces[surfaceName] then
         log("Deleting Lab: " .. surfaceName)
+        global.labSurfaces.equipmentBlueprints.destroy()
         global.labSurfaces[surfaceName] = nil
         game.delete_surface(surfaceName)
         return true
     else
         log("Not a Lab, won't Delete: " .. surfaceName)
+        return false
+    end
+end
+
+-- Set the Lab's equipment Blueprint for a Surface
+function Lab.SetEquipmentBlueprint(surface, equipmentString)
+    if Lab.IsLab(surface) then
+        log("Setting Lab equipment: " .. surface.name)
+        Equipment.Set(
+                global.labSurfaces[surface.name].equipmentBlueprints,
+                equipmentString
+        )
+        surface.print("The equipment Blueprint for this Lab has been changed")
+        return true
+    else
+        log("Not a Lab, won't Set equipment: " .. surface.name)
+        return false
+    end
+end
+
+-- Reset the Lab's equipment Blueprint for a Surface
+function Lab.ResetEquipmentBlueprint(surface)
+    if Lab.IsLab(surface) then
+        log("Resetting Lab equipment: " .. surface.name)
+        Equipment.Set(
+                global.labSurfaces[surface.name].equipmentBlueprints,
+                Lab.equipmentString
+        )
+        surface.print("The equipment Blueprint for this Lab has been reset")
+        return true
+    else
+        log("Not a Lab, won't Reset equipment: " .. surface.name)
         return false
     end
 end
@@ -119,27 +155,24 @@ function Lab.Equip(surface)
 
     log("Equipping Lab: " .. surface.name)
 
-    electricInterface = surface.create_entity {
-        name = "electric-energy-interface",
-        position = { 0, 0 },
-        force = surfaceData.sandboxForceName,
-    }
-    electricInterface.minable = true
-
-    bigPole = surface.create_entity {
-        name = "big-electric-pole",
-        position = { 0, -2 },
-        force = surfaceData.sandboxForceName,
-    }
-    bigPole.minable = true
-
-    trashCan = surface.create_entity {
-        name = "infinity-chest",
-        position = { 0, 2 },
-        force = surfaceData.sandboxForceName,
-    }
-    trashCan.remove_unfiltered_items = true
-    trashCan.minable = true
+    surface.generate_with_lab_tiles = true
+    Equipment.Place(
+            surfaceData.equipmentBlueprints[1],
+            surface,
+            surfaceData.sandboxForceName,
+            function(radius)
+                local tiles = {}
+                for y = -radius, radius, 1 do
+                    for x = -radius, radius, 1 do
+                        table.insert(tiles, {
+                            name = ((x + y) % 2 == 0) and "lab-dark-1" or "lab-dark-2",
+                            position = { x = x, y = y }
+                        })
+                    end
+                end
+                surface.set_tiles(tiles)
+            end
+    )
 
     return true
 end

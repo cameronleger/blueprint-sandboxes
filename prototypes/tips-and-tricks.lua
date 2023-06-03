@@ -39,7 +39,7 @@ data:extend({
         type = "tips-and-tricks-item",
         category = category,
         tag = "[img=utility/reset_white]",
-        name = pfxCategory .. "reset",
+        name = pfxCategory .. "reset-v2",
         indent = 1,
         order = pfxOrder .. "c",
         dependencies = { pfxCategory .. "introduction" },

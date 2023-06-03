@@ -220,14 +220,14 @@ function God.OnMarkedForUpgrade(event)
 end
 
 -- Ensure new Ghosts are handled
-function God.OnBuiltEntity(event)
-    -- log("Entity Creating: " .. event.created_entity.unit_number .. " " .. event.created_entity.type)
-    if God.ShouldHandleEntity(event.created_entity) then
+function God.OnBuiltEntity(entity)
+    -- log("Entity Creating: " .. entity.unit_number .. " " .. entity.type)
+    if God.ShouldHandleEntity(entity) then
         God.AsyncWrapper(
                 Settings.godAsyncCreateRequestsPerTick,
                 global.asyncCreateQueue,
                 God.Create,
-                event.created_entity
+                entity
         )
     end
 end

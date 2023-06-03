@@ -161,8 +161,19 @@ function ToggleGUI.OnGuiClick(event)
     if event.element.name == ToggleGUI.toggleShortcut then
         Sandbox.Toggle(event.player_index)
     elseif event.element.name == ToggleGUI.resetButton then
-        return Lab.Reset(player)
-                or SpaceExploration.Reset(player)
+        if event.shift then
+            return Lab.ResetEquipmentBlueprint(player.surface)
+                    or SpaceExploration.ResetEquipmentBlueprint(player.surface)
+        else
+            local blueprintString = Inventory.GetCursorBlueprintString(player)
+            if blueprintString then
+                return Lab.SetEquipmentBlueprint(player.surface, blueprintString)
+                        or SpaceExploration.SetEquipmentBlueprint(player.surface, blueprintString)
+            else
+                return Lab.Reset(player)
+                        or SpaceExploration.Reset(player)
+            end
+        end
     end
 end
 

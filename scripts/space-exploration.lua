@@ -4,6 +4,8 @@ local SpaceExploration = {}
 SpaceExploration.name = "space-exploration"
 SpaceExploration.enabled = not not remote.interfaces[SpaceExploration.name]
 
+SpaceExploration.orbitalEquipmentString = "0eNqllt2OgyAQhd9lrqEB2m5bX6XZGLWjS4JoAJt1G999wW5M07T7N94hzDfDzDkJFyjNgL3TNkB2AV111kN2vIDXjS1M+hfGHiEDHbAFBrZo0woNVsHpiqNF14w8xqOriwphYqDtCd8hkxP7kVPqhi+svjO38Wp6ZYA26KDxWtS8GHM7tCW6mOAbDIO+8zGysyl3pAkGI2RcTamqO5D6xb2eAEWstxzqGl3u9UdESLF8DzKtl0za1trGLV69oQ8P8KvtnECttnNLrqdzjyFo2/h0ymHbnTEf4p6JZeIpT82NW8ENOKXuBW2+WndH5+rajs20FOSR+z7elPemCHXnWu6roq47c4J0kSeANRWgqABJBAhiPDU/tQH/n4CkakBSNSCpGpBUDUiiBiRRA5KoAUnTgCBKQBAVIIgCEMT5C9r4BW36gjZ8QZs91f5U91PNT/U+0fpE5xON/yffx5fA/OzKbl57DM7o/AxUe7nZHdTu5aDEfh1fSJ/ZLl9g"
+
 -- Whether the Surface has been taken as a Space Sandbox
 function SpaceExploration.IsSandbox(surface)
     return SpaceExploration.enabled
@@ -113,6 +115,7 @@ function SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxFor
         global.sandboxForces[sandboxForce.name].sePlanetaryLabZoneName = zoneName
         global.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
+            equipmentBlueprints = Equipment.Init(Lab.equipmentString),
             daytime = 0.95,
             orbital = false,
         }
@@ -136,6 +139,7 @@ function SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce
         global.sandboxForces[sandboxForce.name].seOrbitalSandboxZoneName = zoneName
         global.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
+            equipmentBlueprints = Equipment.Init(SpaceExploration.orbitalEquipmentString),
             daytime = 0.95,
             orbital = true,
         }
@@ -156,6 +160,53 @@ function SpaceExploration.SetDayTime(player, surface, daytime)
         Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
         return true
     else
+        return false
+    end
+end
+
+-- Reset the Sandbox's equipment Blueprint for a Surface
+function SpaceExploration.ResetEquipmentBlueprint(surface)
+    if not SpaceExploration.enabled then
+        return
+    end
+
+    if SpaceExploration.IsSandbox(surface) then
+        log("Resetting SE equipment: " .. surface.name)
+        if global.seSurfaces[surface.name].orbital then
+            Equipment.Set(
+                    global.seSurfaces[surface.name].equipmentBlueprints,
+                    SpaceExploration.orbitalEquipmentString
+            )
+        else
+            Equipment.Set(
+                    global.seSurfaces[surface.name].equipmentBlueprints,
+                    Lab.equipmentString
+            )
+        end
+        surface.print("The equipment Blueprint for this Sandbox has been reset")
+        return true
+    else
+        log("Not a SE Sandbox, won't Reset equipment: " .. surface.name)
+        return false
+    end
+end
+
+-- Set the Sandbox's equipment Blueprint for a Surface
+function SpaceExploration.SetEquipmentBlueprint(surface, equipmentString)
+    if not SpaceExploration.enabled then
+        return
+    end
+
+    if SpaceExploration.IsSandbox(surface) then
+        log("Setting SE equipment: " .. surface.name)
+        Equipment.Set(
+                global.seSurfaces[surface.name].equipmentBlueprints,
+                equipmentString
+        )
+        surface.print("The equipment Blueprint for this Sandbox has been changed")
+        return true
+    else
+        log("Not a SE Sandbox, won't Set equipment: " .. surface.name)
         return false
     end
 end
@@ -185,6 +236,7 @@ function SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
 
     if global.seSurfaces[zoneName] then
         log("Pre-Deleting SE Sandbox: " .. zoneName)
+        global.seSurfaces[zoneName].equipmentBlueprints.destroy()
         global.seSurfaces[zoneName] = nil
         if sandboxForceData.sePlanetaryLabZoneName == zoneName then
             sandboxForceData.sePlanetaryLabZoneName = nil
@@ -229,43 +281,32 @@ function SpaceExploration.Equip(surface)
     log("Equipping SE Sandbox: " .. surface.name)
 
     if (surfaceData.orbital) then
-        -- Otherwise it will fill with Empty Space on top of the Tiles
-        surface.request_to_generate_chunks({ x = 0, y = 0 }, 1)
-        surface.force_generate_chunk_requests()
-
-        local tiles = {}
-        for y = -16, 16, 1 do
-            for x = -16, 16, 1 do
-                table.insert(tiles, {
-                    name = "se-space-platform-scaffold",
-                    position = { x = x, y = y }
-                })
-            end
-        end
-        surface.set_tiles(tiles)
+        Equipment.Place(
+                surfaceData.equipmentBlueprints[1],
+                surface,
+                surfaceData.sandboxForceName,
+                function(radius) end
+        )
+    else
+        surface.generate_with_lab_tiles = true
+        Equipment.Place(
+                surfaceData.equipmentBlueprints[1],
+                surface,
+                surfaceData.sandboxForceName,
+                function(radius)
+                    local tiles = {}
+                    for y = -radius, radius, 1 do
+                        for x = -radius, radius, 1 do
+                            table.insert(tiles, {
+                                name = ((x + y) % 2 == 0) and "lab-dark-1" or "lab-dark-2",
+                                position = { x = x, y = y }
+                            })
+                        end
+                    end
+                    surface.set_tiles(tiles)
+                end
+        )
     end
-
-    electricInterface = surface.create_entity {
-        name = "electric-energy-interface",
-        position = { 0, 0 },
-        force = surfaceData.sandboxForceName
-    }
-    electricInterface.minable = true
-
-    bigPole = surface.create_entity {
-        name = "big-electric-pole",
-        position = { 0, -2 },
-        force = surfaceData.sandboxForceName
-    }
-    bigPole.minable = true
-
-    trashCan = surface.create_entity {
-        name = "infinity-chest",
-        position = { 0, 2 },
-        force = surfaceData.sandboxForceName,
-    }
-    trashCan.remove_unfiltered_items = true
-    trashCan.minable = true
 
     return true
 end

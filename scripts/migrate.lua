@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 011400
+Migrate.version = 011500
 
 function Migrate.Run()
     if not global.version then
@@ -20,6 +20,7 @@ function Migrate.Run()
         if global.version < 011001 then Migrate.v1_10_1() end
         if global.version < 011101 then Migrate.v1_11_1() end
         if global.version < 011103 then Migrate.v1_11_3() end
+        if global.version < 011500 then Migrate.v1_15_0() end
     end
 
     global.version = Migrate.version
@@ -346,6 +347,28 @@ function Migrate.v1_11_3()
     end
 
     log("Migration 1.11.3 Finished")
+end
+
+function Migrate.v1_15_0()
+    --[[
+    1.15.0 introduced a default Equipment Inventory for each Sandbox
+    ]]
+
+    log("Migration 1.15.0 Starting")
+
+    for surfaceName, surfaceData in pairs(global.labSurfaces) do
+        surfaceData.equipmentBlueprints = Equipment.Init(Lab.equipmentString)
+    end
+
+    for surfaceName, surfaceData in pairs(global.seSurfaces) do
+        if (surfaceData.orbital) then
+            surfaceData.equipmentBlueprints = Equipment.Init(SpaceExploration.orbitalEquipmentString)
+        else
+            surfaceData.equipmentBlueprints = Equipment.Init(Lab.equipmentString)
+        end
+    end
+
+    log("Migration 1.15.0 Finished")
 end
 
 return Migrate

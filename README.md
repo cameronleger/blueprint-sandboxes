@@ -17,6 +17,7 @@ To teach you the basics and provide many more details, the in-game Tips-and-Tric
 * All Recipes: If desired, use all Technology (instead of what you already know).
 * Resource Generation: Draw then use any kind of Resource Patch.
 * Water placement: Place water, so you can then landfill it (or not).
+* Default Equipment: You can decide what an empty Sandbox starts with.
 
 # FAQ
 

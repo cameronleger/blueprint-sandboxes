@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.15.0
+Date: 2023-06-02
+  Changes:
+    - Blueprints can be provided as the default Equipment to be used when Resetting each Sandbox
+  Bugfixes:
+    - script_raised_built is now handled like on_built_entity
+---------------------------------------------------------------------------------------------------
 Version: 1.14.0
 Date: 2023-05-30
   Changes:
