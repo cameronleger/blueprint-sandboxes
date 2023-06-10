@@ -236,7 +236,10 @@ function SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
 
     if global.seSurfaces[zoneName] then
         log("Pre-Deleting SE Sandbox: " .. zoneName)
-        global.seSurfaces[zoneName].equipmentBlueprints.destroy()
+        local equipmentBlueprints = global.seSurfaces[zoneName].equipmentBlueprints
+        if equipmentBlueprints and equipmentBlueprints.valid() then
+            equipmentBlueprints.destroy()
+        end
         global.seSurfaces[zoneName] = nil
         if sandboxForceData.sePlanetaryLabZoneName == zoneName then
             sandboxForceData.sePlanetaryLabZoneName = nil

@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.16.0
+Date: 2023-06-10
+  Changes:
+    - Illusion replacements of Container-based Entities are now Infinity Containers
+  Bugfixes:
+    - Some much older versions of this mod would crash in a rare scenario when loading a recent version
+---------------------------------------------------------------------------------------------------
 Version: 1.15.0
 Date: 2023-06-02
   Changes:

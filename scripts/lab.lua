@@ -90,6 +90,10 @@ end
 function Lab.DeleteLab(surfaceName)
     if game.surfaces[surfaceName] and global.labSurfaces[surfaceName] then
         log("Deleting Lab: " .. surfaceName)
+        local equipmentBlueprints = global.labSurfaces.equipmentBlueprints
+        if equipmentBlueprints and equipmentBlueprints.valid() then
+            equipmentBlueprints.destroy()
+        end
         global.labSurfaces.equipmentBlueprints.destroy()
         global.labSurfaces[surfaceName] = nil
         game.delete_surface(surfaceName)
