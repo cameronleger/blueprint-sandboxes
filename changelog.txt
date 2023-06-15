@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.16.1
+Date: 2023-06-15
+  Bugfixes:
+    - Potential crashes and incorrect Sandbox surface generation when paired with mods such as RSO caused by 1.15
+---------------------------------------------------------------------------------------------------
 Version: 1.16.0
 Date: 2023-06-10
   Changes:

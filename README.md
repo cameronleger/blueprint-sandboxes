@@ -33,6 +33,10 @@ To teach you the basics and provide many more details, the in-game Tips-and-Tric
 
 This is an issue with Factorio, and there's nothing this mod can do about it (while still being this mod).
 
+### Space Exploration Sandboxes report incorrect Daylight on their first use
+
+This also seems to be an issue with Factorio. Although the Daylight property is forcefully set and told to not change, the next read of the value will be zero (or perhaps what the value originally was). It's purely a cosmetic bug.
+
 ### Space Exploration sometimes blocks placements due to Zone/Force issues
 
 In its original form, this mod had great compatibility with Space Exploration - from this mod's POV. From SE's POV, however, at least two things were bad. First, it's technically possible to cheat (well, it _always_ is, since you're in control of the games you play), even though this mod discourages it and aims to prevent it. Second, SE's handling of Forces had some assumptions that were not true when using this mod. As such, there were a few bugs, like having twice as many CMEs as normal.

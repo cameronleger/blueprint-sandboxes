@@ -53,23 +53,6 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
         })
     end
 
-    if remote.interfaces["RSO"] then
-        pcall(remote.call, "RSO", "ignoreSurface", labName)
-    end
-
-    if remote.interfaces["dangOreus"] then
-        pcall(remote.call, "dangOreus", "toggle", labName)
-    end
-
-    if remote.interfaces["AbandonedRuins"] then
-        pcall(remote.call, "AbandonedRuins", "exclude_surface", labName)
-    end
-
-    surface.freeze_daytime = true
-    surface.daytime = 0.95
-    surface.show_clouds = false
-    surface.generate_with_lab_tiles = true
-
     return surface
 end
 
@@ -149,6 +132,36 @@ function Lab.Reset(player)
     end
 end
 
+-- Set some important Surface settings for a Lab
+function Lab.AfterCreate(surface)
+    local surfaceData = global.labSurfaces[surface.name]
+    if not surfaceData then
+        log("Not a Lab, won't handle Creation: " .. surface.name)
+        return false
+    end
+
+    log("Handling Creation of Lab: " .. surface.name)
+
+    if remote.interfaces["RSO"] then
+        pcall(remote.call, "RSO", "ignoreSurface", surface.name)
+    end
+
+    if remote.interfaces["dangOreus"] then
+        pcall(remote.call, "dangOreus", "toggle", surface.name)
+    end
+
+    if remote.interfaces["AbandonedRuins"] then
+        pcall(remote.call, "AbandonedRuins", "exclude_surface", surface.name)
+    end
+
+    surface.freeze_daytime = true
+    surface.daytime = 0.95
+    surface.show_clouds = false
+    surface.generate_with_lab_tiles = true
+
+    return true
+end
+
 -- Add some helpful initial Entities to a Lab
 function Lab.Equip(surface)
     local surfaceData = global.labSurfaces[surface.name]
@@ -159,7 +172,6 @@ function Lab.Equip(surface)
 
     log("Equipping Lab: " .. surface.name)
 
-    surface.generate_with_lab_tiles = true
     Equipment.Place(
             surfaceData.equipmentBlueprints[1],
             surface,

@@ -127,8 +127,9 @@ script.on_event(defines.events.on_player_changed_surface, function(event)
 end)
 
 script.on_event(defines.events.on_surface_created, function(event)
-    return Lab.Equip(game.surfaces[event.surface_index])
-            or SpaceExploration.Equip(game.surfaces[event.surface_index])
+    local surface = game.surfaces[event.surface_index]
+    local _ = Lab.AfterCreate(surface) or SpaceExploration.AfterCreate(surface)
+    local _ =  Lab.Equip(surface) or SpaceExploration.Equip(surface)
 end)
 
 script.on_event(defines.events.on_surface_cleared, function(event)

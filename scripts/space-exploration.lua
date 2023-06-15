@@ -92,15 +92,11 @@ function SpaceExploration.GetOrCreateSurface(zoneName)
         return
     end
 
-    local surface = remote.call(SpaceExploration.name, "zone_get_make_surface", {
+    return remote.call(SpaceExploration.name, "zone_get_make_surface", {
         zone_index = remote.call(SpaceExploration.name, "get_zone_from_name", {
             zone_name = zoneName,
         }).index,
     })
-    surface.freeze_daytime = true
-    surface.daytime = global.seSurfaces[zoneName].daytime
-    surface.show_clouds = false
-    return surface
 end
 
 -- Chooses a non-home-system Star for a Force's Space Sandbox, if necessary
@@ -121,10 +117,7 @@ function SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxFor
         }
     end
 
-    local surface = SpaceExploration.GetOrCreateSurface(zoneName)
-    surface.generate_with_lab_tiles = true
-
-    return surface
+    return SpaceExploration.GetOrCreateSurface(zoneName)
 end
 
 -- Chooses a non-home-system Star for a Force's Planetary Sandbox, if necessary
@@ -145,10 +138,7 @@ function SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce
         }
     end
 
-    local surface = SpaceExploration.GetOrCreateSurface(zoneName)
-    surface.generate_with_lab_tiles = false
-
-    return surface
+    return SpaceExploration.GetOrCreateSurface(zoneName)
 end
 
 -- Set a Sandbox's Daytime to a specific value
@@ -267,6 +257,33 @@ function SpaceExploration.DeleteSandbox(sandboxForceData, zoneName)
         log("Not a SE Sandbox, won't Delete: " .. zoneName)
         return false
     end
+end
+
+-- Set some important Surface settings for Space Sandbox
+function SpaceExploration.AfterCreate(surface)
+    if not SpaceExploration.enabled then
+        return
+    end
+
+    local surfaceData = global.seSurfaces[surface.name]
+    if not surfaceData then
+        log("Not a SE Sandbox, won't handle Creation: " .. surface.name)
+        return false
+    end
+
+    log("Handling Creation of SE Sandbox: " .. surface.name)
+
+    surface.freeze_daytime = true
+    surface.daytime = surfaceData.daytime
+    surface.show_clouds = false
+
+    if (surfaceData.orbital) then
+        surface.generate_with_lab_tiles = false
+    else
+        surface.generate_with_lab_tiles = true
+    end
+
+    return true
 end
 
 -- Add some helpful initial Entities to a Space Sandbox

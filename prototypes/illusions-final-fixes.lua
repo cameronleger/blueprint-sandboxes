@@ -40,8 +40,6 @@ for _, mapping in pairs(Illusion.mappings) do
             illusion.erase_contents_when_mined = true
         end
 
-        log(serpent.block(illusion))
-
         data:extend({ illusion })
     else
         log("data[" .. type .. "][" .. name .. "] not found; cannot create Illusion")
