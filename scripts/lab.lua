@@ -77,7 +77,6 @@ function Lab.DeleteLab(surfaceName)
         if equipmentBlueprints and equipmentBlueprints.valid() then
             equipmentBlueprints.destroy()
         end
-        global.labSurfaces.equipmentBlueprints.destroy()
         global.labSurfaces[surfaceName] = nil
         game.delete_surface(surfaceName)
         return true
