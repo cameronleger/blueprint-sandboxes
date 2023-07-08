@@ -1,5 +1,10 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.16.2
+Date: 2023-07-08
+  Bugfixes:
+    - Regression fix when leaving a Lab into a non-Character controller
+---------------------------------------------------------------------------------------------------
+Version: 1.16.2
 Date: 2023-07-02
   Bugfixes:
     - Crash when deleting Labs

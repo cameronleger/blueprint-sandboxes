@@ -195,6 +195,9 @@ function Sandbox.Exit(player)
     -- Attach the Player back to their original Character (also changes force)
     Sandbox.RecoverPlayerCharacter(player, playerData)
 
+    -- Swap to their original Force (in case they're not sent back to a Character)
+    player.force = playerData.preSandboxForceName
+
     -- Toggle Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
     player.cheat_mode = playerData.preSandboxCheatMode or false
 
