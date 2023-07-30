@@ -1,5 +1,10 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.16.2
+Version: 1.16.4
+Date: 2023-07-30
+  Changes:
+    - Necessary updates for 1.16.0 and Factorio 1.1.87: large refactor of Equipment Blueprint placement
+---------------------------------------------------------------------------------------------------
+Version: 1.16.3
 Date: 2023-07-08
   Bugfixes:
     - Regression fix when leaving a Lab into a non-Character controller

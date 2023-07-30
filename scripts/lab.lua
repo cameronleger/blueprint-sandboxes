@@ -174,19 +174,7 @@ function Lab.Equip(surface)
     Equipment.Place(
             surfaceData.equipmentBlueprints[1],
             surface,
-            surfaceData.sandboxForceName,
-            function(radius)
-                local tiles = {}
-                for y = -radius, radius, 1 do
-                    for x = -radius, radius, 1 do
-                        table.insert(tiles, {
-                            name = ((x + y) % 2 == 0) and "lab-dark-1" or "lab-dark-2",
-                            position = { x = x, y = y }
-                        })
-                    end
-                end
-                surface.set_tiles(tiles)
-            end
+            surfaceData.sandboxForceName
     )
 
     return true

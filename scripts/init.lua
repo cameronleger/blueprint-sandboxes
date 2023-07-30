@@ -32,6 +32,7 @@ function Init.FirstTimeInit()
     global.labSurfaces = {}
     global.sandboxForces = {}
     global.seSurfaces = {}
+    global.equipmentInProgress = {}
     global.asyncCreateQueue = Queue.New()
     global.asyncUpgradeQueue = Queue.New()
     global.asyncDestroyQueue = Queue.New()

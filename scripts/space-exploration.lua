@@ -300,33 +300,14 @@ function SpaceExploration.Equip(surface)
 
     log("Equipping SE Sandbox: " .. surface.name)
 
-    if (surfaceData.orbital) then
-        Equipment.Place(
-                surfaceData.equipmentBlueprints[1],
-                surface,
-                surfaceData.sandboxForceName,
-                function(radius) end
-        )
-    else
+    if not surfaceData.orbital then
         surface.generate_with_lab_tiles = true
-        Equipment.Place(
-                surfaceData.equipmentBlueprints[1],
-                surface,
-                surfaceData.sandboxForceName,
-                function(radius)
-                    local tiles = {}
-                    for y = -radius, radius, 1 do
-                        for x = -radius, radius, 1 do
-                            table.insert(tiles, {
-                                name = ((x + y) % 2 == 0) and "lab-dark-1" or "lab-dark-2",
-                                position = { x = x, y = y }
-                            })
-                        end
-                    end
-                    surface.set_tiles(tiles)
-                end
-        )
     end
+    Equipment.Place(
+            surfaceData.equipmentBlueprints[1],
+            surface,
+            surfaceData.sandboxForceName
+    )
 
     return true
 end

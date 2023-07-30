@@ -137,6 +137,17 @@ script.on_event(defines.events.on_surface_cleared, function(event)
             or SpaceExploration.Equip(game.surfaces[event.surface_index])
 end)
 
+script.on_event(defines.events.on_chunk_generated, function(event)
+    local equipmentData = global.equipmentInProgress[event.surface.name]
+    if equipmentData then
+        Equipment.BuildBlueprint(
+                equipmentData.stack,
+                equipmentData.surface,
+                equipmentData.forceName
+        )
+    end
+end)
+
 script.on_event(defines.events.on_pre_surface_deleted, function(event)
     local surface = game.surfaces[event.surface_index]
     if global.labSurfaces[surface.name] then

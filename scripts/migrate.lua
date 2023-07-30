@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 011603
+Migrate.version = 011604
 
 function Migrate.Run()
     if not global.version then
@@ -21,6 +21,7 @@ function Migrate.Run()
         if global.version < 011101 then Migrate.v1_11_1() end
         if global.version < 011103 then Migrate.v1_11_3() end
         if global.version < 011500 then Migrate.v1_15_0() end
+        if global.version < 011604 then Migrate.v1_16_4() end
     end
 
     global.version = Migrate.version
@@ -369,6 +370,18 @@ function Migrate.v1_15_0()
     end
 
     log("Migration 1.15.0 Finished")
+end
+
+function Migrate.v1_16_4()
+    --[[
+    1.16.4 introduced an alternative Equipment placement technique
+    ]]
+
+    log("Migration 1.16.4 Starting")
+
+    global.equipmentInProgress = {}
+
+    log("Migration 1.16.4 Finished")
 end
 
 return Migrate
