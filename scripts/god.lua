@@ -19,6 +19,8 @@ God.skipHandlingEntities = {
     ["logistic-train-stop-input"] = true,
     ["logistic-train-stop-output"] = true,
     ["tl-dummy-entity"] = true,
+    ["si-in-world-drop-entity"] = true,
+    ["si-in-world-pickup-entity"] = true,
 }
 
 -- Immediately destroy an Entity (and perhaps related Entities)
