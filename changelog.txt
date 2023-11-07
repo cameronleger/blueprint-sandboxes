@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.16.6
+Date: 2023-11-06
+  Changes:
+    - Editor Extensions' Lab setting is forcefully disabled due to compatibility issues
+  Bugfixes:
+    - Updated support for Editor Extensions' Recipes in the Sandbox
+---------------------------------------------------------------------------------------------------
 Version: 1.16.5
 Date: 2023-10-31
   Changes:
