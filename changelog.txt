@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.17.1
+Date: 2024-01-09
+  Changes:
+    - Neutral Entities in Sandboxes are now considered the same as those belonging to the Sandbox Force
+  Bugfixes:
+    - Items on the ground in Sandboxes were not being destroyed when marked for deconstruction
+---------------------------------------------------------------------------------------------------
 Version: 1.17.0
 Date: 2024-01-03
   Changes:

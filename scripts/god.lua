@@ -180,7 +180,8 @@ function God.AsyncWrapper(setting, queue, handler, entity)
 end
 
 function God.ShouldHandleEntity(entity)
-    if not Sandbox.IsSandboxForce(entity.force) then
+    if entity.force.name ~= "neutral"
+            and not Sandbox.IsSandboxForce(entity.force) then
         return false
     end
 
