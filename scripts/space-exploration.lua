@@ -2,26 +2,28 @@
 local SpaceExploration = {}
 
 SpaceExploration.name = "space-exploration"
-SpaceExploration.enabled = not not remote.interfaces[SpaceExploration.name]
+function SpaceExploration.enabled()
+    return not not remote.interfaces[SpaceExploration.name]
+end
 
 SpaceExploration.orbitalEquipmentString = "0eNqllt2OgyAQhd9lrqEB2m5bX6XZGLWjS4JoAJt1G999wW5M07T7N94hzDfDzDkJFyjNgL3TNkB2AV111kN2vIDXjS1M+hfGHiEDHbAFBrZo0woNVsHpiqNF14w8xqOriwphYqDtCd8hkxP7kVPqhi+svjO38Wp6ZYA26KDxWtS8GHM7tCW6mOAbDIO+8zGysyl3pAkGI2RcTamqO5D6xb2eAEWstxzqGl3u9UdESLF8DzKtl0za1trGLV69oQ8P8KvtnECttnNLrqdzjyFo2/h0ymHbnTEf4p6JZeIpT82NW8ENOKXuBW2+WndH5+rajs20FOSR+z7elPemCHXnWu6roq47c4J0kSeANRWgqABJBAhiPDU/tQH/n4CkakBSNSCpGpBUDUiiBiRRA5KoAUnTgCBKQBAVIIgCEMT5C9r4BW36gjZ8QZs91f5U91PNT/U+0fpE5xON/yffx5fA/OzKbl57DM7o/AxUe7nZHdTu5aDEfh1fSJ/ZLl9g"
 
 -- Whether the Surface has been taken as a Space Sandbox
 function SpaceExploration.IsSandbox(surface)
-    return SpaceExploration.enabled
+    return SpaceExploration.enabled()
             and global.seSurfaces[surface.name]
 end
 
 -- Whether the Surface has been taken as a Planetary Lab Sandbox
 function SpaceExploration.IsPlanetarySandbox(surface)
-    return SpaceExploration.enabled
+    return SpaceExploration.enabled()
             and global.seSurfaces[surface.name]
             and not global.seSurfaces[surface.name].orbital
 end
 
 -- Whether the Zone is Star
 function SpaceExploration.IsStar(zoneName)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return false
     end
     return remote.call(SpaceExploration.name, "get_zone_from_name", {
@@ -31,7 +33,7 @@ end
 
 -- Ask Space Exploration for the Player's current Character
 function SpaceExploration.GetPlayerCharacter(player)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
     return remote.call(SpaceExploration.name, "get_player_character", {
@@ -63,7 +65,7 @@ end
 -- We also carefully choose Moons in order to not take away too much from them,
 -- and to not be too dangerous.
 function SpaceExploration.ChooseZoneForForce(player, sandboxForce, type)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
 
@@ -88,7 +90,7 @@ function SpaceExploration.ChooseZoneForForce(player, sandboxForce, type)
 end
 
 function SpaceExploration.GetOrCreateSurface(zoneName)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
 
@@ -101,7 +103,7 @@ end
 
 -- Chooses a non-home-system Star for a Force's Space Sandbox, if necessary
 function SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxForce)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
 
@@ -122,7 +124,7 @@ end
 
 -- Chooses a non-home-system Star for a Force's Planetary Sandbox, if necessary
 function SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
 
@@ -156,7 +158,7 @@ end
 
 -- Reset the Sandbox's equipment Blueprint for a Surface
 function SpaceExploration.ResetEquipmentBlueprint(surface)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
 
@@ -183,7 +185,7 @@ end
 
 -- Set the Sandbox's equipment Blueprint for a Surface
 function SpaceExploration.SetEquipmentBlueprint(surface, equipmentString)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
 
@@ -203,7 +205,7 @@ end
 
 -- Reset the Space Sandbox a Player is currently in
 function SpaceExploration.Reset(player)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
 
@@ -220,7 +222,7 @@ end
 
 -- Return a Sandbox to the available Zones
 function SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
-    if not SpaceExploration.enabled or not zoneName then
+    if not SpaceExploration.enabled() or not zoneName then
         return
     end
 
@@ -244,7 +246,7 @@ end
 
 -- Delete a Space Sandbox and return it to the available Zones
 function SpaceExploration.DeleteSandbox(sandboxForceData, zoneName)
-    if not SpaceExploration.enabled or not zoneName then
+    if not SpaceExploration.enabled() or not zoneName then
         return
     end
 
@@ -261,7 +263,7 @@ end
 
 -- Set some important Surface settings for Space Sandbox
 function SpaceExploration.AfterCreate(surface)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
 
@@ -288,7 +290,7 @@ end
 
 -- Add some helpful initial Entities to a Space Sandbox
 function SpaceExploration.Equip(surface)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
 
@@ -319,7 +321,7 @@ in the Navigation Satellite would be persisted, and without any good way
 to undo that override.
 --]]
 function SpaceExploration.ExitRemoteView(player)
-    if not SpaceExploration.enabled then
+    if not SpaceExploration.enabled() then
         return
     end
     remote.call(SpaceExploration.name, "remote_view_stop", { player = player })

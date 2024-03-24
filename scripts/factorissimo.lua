@@ -2,13 +2,15 @@
 local Factorissimo = {}
 
 Factorissimo.name = "factorissimo"
-Factorissimo.enabled = not not remote.interfaces[Factorissimo.name]
+function Factorissimo.enabled()
+    return not not remote.interfaces[Factorissimo.name]
+end
 
 Factorissimo.surfacePfx = "factory-floor-"
 local surfacePfxLength = string.len(Factorissimo.surfacePfx)
 
 function Factorissimo.GetAllFactories()
-    if Factorissimo.enabled then
+    if Factorissimo.enabled() then
         return remote.call(Factorissimo.name, "get_global", { "factories" })
     else
         return {}
@@ -17,7 +19,7 @@ end
 
 -- Whether the Surface is a Factory
 function Factorissimo.IsFactory(thingWithName)
-    if not Factorissimo.enabled then
+    if not Factorissimo.enabled() then
         return false
     end
 
@@ -26,7 +28,7 @@ end
 
 -- Whether the Surface is a Factory inside of a Sandbox
 function Factorissimo.IsFactoryInsideSandbox(surface, position)
-    if not Factorissimo.enabled then
+    if not Factorissimo.enabled() then
         return false
     end
 

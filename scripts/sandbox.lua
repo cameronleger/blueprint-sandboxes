@@ -10,7 +10,7 @@ Sandbox.choices = {
     { "sandbox." .. Sandbox.pfx .. "force-lab-space-exploration" },
     { "sandbox." .. Sandbox.pfx .. "force-orbit-space-exploration" },
 }
-if not SpaceExploration.enabled then
+if not SpaceExploration.enabled() then
     Sandbox.choices[3] = { "sandbox." .. Sandbox.pfx .. "space-exploration-disabled" }
     Sandbox.choices[4] = { "sandbox." .. Sandbox.pfx .. "space-exploration-disabled" }
 end
@@ -51,9 +51,9 @@ function Sandbox.IsEnabled(selectedSandbox)
     elseif selectedSandbox == Sandbox.force then
         return true
     elseif selectedSandbox == Sandbox.forceOrbitalSandbox then
-        return SpaceExploration.enabled
+        return SpaceExploration.enabled()
     elseif selectedSandbox == Sandbox.forcePlanetaryLab then
-        return SpaceExploration.enabled
+        return SpaceExploration.enabled()
     else
         log("Impossible Choice for Sandbox: " .. selectedSandbox)
         return false
@@ -70,11 +70,11 @@ function Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     elseif playerData.selectedSandbox == Sandbox.force
     then
         return Lab.GetOrCreateSurface(global.sandboxForces[sandboxForce.name].labName, sandboxForce)
-    elseif SpaceExploration.enabled
+    elseif SpaceExploration.enabled()
             and playerData.selectedSandbox == Sandbox.forceOrbitalSandbox
     then
         return SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce)
-    elseif SpaceExploration.enabled
+    elseif SpaceExploration.enabled()
             and playerData.selectedSandbox == Sandbox.forcePlanetaryLab
     then
         return SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxForce)

@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 011701
+Migrate.version = 011800
 
 function Migrate.Run()
     if not global.version then
@@ -47,7 +47,7 @@ function Migrate.v1_0_3()
 
     log("Migration 1.0.3 Starting")
 
-    if SpaceExploration.enabled then
+    if SpaceExploration.enabled() then
         local planetaryLabId = 3
         local planetaryLabsOnStars = {}
         local playersToKickFromPlanetaryLabs = {}
@@ -243,7 +243,7 @@ function Migrate.v1_10_1()
 
     log("Migration 1.10.1 Starting")
 
-    if SpaceExploration.enabled then
+    if SpaceExploration.enabled() then
         local planetaryLabId = 3
         local badPlanetaryLabs = {}
         local badPlanetaryLabNames = {}
