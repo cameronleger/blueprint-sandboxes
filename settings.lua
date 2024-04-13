@@ -100,4 +100,11 @@ data:extend({
         minimum_value = 0,
         maximum_value = 10000,
     },
+    {
+        type = "bool-setting",
+        name = Settings.labsAbsorbPollution,
+        setting_type = "startup",
+        order = "a[lab]-a",
+        default_value = true,
+    },
 })

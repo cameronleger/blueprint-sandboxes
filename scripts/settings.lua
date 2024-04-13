@@ -12,6 +12,7 @@ Settings.godAsyncTick = BPSB.pfx .. "god-async-tick"
 Settings.godAsyncCreateRequestsPerTick = BPSB.pfx .. "god-async-create-per-tick"
 Settings.godAsyncUpgradeRequestsPerTick = BPSB.pfx .. "god-async-upgrade-per-tick"
 Settings.godAsyncDeleteRequestsPerTick = BPSB.pfx .. "god-async-delete-per-tick"
+Settings.labsAbsorbPollution = BPSB.pfx .. "labs-absorb-pollution"
 
 function Settings.SetupScanSandboxes()
     if settings.global[Settings.scanSandboxes].value then

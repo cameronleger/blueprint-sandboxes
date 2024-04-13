@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.19.0
+Date: 2024-04-13
+  Changes:
+    - Lab-based Sandboxes can slowly absorb Pollution
+    - Start-up Setting for Lab Pollution absorption
+---------------------------------------------------------------------------------------------------
 Version: 1.18.0
 Date: 2024-03-24
   Changes:
