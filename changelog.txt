@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.19.1
+Date: 2024-07-06
+  Changes:
+    - Factorissimo2 marked as incompatible; the factorissimo-2-notnotmelon is the only supported variant
+---------------------------------------------------------------------------------------------------
 Version: 1.19.0
 Date: 2024-04-13
   Changes:
