@@ -10,6 +10,7 @@ function Research.Sync(originalForce, sandboxForce)
         for tech, _ in pairs(game.technology_prototypes) do
             sandboxForce.technologies[tech].researched = originalForce.technologies[tech].researched
             sandboxForce.technologies[tech].level = originalForce.technologies[tech].level
+            -- TODO: Consider file:///home/cameron/src/factorio/factorio_expansion/doc-html/classes/LuaTechnology.html#saved_progress
         end
         log("Copied all Research from: " .. originalForce.name .. " -> " .. sandboxForce.name)
     end

@@ -93,6 +93,7 @@ function Sandbox.Enter(player)
         return
     end
 
+    -- TODO: Consider newer controllers here too
     if player.stashed_controller_type
             and player.stashed_controller_type ~= defines.controllers.editor
     then

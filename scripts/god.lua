@@ -239,6 +239,8 @@ function God.OnBuiltEntity(entity)
     end
 end
 
+-- TODO: Consider defines.build_mode
+
 -- For each known Sandbox Surface, handle any async God functionality
 function God.HandleAllSandboxRequests(event)
     local createRequestsPerTick = settings.global[Settings.godAsyncCreateRequestsPerTick].value

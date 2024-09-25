@@ -1,6 +1,12 @@
 -- Managing Forces and their Sandbox Forces
 local Force = {}
 
+-- TODO: Consider new copy function file:///home/cameron/src/factorio/factorio_expansion/doc-html/classes/LuaForce.html#copy_from
+
+-- TODO: Consider hiding Sandbox: file:///home/cameron/src/factorio/factorio_expansion/doc-html/classes/LuaForce.html#set_surface_hidden
+
+-- TODO: Consider locking space platforms: file:///home/cameron/src/factorio/factorio_expansion/doc-html/classes/LuaForce.html#lock_space_platforms
+
 -- Properties from the original Force that are synced to the Sandbox Force (in not-all-tech mode)
 Force.syncedProperties = {
     -- "manual_mining_speed_modifier", Forcibly set

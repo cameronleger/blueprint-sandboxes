@@ -119,6 +119,8 @@ script.on_event(defines.events.on_console_chat, Chat.OnChat)
 
 script.on_event(defines.events.on_research_finished, Research.OnResearched)
 script.on_event(defines.events.on_research_reversed, Research.OnResearched)
+-- TODO: validate on_research_moved
+script.on_event(defines.events.on_research_moved, Research.OnResearched)
 script.on_event(defines.events.on_research_started, Research.OnResearchStarted)
 
 script.on_event(defines.events.on_player_changed_surface, function(event)
@@ -182,7 +184,11 @@ script.on_event(defines.events.on_surface_renamed, function(event)
 end)
 
 script.on_event(defines.events.on_marked_for_deconstruction, God.OnMarkedForDeconstruct)
+
+-- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_marked_for_upgrade
 script.on_event(defines.events.on_marked_for_upgrade, God.OnMarkedForUpgrade)
+
+-- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_built_entity
 script.on_event(defines.events.on_built_entity, function(event)
     God.OnBuiltEntity(event.created_entity)
 end, God.onBuiltEntityFilters)
@@ -192,13 +198,17 @@ end, God.onBuiltEntityFilters)
 script.on_event(defines.events.on_player_crafted_item, God.OnPlayerCraftedItem)
 script.on_event(defines.events.on_player_main_inventory_changed, God.OnInventoryChanged)
 
+-- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_player_setup_blueprint
 script.on_event(defines.events.on_player_setup_blueprint, Illusion.OnBlueprintSetup)
 
 -- TODO: on_entity_settings_pasted
 
+-- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_player_selected_area
 script.on_event(defines.events.on_player_selected_area, function(event)
     Resources.OnAreaSelected(event, true)
 end)
+
+-- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_player_alt_selected_area
 script.on_event(defines.events.on_player_alt_selected_area, function(event)
     Resources.OnAreaSelected(event, false)
 end)
@@ -235,3 +245,5 @@ script.on_event(defines.events.on_gui_closed, function(event)
         Illusion.OnBlueprintGUIClosed(event)
     end
 end)
+
+-- TODO: Consider defines.input_action.*blueprint*
