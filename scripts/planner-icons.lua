@@ -1,15 +1,14 @@
 local PlannerIcons = {}
 
--- TODO: Icon/Size was changed, the if-checks need to be different
 function PlannerIcons.CreateLayeredIcon(prototype)
     local backgroundIconSize = 64
-    local overallLayeredIconScale = 0.4
+    local overallLayeredIconScale = 0.5
+    local prototypeIconSize = prototype.icon_size or 64
 
     local layeredIcons = {
         {
             icon = BPSB.path .. "/graphics/icon-x64.png",
             icon_size = backgroundIconSize,
-            icon_mipmaps = 3,
             tint = { r = 0.75, g = 0.75, b = 0.75, a = 1 },
         },
     }
@@ -25,21 +24,19 @@ function PlannerIcons.CreateLayeredIcon(prototype)
             end
             table.insert(layeredIcons, {
                 icon = icon.icon,
-                icon_size = icon.icon_size or prototype.icon_size,
+                icon_size = icon.icon_size or prototypeIconSize,
                 tint = icon.tint,
                 shift = icon.shift,
                 scale = thisIconScale * overallLayeredIconScale * (backgroundIconSize / (icon.icon_size or prototype.icon_size)),
-                icon_mipmaps = icon.icon_mipmaps,
             })
         end
-    elseif prototype.icon and prototype.icon_size then
+    elseif prototype.icon then
         foundIcon = true
         -- The simplest Icon approach
         table.insert(layeredIcons, {
             icon = prototype.icon,
-            icon_size = prototype.icon_size,
-            icon_mipmaps = prototype.icon_mipmaps,
-            scale = overallLayeredIconScale * (backgroundIconSize / prototype.icon_size),
+            icon_size = prototypeIconSize,
+            scale = overallLayeredIconScale * (backgroundIconSize / prototypeIconSize),
         })
     elseif prototype.variants then
         foundIcon = true
