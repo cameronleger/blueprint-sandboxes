@@ -7,7 +7,7 @@ function Research.Sync(originalForce, sandboxForce)
         sandboxForce.research_all_technologies()
         log("Researching everything for: " .. sandboxForce.name)
     else
-        for tech, _ in pairs(game.technology_prototypes) do
+        for tech, _ in pairs(prototypes.technology) do
             sandboxForce.technologies[tech].researched = originalForce.technologies[tech].researched
             sandboxForce.technologies[tech].level = originalForce.technologies[tech].level
             -- TODO: Consider file:///home/cameron/src/factorio/factorio_expansion/doc-html/classes/LuaTechnology.html#saved_progress

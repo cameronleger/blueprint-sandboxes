@@ -130,6 +130,7 @@ function Equipment.BuildBlueprint(stack, surface, forceName)
         storage.equipmentInProgress[surface.name] = nil
         return true
     elseif equipmentData.retries <= 0 then
+        -- TODO: This occurs quite frequently in Space Age
         log("No ghosts created, but we've exceeded retry limit, ending repeated attempts")
         surface.print("Failed to place Equipment Blueprint after too many retries")
         storage.equipmentInProgress[surface.name] = nil
