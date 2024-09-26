@@ -33,7 +33,7 @@ function Equipment.Place(stack, surface, forceName)
             stack = stack,
             surface = surface,
             forceName = forceName,
-            retries = 100,
+            retries = 500,
         }
         Equipment.BuildBlueprint(stack, surface, forceName)
     else
@@ -101,10 +101,22 @@ end
 
 -- Applies an Equipment Blueprint to a Surface
 function Equipment.BuildBlueprint(stack, surface, forceName)
+    local logRetryInterval = 100
     local equipmentData = storage.equipmentInProgress[surface.name]
 
-    -- First, let's check if the Chunks are ready for us
+    -- Skip retrying if we've hit our limit
+    if equipmentData.retries <= 0 then
+        log("No ghosts created, but we've exceeded retry limit, ending repeated attempts")
+        surface.print("Failed to place Equipment Blueprint after too many retries")
+        storage.equipmentInProgress[surface.name] = nil
+        return false
+    end
+
+    -- Let's check if the Chunks are ready for us
     if not Equipment.IsReadyForBlueprint(stack, surface) then
+        if equipmentData.retries % logRetryInterval == 0 then
+            log("Chunks are not ready for Blueprint, retries remaining: " .. equipmentData.retries)
+        end
         equipmentData.retries = equipmentData.retries - 1
         return false
     end
@@ -124,18 +136,31 @@ function Equipment.BuildBlueprint(stack, surface, forceName)
         raise_built = true,
     })
 
+    -- Since we may have changed the ghosts into real entities, we need to simply count entities
+    local surfaceEntityCount = surface.count_entities_filtered({})
+    local blueprintEntityCount = stack.get_blueprint_entity_count()
+    if equipmentData.retries % logRetryInterval == 0 then
+        log("Surface has " .. surfaceEntityCount .. " entities, Blueprint has " .. blueprintEntityCount .. " entities")
+    end
+
     -- But that may have not been successful, despite our attempts to ensure it!
-    if #ghosts > 0 then
+    if surfaceEntityCount >= blueprintEntityCount then
+        log("Surface has more entities than the Blueprint does; assuming Blueprint is placed")
+        storage.equipmentInProgress[surface.name] = nil
+        return true
+    elseif #ghosts > 0 then
         log("Some ghosts created, ending repeated attempts; assuming Blueprint is placed")
         storage.equipmentInProgress[surface.name] = nil
         return true
     elseif equipmentData.retries <= 0 then
-        -- TODO: This occurs quite frequently in Space Age
         log("No ghosts created, but we've exceeded retry limit, ending repeated attempts")
         surface.print("Failed to place Equipment Blueprint after too many retries")
         storage.equipmentInProgress[surface.name] = nil
         return false
     else
+        if equipmentData.retries % logRetryInterval == 0 then
+            log("No amount of ghosts listed, retries remaining: " .. equipmentData.retries)
+        end
         equipmentData.retries = equipmentData.retries - 1
         return false
     end
