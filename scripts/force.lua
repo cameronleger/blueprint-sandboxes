@@ -37,7 +37,7 @@ Force.syncedProperties = {
 
 -- Setup Force, if necessary
 function Force.Init(force)
-    if global.forces[force.name]
+    if storage.forces[force.name]
             or Sandbox.IsSandboxForce(force)
             or #force.players < 1
     then
@@ -48,10 +48,10 @@ function Force.Init(force)
     log("Force.Init: " .. force.name)
     local forceLabName = Lab.NameFromForce(force)
     local sandboxForceName = Sandbox.NameFromForce(force)
-    global.forces[force.name] = {
+    storage.forces[force.name] = {
         sandboxForceName = sandboxForceName,
     }
-    global.sandboxForces[sandboxForceName] = {
+    storage.sandboxForces[sandboxForceName] = {
         forceName = force.name,
         hiddenItemsUnlocked = false,
         labName = forceLabName,
@@ -63,14 +63,14 @@ end
 -- Delete Force's information, if necessary
 function Force.Merge(oldForceName, newForce)
     -- Double-check we know about this Force
-    local oldForceData = global.forces[oldForceName]
-    local newForceData = global.forces[newForce.name]
+    local oldForceData = storage.forces[oldForceName]
+    local newForceData = storage.forces[newForce.name]
     if not oldForceData or not newForceData then
         log("Skip Force.Merge: " .. oldForceName .. " -> " .. newForce.name)
         return
     end
     local sandboxForceName = oldForceData.sandboxForceName
-    local oldSandboxForceData = global.sandboxForces[sandboxForceName]
+    local oldSandboxForceData = storage.sandboxForces[sandboxForceName]
     local oldSandboxForce = game.forces[sandboxForceName]
 
     -- Bounce any Players currently using the older Sandboxes
@@ -93,8 +93,8 @@ function Force.Merge(oldForceName, newForce)
     end
 
     -- Delete the old Force's data
-    global.forces[oldForceName] = nil
-    global.sandboxForces[sandboxForceName] = nil
+    storage.forces[oldForceName] = nil
+    storage.sandboxForces[sandboxForceName] = nil
 end
 
 -- Configure Sandbox Force
@@ -126,7 +126,7 @@ end
 
 -- Create Sandbox Force, if necessary
 function Force.GetOrCreateSandboxForce(force)
-    local sandboxForceName = global.forces[force.name].sandboxForceName
+    local sandboxForceName = storage.forces[force.name].sandboxForceName
     local sandboxForce = game.forces[sandboxForceName]
     if sandboxForce then
         Force.ConfigureSandboxForce(force, sandboxForce)

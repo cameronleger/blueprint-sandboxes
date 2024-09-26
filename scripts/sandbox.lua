@@ -29,7 +29,7 @@ end
 -- Whether the Force is specific to Blueprint Sandboxes
 function Sandbox.IsSandboxForce(force)
     -- return string.sub(force.name, 1, pfxLength) == Sandbox.pfx
-    return not not global.sandboxForces[force.name]
+    return not not storage.sandboxForces[force.name]
 end
 
 -- Whether something is any type of Sandbox
@@ -40,7 +40,7 @@ end
 
 -- Whether something is any type of Sandbox
 function Sandbox.IsPlayerInsideSandbox(player)
-    return global.players[player.index].preSandboxPosition ~= nil
+    return storage.players[player.index].preSandboxPosition ~= nil
             and Sandbox.IsSandbox(player.surface)
 end
 
@@ -62,14 +62,14 @@ end
 
 -- Which Surface Name to use for this Player based on their Selected Sandbox
 function Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if playerData.selectedSandbox == Sandbox.player
     then
         return Lab.GetOrCreateSurface(playerData.labName, sandboxForce)
     elseif playerData.selectedSandbox == Sandbox.force
     then
-        return Lab.GetOrCreateSurface(global.sandboxForces[sandboxForce.name].labName, sandboxForce)
+        return Lab.GetOrCreateSurface(storage.sandboxForces[sandboxForce.name].labName, sandboxForce)
     elseif SpaceExploration.enabled()
             and playerData.selectedSandbox == Sandbox.forceOrbitalSandbox
     then
@@ -86,7 +86,7 @@ end
 
 -- Convert the Player to God-mode, save their previous State, and enter Selected Sandbox
 function Sandbox.Enter(player)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if Sandbox.IsPlayerInsideSandbox(player) then
         log("Already inside Sandbox: " .. playerData.insideSandbox)
@@ -179,7 +179,7 @@ end
 
 -- Convert the Player to their previous State, and leave Selected Sandbox
 function Sandbox.Exit(player)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if not Sandbox.IsPlayerInsideSandbox(player) then
         log("Already outside Sandbox")
@@ -287,7 +287,7 @@ end
 
 -- Keep a Player's God-state, but change between Selected Sandboxes
 function Sandbox.Transfer(player)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if not Sandbox.IsPlayerInsideSandbox(player) then
         log("Outside Sandbox, cannot transfer")
@@ -310,7 +310,7 @@ end
 
 -- Update Sandboxes Player if a Player actually changes Forces (outside of this mod)
 function Sandbox.OnPlayerForceChanged(player)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
     local force = player.force
     if not Sandbox.IsSandboxForce(force)
             and playerData.forceName ~= force.name
@@ -321,7 +321,7 @@ function Sandbox.OnPlayerForceChanged(player)
         local sandboxForceName = Sandbox.NameFromForce(force)
 
         playerData.sandboxForceName = sandboxForceName
-        local labData = global.labSurfaces[playerData.labName]
+        local labData = storage.labSurfaces[playerData.labName]
         if labData then
             labData.sandboxForceName = sandboxForceName
         end
@@ -346,14 +346,14 @@ end
 
 -- Determine whether the Player is inside a known Sandbox
 function Sandbox.GetSandboxChoiceFor(player, surface)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
     if surface.name == playerData.labName then
         return Sandbox.player
-    elseif surface.name == global.sandboxForces[playerData.sandboxForceName].labName then
+    elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].labName then
         return Sandbox.force
-    elseif surface.name == global.sandboxForces[playerData.sandboxForceName].seOrbitalSandboxZoneName then
+    elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].seOrbitalSandboxZoneName then
         return Sandbox.forceOrbitalSandbox
-    elseif surface.name == global.sandboxForces[playerData.sandboxForceName].sePlanetaryLabZoneName then
+    elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].sePlanetaryLabZoneName then
         return Sandbox.forcePlanetaryLab
     elseif Factorissimo.IsFactory(surface) then
         local outsideSurface = Factorissimo.GetOutsideSurfaceForFactory(
@@ -370,14 +370,14 @@ end
 -- Update whether the Player is inside a known Sandbox
 function Sandbox.OnPlayerSurfaceChanged(player)
     if Sandbox.IsPlayerInsideSandbox(player) then
-        global.players[player.index].insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
+        storage.players[player.index].insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
     end
 end
 
 -- Enter, Exit, or Transfer a Player across Sandboxes
 function Sandbox.Toggle(player_index)
     local player = game.players[player_index]
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if Factorissimo.IsFactoryInsideSandbox(player.surface, player.position) then
         player.print("You are inside of a Factory, so you cannot change Sandboxes")

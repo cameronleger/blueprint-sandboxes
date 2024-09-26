@@ -137,7 +137,7 @@ end
 -- Ensure the God's Inventory is kept in-sync
 function God.OnInventoryChanged(event)
     local player = game.players[event.player_index]
-    local playerData = global.players[event.player_index]
+    local playerData = storage.players[event.player_index]
     if Sandbox.IsPlayerInsideSandbox(player) then
         Inventory.Prune(player)
         playerData.sandboxInventory = Inventory.Persist(
@@ -206,7 +206,7 @@ function God.OnMarkedForDeconstruct(event)
     if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncDeleteRequestsPerTick,
-                global.asyncDestroyQueue,
+                storage.asyncDestroyQueue,
                 God.Destroy,
                 event.entity
         )
@@ -219,7 +219,7 @@ function God.OnMarkedForUpgrade(event)
     if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncUpgradeRequestsPerTick,
-                global.asyncUpgradeQueue,
+                storage.asyncUpgradeQueue,
                 God.Upgrade,
                 event.entity
         )
@@ -232,7 +232,7 @@ function God.OnBuiltEntity(entity)
     if God.ShouldHandleEntity(entity) then
         God.AsyncWrapper(
                 Settings.godAsyncCreateRequestsPerTick,
-                global.asyncCreateQueue,
+                storage.asyncCreateQueue,
                 God.Create,
                 entity
         )
@@ -248,45 +248,45 @@ function God.HandleAllSandboxRequests(event)
     local deleteRequestsPerTick = settings.global[Settings.godAsyncDeleteRequestsPerTick].value
 
     local destroyRequestsHandled = 0
-    while Queue.Size(global.asyncDestroyQueue) > 0
+    while Queue.Size(storage.asyncDestroyQueue) > 0
             and deleteRequestsPerTick > 0
     do
-        God.Destroy(Queue.Pop(global.asyncDestroyQueue))
+        God.Destroy(Queue.Pop(storage.asyncDestroyQueue))
         destroyRequestsHandled = destroyRequestsHandled + 1
         deleteRequestsPerTick = deleteRequestsPerTick - 1
     end
-    if Queue.Size(global.asyncDestroyQueue) == 0
+    if Queue.Size(storage.asyncDestroyQueue) == 0
             and destroyRequestsHandled > 0
     then
-        global.asyncDestroyQueue = Queue.New()
+        storage.asyncDestroyQueue = Queue.New()
     end
 
     local upgradeRequestsHandled = 0
-    while Queue.Size(global.asyncUpgradeQueue) > 0
+    while Queue.Size(storage.asyncUpgradeQueue) > 0
             and upgradeRequestsPerTick > 0
     do
-        God.Upgrade(Queue.Pop(global.asyncUpgradeQueue))
+        God.Upgrade(Queue.Pop(storage.asyncUpgradeQueue))
         upgradeRequestsHandled = upgradeRequestsHandled + 1
         upgradeRequestsPerTick = upgradeRequestsPerTick - 1
     end
-    if Queue.Size(global.asyncUpgradeQueue) == 0
+    if Queue.Size(storage.asyncUpgradeQueue) == 0
             and upgradeRequestsHandled > 0
     then
-        global.asyncUpgradeQueue = Queue.New()
+        storage.asyncUpgradeQueue = Queue.New()
     end
 
     local createRequestsHandled = 0
-    while Queue.Size(global.asyncCreateQueue) > 0
+    while Queue.Size(storage.asyncCreateQueue) > 0
             and createRequestsPerTick > 0
     do
-        God.Create(Queue.Pop(global.asyncCreateQueue))
+        God.Create(Queue.Pop(storage.asyncCreateQueue))
         createRequestsHandled = createRequestsHandled + 1
         createRequestsPerTick = createRequestsPerTick - 1
     end
-    if Queue.Size(global.asyncCreateQueue) == 0
+    if Queue.Size(storage.asyncCreateQueue) == 0
             and createRequestsHandled > 0
     then
-        global.asyncCreateQueue = Queue.New()
+        storage.asyncCreateQueue = Queue.New()
     end
 end
 

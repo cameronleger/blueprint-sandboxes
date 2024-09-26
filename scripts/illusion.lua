@@ -162,7 +162,7 @@ function Illusion.HandleBlueprintEvent(player, potentialItemStacks)
     local entities = blueprint.get_blueprint_entities()
     if not entities then
         log("Cannot handle Blueprint update: no entities in Blueprint (caused by selecting new contents)")
-        local playerData = global.players[player.index]
+        local playerData = storage.players[player.index]
         local lastWarningForNewContents = playerData.lastWarningForNewContents or 0
         if game.tick - lastWarningForNewContents > (216000) then -- 1 hour
             player.print("WARNING: Known issues in Factorio prevent mods from seeing or updating Blueprints when using 'Select new contents'.")

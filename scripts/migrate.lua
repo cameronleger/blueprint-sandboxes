@@ -3,29 +3,29 @@ local Migrate = {}
 Migrate.version = 020000
 
 function Migrate.Run()
-    if not global.version then
-        global.version = 0
+    if not storage.version then
+        storage.version = 0
     end
 
-    if global.version < Migrate.version then
-        if global.version < 010003 then Migrate.v1_0_3() end
-        if global.version < 010100 then Migrate.v1_1_0() end
-        if global.version < 010401 then Migrate.v1_4_1() end
-        if global.version < 010500 then Migrate.v1_5_0() end
-        if global.version < 010600 then Migrate.v1_6_0() end
-        if global.version < 010700 then Migrate.v1_7_0() end
-        if global.version < 010703 then Migrate.v1_7_3() end
-        if global.version < 010704 then Migrate.v1_7_4() end
-        if global.version < 011000 then Migrate.v1_10_0() end
-        if global.version < 011001 then Migrate.v1_10_1() end
-        if global.version < 011101 then Migrate.v1_11_1() end
-        if global.version < 011103 then Migrate.v1_11_3() end
-        if global.version < 011500 then Migrate.v1_15_0() end
-        if global.version < 011604 then Migrate.v1_16_4() end
-        if global.version < 011606 then Migrate.v1_16_6() end
+    if storage.version < Migrate.version then
+        if storage.version < 010003 then Migrate.v1_0_3() end
+        if storage.version < 010100 then Migrate.v1_1_0() end
+        if storage.version < 010401 then Migrate.v1_4_1() end
+        if storage.version < 010500 then Migrate.v1_5_0() end
+        if storage.version < 010600 then Migrate.v1_6_0() end
+        if storage.version < 010700 then Migrate.v1_7_0() end
+        if storage.version < 010703 then Migrate.v1_7_3() end
+        if storage.version < 010704 then Migrate.v1_7_4() end
+        if storage.version < 011000 then Migrate.v1_10_0() end
+        if storage.version < 011001 then Migrate.v1_10_1() end
+        if storage.version < 011101 then Migrate.v1_11_1() end
+        if storage.version < 011103 then Migrate.v1_11_3() end
+        if storage.version < 011500 then Migrate.v1_15_0() end
+        if storage.version < 011604 then Migrate.v1_16_4() end
+        if storage.version < 011606 then Migrate.v1_16_6() end
     end
 
-    global.version = Migrate.version
+    storage.version = Migrate.version
 end
 
 function Migrate.RecreateGuis()
@@ -52,7 +52,7 @@ function Migrate.v1_0_3()
         local planetaryLabsOnStars = {}
         local playersToKickFromPlanetaryLabs = {}
 
-        for name, surfaceData in pairs(global.seSurfaces) do
+        for name, surfaceData in pairs(storage.seSurfaces) do
             if (not surfaceData.orbital) and SpaceExploration.IsStar(name) then
                 table.insert(planetaryLabsOnStars, {
                     zoneName = name,
@@ -62,7 +62,7 @@ function Migrate.v1_0_3()
         end
 
         for index, player in pairs(game.players) do
-            local playerData = global.players[index]
+            local playerData = storage.players[index]
             if playerData.insideSandbox == planetaryLabId
                     and SpaceExploration.IsStar(player.surface.name)
             then
@@ -78,7 +78,7 @@ function Migrate.v1_0_3()
         for _, surfaceData in pairs(planetaryLabsOnStars) do
             log("Destroying Planetary Lab inside Star: " .. surfaceData.zoneName)
             SpaceExploration.DeleteSandbox(
-                    global.sandboxForces[surfaceData.sandboxForceName],
+                    storage.sandboxForces[surfaceData.sandboxForceName],
                     surfaceData.zoneName
             )
         end
@@ -95,7 +95,7 @@ function Migrate.v1_1_0()
     log("Migration 1.1.0 Starting")
 
     for index, player in pairs(game.players) do
-        local playerData = global.players[index]
+        local playerData = storage.players[index]
         playerData.sandboxInventory = game.create_inventory(#player.get_main_inventory())
         if Sandbox.IsPlayerInsideSandbox(player) then
             log("Player inside Sandbox, fully-syncing the inventory.")
@@ -141,7 +141,7 @@ function Migrate.v1_6_0()
     log("Migration 1.6.0 Starting")
 
     for index, _ in pairs(game.players) do
-        local playerData = global.players[index]
+        local playerData = storage.players[index]
         playerData.lastSandboxPositions = {}
     end
 
@@ -155,23 +155,23 @@ function Migrate.v1_7_0()
 
     log("Migration 1.7.0 Starting")
 
-    for surfaceName, _ in pairs(global.labSurfaces) do
+    for surfaceName, _ in pairs(storage.labSurfaces) do
         local surface = game.surfaces[surfaceName]
         if surface then
             surface.always_day = false
             surface.freeze_daytime = true
             surface.daytime = 0.95
-            global.labSurfaces[surfaceName].daytime = 0.95
+            storage.labSurfaces[surfaceName].daytime = 0.95
         end
     end
 
-    for surfaceName, _ in pairs(global.seSurfaces) do
+    for surfaceName, _ in pairs(storage.seSurfaces) do
         local surface = game.surfaces[surfaceName]
         if surface then
             surface.always_day = false
             surface.freeze_daytime = true
             surface.daytime = 0.95
-            global.seSurfaces[surfaceName].daytime = 0.95
+            storage.seSurfaces[surfaceName].daytime = 0.95
         end
     end
 
@@ -220,15 +220,15 @@ function Migrate.v1_10_0()
 
     log("Migration 1.10.0 Starting")
 
-    global.asyncCreateQueue = Queue.New()
-    global.asyncUpgradeQueue = Queue.New()
-    global.asyncDestroyQueue = Queue.New()
+    storage.asyncCreateQueue = Queue.New()
+    storage.asyncUpgradeQueue = Queue.New()
+    storage.asyncDestroyQueue = Queue.New()
 
-    for _, surfaceData in pairs(global.labSurfaces) do
+    for _, surfaceData in pairs(storage.labSurfaces) do
         surfaceData.hasRequests = nil
     end
 
-    for _, surfaceData in pairs(global.seSurfaces) do
+    for _, surfaceData in pairs(storage.seSurfaces) do
         surfaceData.hasRequests = nil
     end
 
@@ -250,7 +250,7 @@ function Migrate.v1_10_1()
         local playersToKickFromPlanetaryLabs = {}
         local zoneIndex = remote.call(SpaceExploration.name, "get_zone_index", {})
 
-        for name, surfaceData in pairs(global.seSurfaces) do
+        for name, surfaceData in pairs(storage.seSurfaces) do
             if not surfaceData.orbital then
                 local zone = remote.call(SpaceExploration.name, "get_zone_from_name", {
                     zone_name = name,
@@ -268,7 +268,7 @@ function Migrate.v1_10_1()
         end
 
         for index, player in pairs(game.players) do
-            local playerData = global.players[index]
+            local playerData = storage.players[index]
             if playerData.insideSandbox == planetaryLabId
                     and badPlanetaryLabNames[player.surface.name]
             then
@@ -284,14 +284,14 @@ function Migrate.v1_10_1()
         for _, surfaceData in pairs(badPlanetaryLabs) do
             log("Destroying Planetary Lab: " .. surfaceData.zoneName)
             SpaceExploration.DeleteSandbox(
-                    global.sandboxForces[surfaceData.sandboxForceName],
+                    storage.sandboxForces[surfaceData.sandboxForceName],
                     surfaceData.zoneName
             )
             local message = "Unfortunately, your Planetary Sandbox was generated in a " ..
                     "non-ideal or dangerous location, so it was destroyed. Accessing " ..
                     "the Sandbox again will create a new one in a safer location."
             game.forces[surfaceData.sandboxForceName].print(message)
-            game.forces[global.sandboxForces[surfaceData.sandboxForceName].forceName].print(message)
+            game.forces[storage.sandboxForces[surfaceData.sandboxForceName].forceName].print(message)
         end
     end
 
@@ -306,7 +306,7 @@ function Migrate.v1_11_1()
     log("Migration 1.11.1 Starting")
 
     if remote.interfaces["dangOreus"] then
-        for labName, _ in pairs(global.labSurfaces) do
+        for labName, _ in pairs(storage.labSurfaces) do
             pcall(remote.call, "dangOreus", "toggle", labName)
         end
     end
@@ -340,11 +340,11 @@ function Migrate.v1_11_3()
 
     log("Migration 1.11.3 Starting")
 
-    for surfaceName, _ in pairs(global.labSurfaces) do
+    for surfaceName, _ in pairs(storage.labSurfaces) do
         Migrate.v1_11_3_surface(surfaceName)
     end
 
-    for surfaceName, _ in pairs(global.seSurfaces) do
+    for surfaceName, _ in pairs(storage.seSurfaces) do
         Migrate.v1_11_3_surface(surfaceName)
     end
 
@@ -358,11 +358,11 @@ function Migrate.v1_15_0()
 
     log("Migration 1.15.0 Starting")
 
-    for surfaceName, surfaceData in pairs(global.labSurfaces) do
+    for surfaceName, surfaceData in pairs(storage.labSurfaces) do
         surfaceData.equipmentBlueprints = Equipment.Init(Lab.equipmentString)
     end
 
-    for surfaceName, surfaceData in pairs(global.seSurfaces) do
+    for surfaceName, surfaceData in pairs(storage.seSurfaces) do
         if (surfaceData.orbital) then
             surfaceData.equipmentBlueprints = Equipment.Init(SpaceExploration.orbitalEquipmentString)
         else
@@ -380,7 +380,7 @@ function Migrate.v1_16_4()
 
     log("Migration 1.16.4 Starting")
 
-    global.equipmentInProgress = {}
+    storage.equipmentInProgress = {}
 
     log("Migration 1.16.4 Finished")
 end

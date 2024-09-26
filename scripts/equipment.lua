@@ -29,7 +29,7 @@ function Equipment.Place(stack, surface, forceName)
         log("Beginning Equipment Placement")
         Equipment.Prepare(stack, surface)
 
-        global.equipmentInProgress[surface.name] = {
+        storage.equipmentInProgress[surface.name] = {
             stack = stack,
             surface = surface,
             forceName = forceName,
@@ -37,7 +37,7 @@ function Equipment.Place(stack, surface, forceName)
         }
         Equipment.BuildBlueprint(stack, surface, forceName)
     else
-        global.equipmentInProgress[surface.name] = nil
+        storage.equipmentInProgress[surface.name] = nil
     end
     return true
 end
@@ -101,7 +101,7 @@ end
 
 -- Applies an Equipment Blueprint to a Surface
 function Equipment.BuildBlueprint(stack, surface, forceName)
-    local equipmentData = global.equipmentInProgress[surface.name]
+    local equipmentData = storage.equipmentInProgress[surface.name]
 
     -- First, let's check if the Chunks are ready for us
     if not Equipment.IsReadyForBlueprint(stack, surface) then
@@ -127,12 +127,12 @@ function Equipment.BuildBlueprint(stack, surface, forceName)
     -- But that may have not been successful, despite our attempts to ensure it!
     if #ghosts > 0 then
         log("Some ghosts created, ending repeated attempts; assuming Blueprint is placed")
-        global.equipmentInProgress[surface.name] = nil
+        storage.equipmentInProgress[surface.name] = nil
         return true
     elseif equipmentData.retries <= 0 then
         log("No ghosts created, but we've exceeded retry limit, ending repeated attempts")
         surface.print("Failed to place Equipment Blueprint after too many retries")
-        global.equipmentInProgress[surface.name] = nil
+        storage.equipmentInProgress[surface.name] = nil
         return false
     else
         equipmentData.retries = equipmentData.retries - 1

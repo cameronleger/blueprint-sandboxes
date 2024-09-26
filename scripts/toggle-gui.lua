@@ -46,7 +46,7 @@ function ToggleGUI.Init(player)
         name = ToggleGUI.selectedSandboxDropdown,
         tooltip = { "gui-description." .. ToggleGUI.selectedSandboxDropdown },
         items = Sandbox.choices,
-        selected_index = global.players[player.index].selectedSandbox,
+        selected_index = storage.players[player.index].selectedSandbox,
     }.style.horizontally_stretchable = true
 
     local daylightFlow = innerFrame.add {
@@ -103,10 +103,10 @@ function ToggleGUI.Update(player)
         return
     end
 
-    ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = global.players[player.index].selectedSandbox
+    ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = storage.players[player.index].selectedSandbox
 
     if Sandbox.IsPlayerInsideSandbox(player) then
-        local playerData = global.players[player.index]
+        local playerData = storage.players[player.index]
 
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, true)
         player.gui.left[ToggleGUI.name].visible = true
@@ -146,11 +146,11 @@ function ToggleGUI.OnGuiDropdown(event)
     if event.element.name == ToggleGUI.selectedSandboxDropdown then
         local choice = event.element.selected_index
         if Sandbox.IsEnabled(choice) then
-            global.players[player.index].selectedSandbox = event.element.selected_index
+            storage.players[player.index].selectedSandbox = event.element.selected_index
             Sandbox.Toggle(event.player_index)
         else
             player.print("That Sandbox is not possible.")
-            event.element.selected_index = global.players[player.index].selectedSandbox
+            event.element.selected_index = storage.players[player.index].selectedSandbox
             ToggleGUI.Update(player)
         end
     end

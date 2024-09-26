@@ -44,9 +44,9 @@ function Settings.OnRuntimeSettingChanged(event)
         Force.SyncAllForces()
     elseif event.setting == Settings.godAsyncTick then
         local newValue = settings.global[Settings.godAsyncTick].value
-        script.on_nth_tick(global.lastSettingForAsyncGodTick, nil)
+        script.on_nth_tick(storage.lastSettingForAsyncGodTick, nil)
         script.on_nth_tick(newValue, God.HandleAllSandboxRequests)
-        global.lastSettingForAsyncGodTick = newValue
+        storage.lastSettingForAsyncGodTick = newValue
     end
 end
 

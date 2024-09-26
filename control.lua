@@ -47,7 +47,7 @@ script.on_event(defines.events.on_player_created, function(event)
 end)
 
 script.on_event(defines.events.on_player_removed, function(event)
-    local playerData = global.players[event.player_index]
+    local playerData = storage.players[event.player_index]
     log("on_player_removed index: " .. event.player_index)
     Lab.DeleteLab(playerData.labName)
     if playerData.sandboxInventory then
@@ -56,7 +56,7 @@ script.on_event(defines.events.on_player_removed, function(event)
     if playerData.preSandboxInventory then
         playerData.preSandboxInventory.destroy()
     end
-    global.players[event.player_index] = nil
+    storage.players[event.player_index] = nil
 end)
 
 script.on_event(defines.events.on_force_created, function(event)
@@ -73,7 +73,7 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, Settings.OnRuntim
 -- Important Game Events
 
 script.on_configuration_changed(function(event)
-    for _, sandboxForceData in pairs(global.sandboxForces) do
+    for _, sandboxForceData in pairs(storage.sandboxForces) do
         -- Ensure that new automatic recipes aren't hidden
         sandboxForceData.hiddenItemsUnlocked = false
     end
@@ -141,7 +141,7 @@ script.on_event(defines.events.on_surface_cleared, function(event)
 end)
 
 script.on_event(defines.events.on_chunk_generated, function(event)
-    local equipmentData = global.equipmentInProgress[event.surface.name]
+    local equipmentData = storage.equipmentInProgress[event.surface.name]
     if equipmentData then
         Equipment.BuildBlueprint(
                 equipmentData.stack,
@@ -153,33 +153,33 @@ end)
 
 script.on_event(defines.events.on_pre_surface_deleted, function(event)
     local surface = game.surfaces[event.surface_index]
-    if global.labSurfaces[surface.name] then
-        global.labSurfaces[surface.name] = nil
+    if storage.labSurfaces[surface.name] then
+        storage.labSurfaces[surface.name] = nil
     end
-    local surfaceData = global.seSurfaces[surface.name]
+    local surfaceData = storage.seSurfaces[surface.name]
     if surfaceData then
-        local sandboxForceData = global.sandboxForces[surfaceData.sandboxForceName]
+        local sandboxForceData = storage.sandboxForces[surfaceData.sandboxForceName]
         SpaceExploration.PreDeleteSandbox(sandboxForceData, surface.name)
     end
 end)
 
 script.on_event(defines.events.on_surface_renamed, function(event)
     -- TODO: Renaming surfaces likely doesn't really work
-    if global.labSurfaces[event.old_name] then
-        global.labSurfaces[event.new_name] = global.labSurfaces[event.old_name]
-        global.labSurfaces[event.old_name] = nil
+    if storage.labSurfaces[event.old_name] then
+        storage.labSurfaces[event.new_name] = storage.labSurfaces[event.old_name]
+        storage.labSurfaces[event.old_name] = nil
     end
-    local surfaceData = global.seSurfaces[event.old_name]
+    local surfaceData = storage.seSurfaces[event.old_name]
     if surfaceData then
-        local sandboxForceData = global.sandboxForces[surfaceData.sandboxForceName]
+        local sandboxForceData = storage.sandboxForces[surfaceData.sandboxForceName]
         if sandboxForceData.sePlanetaryLabZoneName == event.old_name then
             sandboxForceData.sePlanetaryLabZoneName = event.new_name
         end
         if sandboxForceData.seOrbitalSandboxZoneName == event.old_name then
             sandboxForceData.seOrbitalSandboxZoneName = event.new_name
         end
-        global.seSurfaces[event.new_name] = global.seSurfaces[event.old_name]
-        global.seSurfaces[event.old_name] = nil
+        storage.seSurfaces[event.new_name] = storage.seSurfaces[event.old_name]
+        storage.seSurfaces[event.old_name] = nil
     end
 end)
 

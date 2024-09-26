@@ -3,7 +3,7 @@ local Init = {}
 
 -- Setup Player, if necessary
 function Init.Player(player)
-    if global.players[player.index] then
+    if storage.players[player.index] then
         log("Skip Init.Player: " .. player.name)
         return
     end
@@ -11,7 +11,7 @@ function Init.Player(player)
     log("Init.Player: " .. player.name)
     local playerLabName = Lab.NameFromPlayer(player)
     local sandboxForceName = Sandbox.NameFromForce(player.force)
-    global.players[player.index] = {
+    storage.players[player.index] = {
         forceName = player.force.name,
         labName = playerLabName,
         sandboxForceName = sandboxForceName,
@@ -26,17 +26,17 @@ end
 -- Reset all Mod data
 function Init.FirstTimeInit()
     log("Init.FirstTimeInit")
-    global.version = Migrate.version
-    global.forces = {}
-    global.players = {}
-    global.labSurfaces = {}
-    global.sandboxForces = {}
-    global.seSurfaces = {}
-    global.equipmentInProgress = {}
-    global.asyncCreateQueue = Queue.New()
-    global.asyncUpgradeQueue = Queue.New()
-    global.asyncDestroyQueue = Queue.New()
-    global.lastSettingForAsyncGodTick = settings.global[Settings.godAsyncTick].value
+    storage.version = Migrate.version
+    storage.forces = {}
+    storage.players = {}
+    storage.labSurfaces = {}
+    storage.sandboxForces = {}
+    storage.seSurfaces = {}
+    storage.equipmentInProgress = {}
+    storage.asyncCreateQueue = Queue.New()
+    storage.asyncUpgradeQueue = Queue.New()
+    storage.asyncDestroyQueue = Queue.New()
+    storage.lastSettingForAsyncGodTick = settings.global[Settings.godAsyncTick].value
 
     -- Warning: do not rely on this alone; new Saves have no Players/Forces yet
     for _, force in pairs(game.forces) do

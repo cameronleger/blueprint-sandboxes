@@ -33,7 +33,7 @@ end
 
 -- Enable the Infinity Input/Output Recipes
 function Research.EnableSandboxSpecificResearch(force)
-    if global.sandboxForces[force.name].hiddenItemsUnlocked == true then
+    if storage.sandboxForces[force.name].hiddenItemsUnlocked == true then
         return
     end
     log("Unlocking hidden Recipes for: " .. force.name)
@@ -56,7 +56,7 @@ function Research.EnableSandboxSpecificResearch(force)
 
     EditorExtensionsCheats.EnableTestingRecipes(force)
 
-    global.sandboxForces[force.name].hiddenItemsUnlocked = true
+    storage.sandboxForces[force.name].hiddenItemsUnlocked = true
 end
 
 -- For all Forces with Sandboxes, Sync their Research
