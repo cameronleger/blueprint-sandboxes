@@ -21,7 +21,10 @@ function createTilePlannerPrototypes(tile)
             stackable = true,
             place_as_tile = {
                 result = tile.name,
-                condition = {},
+                condition = {
+                    -- TODO: New requirement, investigate: file:///home/cameron/src/factorio/factorio_expansion/doc-html/types/CollisionMaskConnector.html
+                    layers = {}
+                },
                 condition_size = 1,
             },
         },
@@ -33,7 +36,9 @@ function createTilePlannerPrototypes(tile)
             energy_required = 1,
             enabled = false,
             ingredients = {},
-            result = Tiles.pfx .. tile.name,
+            results = {
+                { type = "item", name = Tiles.pfx .. tile.name, amount = 1 },
+            },
             hide_from_stats = true,
         }
     }

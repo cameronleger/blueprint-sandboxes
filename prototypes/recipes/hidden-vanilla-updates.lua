@@ -8,7 +8,9 @@ function createLockedRecipeForHiddenItem(name)
                 energy_required = 1,
                 enabled = false,
                 ingredients = {},
-                result = name,
+                results = {
+                    { type = "item", name = name, amount = 1 },
+                },
             }
         })
     end
@@ -32,6 +34,7 @@ for _, recipe in pairs(data.raw.recipe) do
         end
     end
 end
+
 if shouldEnableLoaders then
     createLockedRecipeForHiddenItem("loader")
     createLockedRecipeForHiddenItem("fast-loader")

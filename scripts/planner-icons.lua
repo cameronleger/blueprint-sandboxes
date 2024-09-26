@@ -1,5 +1,6 @@
 local PlannerIcons = {}
 
+-- TODO: Icon/Size was changed, the if-checks need to be different
 function PlannerIcons.CreateLayeredIcon(prototype)
     local backgroundIconSize = 64
     local overallLayeredIconScale = 0.4
@@ -31,7 +32,7 @@ function PlannerIcons.CreateLayeredIcon(prototype)
                 icon_mipmaps = icon.icon_mipmaps,
             })
         end
-    elseif prototype.icon then
+    elseif prototype.icon and prototype.icon_size then
         foundIcon = true
         -- The simplest Icon approach
         table.insert(layeredIcons, {
