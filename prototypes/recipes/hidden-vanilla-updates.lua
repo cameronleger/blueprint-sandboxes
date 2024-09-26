@@ -5,12 +5,11 @@ function createLockedRecipeForHiddenItem(name)
             {
                 type = "recipe",
                 name = BPSB.pfx .. name,
+                localised_name = {"entity-name." .. name},
                 energy_required = 1,
                 enabled = false,
                 ingredients = {},
-                results = {
-                    { type = "item", name = name, amount = 1 },
-                },
+                results = {{ type = "item", name = name, amount = 1 }},
             }
         })
     end
