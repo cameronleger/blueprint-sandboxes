@@ -101,6 +101,8 @@ end
 
 -- Configure Sandbox Force
 function Force.ConfigureSandboxForce(force, sandboxForce)
+    -- TODO: Ideally, lock the Space Platform; but Cheat Mode forcefully enables
+
     -- Ensure the two Forces don't attack each other
     force.set_cease_fire(sandboxForce, true)
     sandboxForce.set_cease_fire(force, true)

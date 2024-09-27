@@ -15,4 +15,6 @@ function Tiles.GetResourceName(name)
     return string.sub(name, pfxLength + 1)
 end
 
+-- TODO: Build Checkerboard Planner
+
 return Tiles

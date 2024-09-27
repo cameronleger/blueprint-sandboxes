@@ -8,6 +8,7 @@ Queue = require("scripts.queue")
 -- Required by some
 Illusion = require("scripts.illusion")
 EditorExtensionsCheats = require("scripts.editor-extensions-cheats")
+RemoteView = require("scripts.remote-view")
 
 -- Required, but not ordered importantly
 Init = require("scripts.init")
@@ -62,6 +63,11 @@ end)
 script.on_event(defines.events.on_force_created, function(event)
     log("on_force_created name: " .. event.force.name)
     Force.Init(event.force)
+    if Sandbox.IsSandboxForce(event.force) then
+        RemoteView.HideEverythingInSandboxes(event.force)
+    else
+        RemoteView.HideAllSandboxes(event.force)
+    end
 end)
 
 -- Conditional Event Listeners
@@ -131,8 +137,14 @@ end)
 
 script.on_event(defines.events.on_surface_created, function(event)
     local surface = game.surfaces[event.surface_index]
+    RemoteView.HideFromAllSandboxes(surface)
+
+    if not Sandbox.IsSandbox(surface) then
+        return
+    end
+    RemoteView.HideSandboxFromEveryone(surface)
     local _ = Lab.AfterCreate(surface) or SpaceExploration.AfterCreate(surface)
-    local _ =  Lab.Equip(surface) or SpaceExploration.Equip(surface)
+    local _ = Lab.Equip(surface) or SpaceExploration.Equip(surface)
 end)
 
 script.on_event(defines.events.on_surface_cleared, function(event)
