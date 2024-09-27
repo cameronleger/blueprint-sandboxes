@@ -93,7 +93,11 @@ function Sandbox.Enter(player)
         return
     end
 
-    -- TODO: Consider newer controllers here too
+    if player.controller_type == defines.controllers.remote then
+        player.print("You are using a remote view, so you cannot enter a Sandbox. Return to your Character first.")
+        return
+    end
+
     if player.stashed_controller_type
             and player.stashed_controller_type ~= defines.controllers.editor
     then
