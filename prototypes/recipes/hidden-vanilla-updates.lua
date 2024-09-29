@@ -6,6 +6,7 @@ function createLockedRecipeForHiddenItem(name)
                 type = "recipe",
                 name = BPSB.pfx .. name,
                 localised_name = {"entity-name." .. name},
+                hidden_in_factoriopedia = true,
                 energy_required = 1,
                 enabled = false,
                 ingredients = {},

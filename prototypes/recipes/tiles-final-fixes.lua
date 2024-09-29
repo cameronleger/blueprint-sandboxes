@@ -17,6 +17,7 @@ function createTilePlannerPrototypes(tile)
             icons = icons,
             subgroup = Tiles.name,
             order = tile.order,
+            hidden_in_factoriopedia = true,
             stack_size = 1000,
             stackable = true,
             place_as_tile = {
@@ -33,6 +34,7 @@ function createTilePlannerPrototypes(tile)
             name = Tiles.pfx .. tile.name,
             localised_name = localisedName,
             icons = icons,
+            hidden_in_factoriopedia = true,
             energy_required = 1,
             enabled = false,
             ingredients = {},

@@ -46,6 +46,7 @@ function createResourcePlannerPrototypes(resource)
             icons = PlannerIcons.CreateLayeredIcon(resource),
             subgroup = Resources.name,
             order = resource.order,
+            hidden_in_factoriopedia = true,
             stack_size = 1,
             stackable = false,
             select = {
@@ -65,6 +66,7 @@ function createResourcePlannerPrototypes(resource)
             type = "recipe",
             name = Resources.pfx .. resource.name,
             localised_name = localisedName,
+            hidden_in_factoriopedia = true,
             energy_required = 1,
             enabled = false,
             ingredients = {},
