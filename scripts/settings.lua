@@ -14,6 +14,8 @@ Settings.godAsyncUpgradeRequestsPerTick = BPSB.pfx .. "god-async-upgrade-per-tic
 Settings.godAsyncDeleteRequestsPerTick = BPSB.pfx .. "god-async-delete-per-tick"
 Settings.labsAbsorbPollution = BPSB.pfx .. "labs-absorb-pollution"
 
+-- TODO: Global Electric Network
+
 function Settings.SetupScanSandboxes()
     if settings.global[Settings.scanSandboxes].value then
         script.on_nth_tick(Lab.chartAllLabsTick, God.ChartAllOccupiedSandboxes)

@@ -72,6 +72,19 @@ function Research.SyncAllForces()
     end
 end
 
+-- As a Force's Research Queue changes, keep the Force's Sandboxes in-sync
+function Research.OnResearchReordered(event)
+    if not settings.global[Settings.allowAllTech].value then
+        if not Sandbox.IsSandboxForce(event.force) then
+            local sandboxForce = game.forces[Sandbox.NameFromForce(event.force)]
+            if sandboxForce then
+                log("Research queue reordered: " .. event.force.name .. " -> " .. sandboxForce.name)
+                Research.SyncQueue(event.force, sandboxForce)
+            end
+        end
+    end
+end
+
 -- As a Force's Research changes, keep the Force's Sandboxes in-sync
 function Research.OnResearched(event)
     if not settings.global[Settings.allowAllTech].value then
