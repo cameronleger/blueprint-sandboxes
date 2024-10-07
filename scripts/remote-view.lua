@@ -37,6 +37,11 @@ function RemoteView.HideEverythingInSandboxes(sandboxForce)
     end
 end
 
+-- When a Sandbox Force is created, hide all Surfaces from them
+function RemoteView.IsUsingRemoteView(player)
+    return player.controller_type == defines.controllers.remote
+end
+
 function RemoteView.Hide(surface, force)
     force.set_surface_hidden(surface, true)
 end

@@ -128,6 +128,17 @@ script.on_event(defines.events.on_research_reversed, Research.OnResearched)
 script.on_event(defines.events.on_research_moved, Research.OnResearchReordered)
 script.on_event(defines.events.on_research_started, Research.OnResearchStarted)
 
+script.on_event(defines.events.on_player_controller_changed, function(event)
+    local player = game.players[event.player_index]
+    if event.old_type == defines.controllers.god
+            and RemoteView.IsUsingRemoteView(player)
+            and Sandbox.IsPlayerInsideSandbox(player)
+    then
+        player.print("You are inside a Sandbox, so you cannot enter the Remote View. Return to your Character first.")
+        player.set_controller({type = event.old_type})
+    end
+end)
+
 script.on_event(defines.events.on_player_changed_surface, function(event)
     local player = game.players[event.player_index]
     Sandbox.OnPlayerSurfaceChanged(player)

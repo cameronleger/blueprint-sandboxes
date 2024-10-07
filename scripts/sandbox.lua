@@ -93,7 +93,7 @@ function Sandbox.Enter(player)
         return
     end
 
-    if player.controller_type == defines.controllers.remote then
+    if RemoteView.IsUsingRemoteView(player) then
         player.print("You are using a remote view, so you cannot enter a Sandbox. Return to your Character first.")
         return
     end

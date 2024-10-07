@@ -98,7 +98,6 @@ function God.Upgrade(entity)
             and entity.to_be_upgraded()
     then
         local target = entity.get_upgrade_target()
-        local direction = entity.get_upgrade_direction()
 
         if Illusion.IsIllusion(entity.name) and
             Illusion.GetActualName(entity.name) == target.name
@@ -108,10 +107,12 @@ function God.Upgrade(entity)
             return
         end
 
+        -- TODO: Upgrade into the correct quality
+
         local options = {
             name = target.name,
             position = entity.position,
-            direction = direction or entity.direction,
+            direction = entity.direction,
             force = entity.force,
             fast_replace = true,
             spill = false,
