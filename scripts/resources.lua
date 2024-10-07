@@ -81,6 +81,8 @@ function Resources.OnAreaSelectedForRemove(event)
     end
 end
 
+-- TODO: More quality = more resources
+
 -- Add/Remove Resources when a Resource Planner is used
 function Resources.OnAreaSelected(event, add)
     if (Lab.IsLab(event.surface) or SpaceExploration.IsSandbox(event.surface))

@@ -8,6 +8,7 @@ Queue = require("scripts.queue")
 -- Required by some
 Illusion = require("scripts.illusion")
 EditorExtensionsCheats = require("scripts.editor-extensions-cheats")
+Permissions = require("scripts.permissions")
 RemoteView = require("scripts.remote-view")
 
 -- Required, but not ordered importantly
@@ -128,17 +129,6 @@ script.on_event(defines.events.on_research_reversed, Research.OnResearched)
 script.on_event(defines.events.on_research_moved, Research.OnResearchReordered)
 script.on_event(defines.events.on_research_started, Research.OnResearchStarted)
 
-script.on_event(defines.events.on_player_controller_changed, function(event)
-    local player = game.players[event.player_index]
-    if event.old_type == defines.controllers.god
-            and RemoteView.IsUsingRemoteView(player)
-            and Sandbox.IsPlayerInsideSandbox(player)
-    then
-        player.print("You are inside a Sandbox, so you cannot enter the Remote View. Return to your Character first.")
-        player.set_controller({type = event.old_type})
-    end
-end)
-
 script.on_event(defines.events.on_player_changed_surface, function(event)
     local player = game.players[event.player_index]
     Sandbox.OnPlayerSurfaceChanged(player)
@@ -207,10 +197,7 @@ end)
 
 script.on_event(defines.events.on_marked_for_deconstruction, God.OnMarkedForDeconstruct)
 
--- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_marked_for_upgrade
 script.on_event(defines.events.on_marked_for_upgrade, God.OnMarkedForUpgrade)
-
--- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_built_entity
 script.on_event(defines.events.on_built_entity, function(event)
     God.OnBuiltEntity(event.created_entity)
 end, God.onBuiltEntityFilters)
@@ -267,5 +254,3 @@ script.on_event(defines.events.on_gui_closed, function(event)
         Illusion.OnBlueprintGUIClosed(event)
     end
 end)
-
--- TODO: Consider defines.input_action.*blueprint*

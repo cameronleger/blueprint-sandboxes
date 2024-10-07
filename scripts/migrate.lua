@@ -23,6 +23,7 @@ function Migrate.Run()
         if storage.version < 011500 then Migrate.v1_15_0() end
         if storage.version < 011604 then Migrate.v1_16_4() end
         if storage.version < 011606 then Migrate.v1_16_6() end
+        if storage.version < 020000 then Migrate.v2_0_0() end
     end
 
     storage.version = Migrate.version
@@ -399,6 +400,39 @@ function Migrate.v1_16_6()
     end
 
     log("Migration 1.16.6 Finished")
+end
+
+function Migrate.v2_0_0()
+    --[[
+    2.0.0 has many necessary updates for Factorio 2.0
+    ]]
+
+    log("Migration 2.0.0 Starting")
+
+    Force.SyncAllForces()
+    for _, force in pairs(game.forces) do
+        RemoteView.HideAllSandboxes(force)
+        if Sandbox.IsSandboxForce(force) then
+            RemoteView.HideEverythingInSandboxes(force)
+        end
+    end
+
+    for _, player in pairs(game.players) do
+        local playerData = storage.players[player.index]
+        if Sandbox.IsPlayerInsideSandbox(player) then
+            if player.permission_group
+                    and not Permissions.IsSandboxPermissions(player.permission_group.name)
+            then
+                playerData.preSandboxPermissionGroupId = player.permission_group.name
+                local newPermissions = Permissions.GetOrCreate(player)
+                if newPermissions then
+                    player.permission_group = newPermissions
+                end
+            end
+        end
+    end
+
+    log("Migration 2.0.0 Finished")
 end
 
 return Migrate

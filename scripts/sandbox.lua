@@ -133,6 +133,9 @@ function Sandbox.Enter(player)
     playerData.preSandboxPosition = player.position
     playerData.preSandboxSurfaceName = player.surface.name
     playerData.preSandboxCheatMode = player.cheat_mode
+    if player.permission_group then
+        playerData.preSandboxPermissionGroupId = player.permission_group.name
+    end
 
     -- Sometimes a Player has a volatile Inventory that needs restoring later
     if Inventory.ShouldPersist(playerData.preSandboxController) then
@@ -163,6 +166,12 @@ function Sandbox.Enter(player)
 
     -- Enable Cheat mode _afterwards_, since EditorExtensions will alter the Force (now the Sandbox Force) based on this
     player.cheat_mode = true
+
+    -- Set some Permissions so the Player cannot affect their other Surfaces
+    local newPermissions = Permissions.GetOrCreate(player)
+    if newPermissions then
+        player.permission_group = newPermissions
+    end
 
     -- Harmlessly ensure our own Recipes are enabled
     -- TODO: It's unclear why this must happen _after_ the above code
@@ -222,6 +231,11 @@ function Sandbox.Exit(player)
     playerData.preSandboxPosition = nil
     playerData.preSandboxSurfaceName = nil
     playerData.preSandboxCheatMode = nil
+    if playerData.preSandboxPermissionGroupId then
+        player.permission_group = game.permissions.get_group(playerData.preSandboxPermissionGroupId)
+    else
+        player.permission_group = nil
+    end
     if playerData.preSandboxInventory then
         playerData.preSandboxInventory.destroy()
         playerData.preSandboxInventory = nil
