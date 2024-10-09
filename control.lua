@@ -199,7 +199,7 @@ script.on_event(defines.events.on_marked_for_deconstruction, God.OnMarkedForDeco
 
 script.on_event(defines.events.on_marked_for_upgrade, God.OnMarkedForUpgrade)
 script.on_event(defines.events.on_built_entity, function(event)
-    God.OnBuiltEntity(event.created_entity)
+    God.OnBuiltEntity(event.entity)
 end, God.onBuiltEntityFilters)
 script.on_event(defines.events.script_raised_built, function(event)
     God.OnBuiltEntity(event.entity)

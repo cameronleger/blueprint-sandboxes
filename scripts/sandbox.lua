@@ -95,6 +95,10 @@ function Sandbox.Enter(player)
 
     if RemoteView.IsUsingRemoteView(player) then
         player.print("You are using a remote view, so you cannot enter a Sandbox. Return to your Character first.")
+        --player.print(serpent.block({
+        --    physical_surface_name = player.physical_surface.name,
+        --    physical_position = player.physical_position,
+        --}))
         return
     end
 
