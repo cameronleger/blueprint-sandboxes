@@ -5,6 +5,7 @@ local Inventory = {}
 -- TODO: Consider Filters (otherwise they are lost during transition)
 
 -- Extracts a Player Cursor's Blueprint as a string (if present)
+---@param player LuaPlayer
 function Inventory.GetCursorBlueprintString(player)
     local blueprint = nil
     if player.is_cursor_blueprint() then
@@ -27,6 +28,7 @@ function Inventory.GetCursorBlueprintString(player)
 end
 
 -- Whether a Player's Cursor can non-destructively be replaced
+---@param player LuaPlayer
 function Inventory.WasCursorSafelyCleared(player)
     if not player or not player.cursor_stack.valid then
         return false
@@ -53,6 +55,7 @@ function Inventory.ShouldPersist(controller)
 end
 
 -- Ensure a Player's Inventory isn't full
+---@param player LuaPlayer
 function Inventory.Prune(player)
     local inventory = player.get_main_inventory()
     if not inventory then
@@ -61,12 +64,18 @@ function Inventory.Prune(player)
 
     if inventory.count_empty_stacks() == 0 then
         player.print("Your inventory is almost full. Please throw some items away.")
-        player.surface.spill_item_stack(player.position, inventory[#inventory])
+        player.surface.spill_item_stack({
+            position = player.position,
+            stack = inventory[#inventory],
+            allow_belts = false,
+        })
         inventory[#inventory].clear()
     end
 end
 
 -- Persist one Inventory into another mod-created one
+---@param from LuaInventory
+---@param to LuaInventory
 function Inventory.Persist(from, to)
     if not from then
         return nil
@@ -83,6 +92,8 @@ function Inventory.Persist(from, to)
 end
 
 -- Restore one Inventory into another
+---@param from LuaInventory
+---@param to LuaInventory
 function Inventory.Restore(from, to)
     if not from or not to then
         return
