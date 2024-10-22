@@ -1,5 +1,5 @@
-BPSB = require("scripts/bpsb")
-Settings = require("scripts/settings")
+BPSB = require("scripts.bpsb")
+Settings = require("scripts.settings")
 
 data:extend({
     {
@@ -105,6 +105,13 @@ data:extend({
         name = Settings.labsAbsorbPollution,
         setting_type = "startup",
         order = "a[lab]-a",
+        default_value = true,
+    },
+    {
+        type = "bool-setting",
+        name = Settings.customLabTiles,
+        setting_type = "startup",
+        order = "a[lab]-b",
         default_value = true,
     },
 })

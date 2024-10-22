@@ -20,7 +20,7 @@ data:extend({
             type = "time-elapsed",
             ticks = 60 * 5 -- 5 seconds
         },
-        image = BPSB.path .. "/graphics/toggle-gui.png",
+        image = BPSB.path .. "/graphics/choose-sandbox.png",
     },
     {
         type = "tips-and-tricks-item",
@@ -33,7 +33,7 @@ data:extend({
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
         },
-        image = BPSB.path .. "/graphics/choose-sandbox.png",
+        image = BPSB.path .. "/graphics/toggle-gui.png",
     },
     {
         type = "tips-and-tricks-item",

@@ -11,14 +11,14 @@ SpaceExploration.orbitalEquipmentString = "0eNqllt2OgyAQhd9lrqEB2m5bX6XZGLWjS4Jo
 -- Whether the Surface has been taken as a Space Sandbox
 function SpaceExploration.IsSandbox(surface)
     return SpaceExploration.enabled()
-            and global.seSurfaces[surface.name]
+            and storage.seSurfaces[surface.name]
 end
 
 -- Whether the Surface has been taken as a Planetary Lab Sandbox
 function SpaceExploration.IsPlanetarySandbox(surface)
     return SpaceExploration.enabled()
-            and global.seSurfaces[surface.name]
-            and not global.seSurfaces[surface.name].orbital
+            and storage.seSurfaces[surface.name]
+            and not storage.seSurfaces[surface.name].orbital
 end
 
 -- Whether the Zone is Star
@@ -76,7 +76,7 @@ function SpaceExploration.ChooseZoneForForce(player, sandboxForce, type)
                 and not zone.ruins
                 and not zone.glyph
                 and zone.special_type ~= "homesystem"
-                and not global.seSurfaces[zone.name]
+                and not storage.seSurfaces[zone.name]
         then
             local rootZone = SpaceExploration.GetRootZone(zoneIndex, zone)
             if not SpaceExploration.IsZoneThreatening(zone)
@@ -107,11 +107,11 @@ function SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxFor
         return
     end
 
-    local zoneName = global.sandboxForces[sandboxForce.name].sePlanetaryLabZoneName
+    local zoneName = storage.sandboxForces[sandboxForce.name].sePlanetaryLabZoneName
     if zoneName == nil then
         zoneName = SpaceExploration.ChooseZoneForForce(player, sandboxForce, "moon")
-        global.sandboxForces[sandboxForce.name].sePlanetaryLabZoneName = zoneName
-        global.seSurfaces[zoneName] = {
+        storage.sandboxForces[sandboxForce.name].sePlanetaryLabZoneName = zoneName
+        storage.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
             equipmentBlueprints = Equipment.Init(Lab.equipmentString),
             daytime = 0.95,
@@ -128,11 +128,11 @@ function SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce
         return
     end
 
-    local zoneName = global.sandboxForces[sandboxForce.name].seOrbitalSandboxZoneName
+    local zoneName = storage.sandboxForces[sandboxForce.name].seOrbitalSandboxZoneName
     if zoneName == nil then
         zoneName = SpaceExploration.ChooseZoneForForce(player, sandboxForce, "star")
-        global.sandboxForces[sandboxForce.name].seOrbitalSandboxZoneName = zoneName
-        global.seSurfaces[zoneName] = {
+        storage.sandboxForces[sandboxForce.name].seOrbitalSandboxZoneName = zoneName
+        storage.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
             equipmentBlueprints = Equipment.Init(SpaceExploration.orbitalEquipmentString),
             daytime = 0.95,
@@ -148,7 +148,7 @@ function SpaceExploration.SetDayTime(player, surface, daytime)
     if SpaceExploration.IsSandbox(surface) then
         surface.freeze_daytime = true
         surface.daytime = daytime
-        global.seSurfaces[surface.name].daytime = daytime
+        storage.seSurfaces[surface.name].daytime = daytime
         Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
         return true
     else
@@ -164,14 +164,14 @@ function SpaceExploration.ResetEquipmentBlueprint(surface)
 
     if SpaceExploration.IsSandbox(surface) then
         log("Resetting SE equipment: " .. surface.name)
-        if global.seSurfaces[surface.name].orbital then
+        if storage.seSurfaces[surface.name].orbital then
             Equipment.Set(
-                    global.seSurfaces[surface.name].equipmentBlueprints,
+                    storage.seSurfaces[surface.name].equipmentBlueprints,
                     SpaceExploration.orbitalEquipmentString
             )
         else
             Equipment.Set(
-                    global.seSurfaces[surface.name].equipmentBlueprints,
+                    storage.seSurfaces[surface.name].equipmentBlueprints,
                     Lab.equipmentString
             )
         end
@@ -192,7 +192,7 @@ function SpaceExploration.SetEquipmentBlueprint(surface, equipmentString)
     if SpaceExploration.IsSandbox(surface) then
         log("Setting SE equipment: " .. surface.name)
         Equipment.Set(
-                global.seSurfaces[surface.name].equipmentBlueprints,
+                storage.seSurfaces[surface.name].equipmentBlueprints,
                 equipmentString
         )
         surface.print("The equipment Blueprint for this Sandbox has been changed")
@@ -226,13 +226,13 @@ function SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
         return
     end
 
-    if global.seSurfaces[zoneName] then
+    if storage.seSurfaces[zoneName] then
         log("Pre-Deleting SE Sandbox: " .. zoneName)
-        local equipmentBlueprints = global.seSurfaces[zoneName].equipmentBlueprints
+        local equipmentBlueprints = storage.seSurfaces[zoneName].equipmentBlueprints
         if equipmentBlueprints and equipmentBlueprints.valid() then
             equipmentBlueprints.destroy()
         end
-        global.seSurfaces[zoneName] = nil
+        storage.seSurfaces[zoneName] = nil
         if sandboxForceData.sePlanetaryLabZoneName == zoneName then
             sandboxForceData.sePlanetaryLabZoneName = nil
         end
@@ -250,7 +250,7 @@ function SpaceExploration.DeleteSandbox(sandboxForceData, zoneName)
         return
     end
 
-    if global.seSurfaces[zoneName] then
+    if storage.seSurfaces[zoneName] then
         SpaceExploration.PreDeleteSandbox(sandboxForceData, zoneName)
         log("Deleting SE Sandbox: " .. zoneName)
         game.delete_surface(zoneName)
@@ -267,7 +267,7 @@ function SpaceExploration.AfterCreate(surface)
         return
     end
 
-    local surfaceData = global.seSurfaces[surface.name]
+    local surfaceData = storage.seSurfaces[surface.name]
     if not surfaceData then
         log("Not a SE Sandbox, won't handle Creation: " .. surface.name)
         return false
@@ -294,7 +294,7 @@ function SpaceExploration.Equip(surface)
         return
     end
 
-    local surfaceData = global.seSurfaces[surface.name]
+    local surfaceData = storage.seSurfaces[surface.name]
     if not surfaceData then
         log("Not a SE Sandbox, won't Equip: " .. surface.name)
         return false

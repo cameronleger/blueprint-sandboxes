@@ -7,12 +7,10 @@ Sandbox.pfx = BPSB.pfx .. "sb-"
 Sandbox.choices = {
     { "sandbox." .. Sandbox.pfx .. "player-lab" },
     { "sandbox." .. Sandbox.pfx .. "force-lab" },
-    { "sandbox." .. Sandbox.pfx .. "force-lab-space-exploration" },
-    { "sandbox." .. Sandbox.pfx .. "force-orbit-space-exploration" },
 }
-if not SpaceExploration.enabled() then
-    Sandbox.choices[3] = { "sandbox." .. Sandbox.pfx .. "space-exploration-disabled" }
-    Sandbox.choices[4] = { "sandbox." .. Sandbox.pfx .. "space-exploration-disabled" }
+if SpaceExploration.enabled() then
+    Sandbox.choices[3] = { "sandbox." .. Sandbox.pfx .. "force-lab-space-exploration" }
+    Sandbox.choices[4] = { "sandbox." .. Sandbox.pfx .. "force-orbit-space-exploration" }
 end
 
 -- Constants to represent indexes for Sandbox.choices
@@ -22,14 +20,16 @@ Sandbox.forcePlanetaryLab = 3
 Sandbox.forceOrbitalSandbox = 4
 
 -- A unique per-Force Sandbox Name
+---@param force LuaForce
 function Sandbox.NameFromForce(force)
     return Sandbox.pfx .. "f-" .. force.name
 end
 
 -- Whether the Force is specific to Blueprint Sandboxes
+---@param force LuaForce
 function Sandbox.IsSandboxForce(force)
     -- return string.sub(force.name, 1, pfxLength) == Sandbox.pfx
-    return not not global.sandboxForces[force.name]
+    return not not storage.sandboxForces[force.name]
 end
 
 -- Whether something is any type of Sandbox
@@ -39,8 +39,9 @@ function Sandbox.IsSandbox(thingWithName)
 end
 
 -- Whether something is any type of Sandbox
+---@param player LuaPlayer
 function Sandbox.IsPlayerInsideSandbox(player)
-    return global.players[player.index].preSandboxPosition ~= nil
+    return storage.players[player.index].preSandboxPosition ~= nil
             and Sandbox.IsSandbox(player.surface)
 end
 
@@ -61,15 +62,16 @@ function Sandbox.IsEnabled(selectedSandbox)
 end
 
 -- Which Surface Name to use for this Player based on their Selected Sandbox
+---@param player LuaPlayer
 function Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if playerData.selectedSandbox == Sandbox.player
     then
         return Lab.GetOrCreateSurface(playerData.labName, sandboxForce)
     elseif playerData.selectedSandbox == Sandbox.force
     then
-        return Lab.GetOrCreateSurface(global.sandboxForces[sandboxForce.name].labName, sandboxForce)
+        return Lab.GetOrCreateSurface(storage.sandboxForces[sandboxForce.name].labName, sandboxForce)
     elseif SpaceExploration.enabled()
             and playerData.selectedSandbox == Sandbox.forceOrbitalSandbox
     then
@@ -85,11 +87,17 @@ function Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
 end
 
 -- Convert the Player to God-mode, save their previous State, and enter Selected Sandbox
+---@param player LuaPlayer
 function Sandbox.Enter(player)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if Sandbox.IsPlayerInsideSandbox(player) then
         log("Already inside Sandbox: " .. playerData.insideSandbox)
+        return
+    end
+
+    if not RemoteView.EnsureSafeExit(player) then
+        player.print("You are using a remote view, so you cannot enter a Sandbox. Return to your Character first.")
         return
     end
 
@@ -128,6 +136,9 @@ function Sandbox.Enter(player)
     playerData.preSandboxPosition = player.position
     playerData.preSandboxSurfaceName = player.surface.name
     playerData.preSandboxCheatMode = player.cheat_mode
+    if player.permission_group then
+        playerData.preSandboxPermissionGroupId = player.permission_group.name
+    end
 
     -- Sometimes a Player has a volatile Inventory that needs restoring later
     if Inventory.ShouldPersist(playerData.preSandboxController) then
@@ -159,6 +170,12 @@ function Sandbox.Enter(player)
     -- Enable Cheat mode _afterwards_, since EditorExtensions will alter the Force (now the Sandbox Force) based on this
     player.cheat_mode = true
 
+    -- Set some Permissions so the Player cannot affect their other Surfaces
+    local newPermissions = Permissions.GetOrCreate(player)
+    if newPermissions then
+        player.permission_group = newPermissions
+    end
+
     -- Harmlessly ensure our own Recipes are enabled
     -- TODO: It's unclear why this must happen _after_ the above code
     Research.EnableSandboxSpecificResearch(sandboxForce)
@@ -177,8 +194,9 @@ function Sandbox.Enter(player)
 end
 
 -- Convert the Player to their previous State, and leave Selected Sandbox
+---@param player LuaPlayer
 function Sandbox.Exit(player)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if not Sandbox.IsPlayerInsideSandbox(player) then
         log("Already outside Sandbox")
@@ -217,6 +235,11 @@ function Sandbox.Exit(player)
     playerData.preSandboxPosition = nil
     playerData.preSandboxSurfaceName = nil
     playerData.preSandboxCheatMode = nil
+    if playerData.preSandboxPermissionGroupId then
+        player.permission_group = game.permissions.get_group(playerData.preSandboxPermissionGroupId)
+    else
+        player.permission_group = nil
+    end
     if playerData.preSandboxInventory then
         playerData.preSandboxInventory.destroy()
         playerData.preSandboxInventory = nil
@@ -230,6 +253,7 @@ function Sandbox.Exit(player)
 end
 
 -- Ensure the Player has a Character to go back to
+---@param player LuaPlayer
 function Sandbox.RecoverPlayerCharacter(player, playerData)
     -- Typical situation, there wasn't a Character, or there was a valid one
     if (not playerData.preSandboxCharacter) or playerData.preSandboxCharacter.valid then
@@ -285,8 +309,9 @@ function Sandbox.RecoverPlayerCharacter(player, playerData)
 end
 
 -- Keep a Player's God-state, but change between Selected Sandboxes
+---@param player LuaPlayer
 function Sandbox.Transfer(player)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if not Sandbox.IsPlayerInsideSandbox(player) then
         log("Outside Sandbox, cannot transfer")
@@ -308,8 +333,9 @@ function Sandbox.Transfer(player)
 end
 
 -- Update Sandboxes Player if a Player actually changes Forces (outside of this mod)
+---@param player LuaPlayer
 function Sandbox.OnPlayerForceChanged(player)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
     local force = player.force
     if not Sandbox.IsSandboxForce(force)
             and playerData.forceName ~= force.name
@@ -320,7 +346,7 @@ function Sandbox.OnPlayerForceChanged(player)
         local sandboxForceName = Sandbox.NameFromForce(force)
 
         playerData.sandboxForceName = sandboxForceName
-        local labData = global.labSurfaces[playerData.labName]
+        local labData = storage.labSurfaces[playerData.labName]
         if labData then
             labData.sandboxForceName = sandboxForceName
         end
@@ -344,15 +370,17 @@ function Sandbox.OnPlayerForceChanged(player)
 end
 
 -- Determine whether the Player is inside a known Sandbox
+---@param player LuaPlayer
+---@param surface LuaSurface
 function Sandbox.GetSandboxChoiceFor(player, surface)
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
     if surface.name == playerData.labName then
         return Sandbox.player
-    elseif surface.name == global.sandboxForces[playerData.sandboxForceName].labName then
+    elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].labName then
         return Sandbox.force
-    elseif surface.name == global.sandboxForces[playerData.sandboxForceName].seOrbitalSandboxZoneName then
+    elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].seOrbitalSandboxZoneName then
         return Sandbox.forceOrbitalSandbox
-    elseif surface.name == global.sandboxForces[playerData.sandboxForceName].sePlanetaryLabZoneName then
+    elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].sePlanetaryLabZoneName then
         return Sandbox.forcePlanetaryLab
     elseif Factorissimo.IsFactory(surface) then
         local outsideSurface = Factorissimo.GetOutsideSurfaceForFactory(
@@ -367,16 +395,17 @@ function Sandbox.GetSandboxChoiceFor(player, surface)
 end
 
 -- Update whether the Player is inside a known Sandbox
+---@param player LuaPlayer
 function Sandbox.OnPlayerSurfaceChanged(player)
     if Sandbox.IsPlayerInsideSandbox(player) then
-        global.players[player.index].insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
+        storage.players[player.index].insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
     end
 end
 
 -- Enter, Exit, or Transfer a Player across Sandboxes
 function Sandbox.Toggle(player_index)
     local player = game.players[player_index]
-    local playerData = global.players[player.index]
+    local playerData = storage.players[player.index]
 
     if Factorissimo.IsFactoryInsideSandbox(player.surface, player.position) then
         player.print("You are inside of a Factory, so you cannot change Sandboxes")
@@ -396,6 +425,32 @@ function Sandbox.Toggle(player_index)
     else
         SpaceExploration.ExitRemoteView(player)
         Sandbox.Enter(player)
+    end
+end
+
+-- Whether the Global Electrical Network of a Sandbox exists
+---@param surface LuaSurface
+---@return boolean
+function Sandbox.HasGlobalElectricalNetwork(surface)
+    if Lab.IsLab(surface) or SpaceExploration.IsSandbox(surface) then
+        return surface.has_global_electric_network
+    else
+        return false
+    end
+end
+
+-- Toggle the Global Electrical Network of a Sandbox
+---@param surface LuaSurface
+---@return boolean | nil
+function Sandbox.ToggleGlobalElectricalNetwork(surface)
+    if Lab.IsLab(surface) or SpaceExploration.IsSandbox(surface) then
+        if surface.has_global_electric_network then
+            surface.destroy_global_electric_network()
+            return false
+        else
+            surface.create_global_electric_network()
+            return true
+        end
     end
 end
 

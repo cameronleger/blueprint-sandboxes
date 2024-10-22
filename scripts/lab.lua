@@ -9,11 +9,13 @@ Lab.chartAllLabsTick = 300
 Lab.equipmentString = "0eNqNkd1ugzAMhd/F10kF6bq2eZVqQpAaZgkMSkI1hnj3OVRC1dT95M6x/Z2TkxmqdsTBE0ewM5DrOYC9zBCo4bJNd3EaECxQxA4UcNmlClt00ZPTyOibScs++rp0CIsC4it+gM0X9SenokZvrKFvH/fN8qYAOVIkvJtai6ngsavQi8AvGAVDH2Sz56QttEzBBFabJbn6BjL/eNcPwEz8VmNdoy8CfQoiz7bzRGm/KRHXxNLS7h1DfILfHVYBszuskdyni4AxEjchTXns+hsWo/RasYnXIoUrrehHXFJ6a9j24Y8V3NCHVcWc8pfj2RxfzyY77SWXL6PBsLw="
 
 -- A unique per-Player Lab Name
+---@param player LuaPlayer
 function Lab.NameFromPlayer(player)
     return Lab.pfx .. "p-" .. player.name
 end
 
 -- A unique per-Force Lab Name
+---@param force LuaForce
 function Lab.NameFromForce(force)
     return Lab.pfx .. "f-" .. force.name
 end
@@ -21,10 +23,11 @@ end
 -- Whether the Surface (or Force) is specific to a Lab
 function Lab.IsLab(thingWithName)
     return string.sub(thingWithName.name, 1, pfxLength) == Lab.pfx
-    -- return not not global.labSurfaces[thingWithName.name]
+    -- return not not storage.labSurfaces[thingWithName.name]
 end
 
 -- Create a new Lab Surface, if necessary
+---@param sandboxForce LuaForce
 function Lab.GetOrCreateSurface(labName, sandboxForce)
     local surface = game.surfaces[labName]
 
@@ -34,14 +37,14 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
     end
 
     if surface then
-        if global.labSurfaces[labName] then
+        if storage.labSurfaces[labName] then
             return surface
         end
         log("Found a Lab Surface, but not the Data; recreating it for safety")
     end
 
     log("Creating Lab: " .. labName)
-    global.labSurfaces[labName] = {
+    storage.labSurfaces[labName] = {
         sandboxForceName = sandboxForce.name,
         equipmentBlueprints = Equipment.Init(Lab.equipmentString),
         daytime = 0.95,
@@ -57,11 +60,13 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
 end
 
 -- Set a Lab's Daytime to a specific value
+---@param player LuaPlayer
+---@param surface LuaSurface
 function Lab.SetDayTime(player, surface, daytime)
     if Lab.IsLab(surface) then
         surface.freeze_daytime = true
         surface.daytime = daytime
-        global.labSurfaces[surface.name].daytime = daytime
+        storage.labSurfaces[surface.name].daytime = daytime
         Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
         return true
     else
@@ -71,13 +76,13 @@ end
 
 -- Delete a Lab Surface, if present
 function Lab.DeleteLab(surfaceName)
-    if game.surfaces[surfaceName] and global.labSurfaces[surfaceName] then
+    if game.surfaces[surfaceName] and storage.labSurfaces[surfaceName] then
         log("Deleting Lab: " .. surfaceName)
-        local equipmentBlueprints = global.labSurfaces.equipmentBlueprints
+        local equipmentBlueprints = storage.labSurfaces.equipmentBlueprints
         if equipmentBlueprints and equipmentBlueprints.valid() then
             equipmentBlueprints.destroy()
         end
-        global.labSurfaces[surfaceName] = nil
+        storage.labSurfaces[surfaceName] = nil
         game.delete_surface(surfaceName)
         return true
     else
@@ -87,11 +92,12 @@ function Lab.DeleteLab(surfaceName)
 end
 
 -- Set the Lab's equipment Blueprint for a Surface
+---@param surface LuaSurface
 function Lab.SetEquipmentBlueprint(surface, equipmentString)
     if Lab.IsLab(surface) then
         log("Setting Lab equipment: " .. surface.name)
         Equipment.Set(
-                global.labSurfaces[surface.name].equipmentBlueprints,
+                storage.labSurfaces[surface.name].equipmentBlueprints,
                 equipmentString
         )
         surface.print("The equipment Blueprint for this Lab has been changed")
@@ -103,11 +109,12 @@ function Lab.SetEquipmentBlueprint(surface, equipmentString)
 end
 
 -- Reset the Lab's equipment Blueprint for a Surface
+---@param surface LuaSurface
 function Lab.ResetEquipmentBlueprint(surface)
     if Lab.IsLab(surface) then
         log("Resetting Lab equipment: " .. surface.name)
         Equipment.Set(
-                global.labSurfaces[surface.name].equipmentBlueprints,
+                storage.labSurfaces[surface.name].equipmentBlueprints,
                 Lab.equipmentString
         )
         surface.print("The equipment Blueprint for this Lab has been reset")
@@ -119,6 +126,7 @@ function Lab.ResetEquipmentBlueprint(surface)
 end
 
 -- Reset the Lab a Player is currently in
+---@param player LuaPlayer
 function Lab.Reset(player)
     if Lab.IsLab(player.surface) then
         log("Resetting Lab: " .. player.surface.name)
@@ -132,8 +140,9 @@ function Lab.Reset(player)
 end
 
 -- Set some important Surface settings for a Lab
+---@param surface LuaSurface
 function Lab.AfterCreate(surface)
-    local surfaceData = global.labSurfaces[surface.name]
+    local surfaceData = storage.labSurfaces[surface.name]
     if not surfaceData then
         log("Not a Lab, won't handle Creation: " .. surface.name)
         return false
@@ -162,8 +171,9 @@ function Lab.AfterCreate(surface)
 end
 
 -- Add some helpful initial Entities to a Lab
+---@param surface LuaSurface
 function Lab.Equip(surface)
-    local surfaceData = global.labSurfaces[surface.name]
+    local surfaceData = storage.labSurfaces[surface.name]
     if not surfaceData then
         log("Not a Lab, won't Equip: " .. surface.name)
         return false
@@ -181,8 +191,10 @@ function Lab.Equip(surface)
 end
 
 -- Update all Entities in Lab with a new Force
+---@param surface LuaSurface
+---@param force LuaForce
 function Lab.AssignEntitiesToForce(surface, force)
-    local surfaceData = global.labSurfaces[surface.name]
+    local surfaceData = storage.labSurfaces[surface.name]
     if not surfaceData then
         log("Not a Lab, won't Reassign: " .. surface.name)
         return false

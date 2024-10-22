@@ -6,7 +6,9 @@ ToggleGUI.toggleShortcut = ToggleGUI.pfx .. "sb-toggle-shortcut"
 ToggleGUI.selectedSandboxDropdown = ToggleGUI.pfx .. "selected-sandbox-dropdown"
 ToggleGUI.resetButton = ToggleGUI.pfx .. "reset-button"
 ToggleGUI.daytimeSlider = ToggleGUI.pfx .. "daytime-slider"
+ToggleGUI.globalElectricNetworkCheckbox = ToggleGUI.pfx .. "global-eletric-network-checkbox"
 
+---@param player LuaPlayer
 function ToggleGUI.Init(player)
     if player.gui.left[ToggleGUI.name] then
         return
@@ -23,7 +25,7 @@ function ToggleGUI.Init(player)
         type = "frame",
         name = "innerFrame",
         direction = "vertical",
-        style = "inside_shallow_frame_with_padding",
+        style = "inside_shallow_frame_with_padding_and_vertical_spacing",
     }
 
     local topLineFlow = innerFrame.add {
@@ -46,7 +48,7 @@ function ToggleGUI.Init(player)
         name = ToggleGUI.selectedSandboxDropdown,
         tooltip = { "gui-description." .. ToggleGUI.selectedSandboxDropdown },
         items = Sandbox.choices,
-        selected_index = global.players[player.index].selectedSandbox,
+        selected_index = storage.players[player.index].selectedSandbox,
     }.style.horizontally_stretchable = true
 
     local daylightFlow = innerFrame.add {
@@ -73,6 +75,22 @@ function ToggleGUI.Init(player)
         value_step = 0.025,
         style = "notched_slider",
     }.style.horizontally_stretchable = true
+
+    local globalElectricNetworkFlow = innerFrame.add {
+        type = "flow",
+        name = "globalElectricNetworkFlow",
+        direction = "horizontal",
+        style = BPSB.pfx .. "centered-horizontal-flow",
+    }
+
+    globalElectricNetworkFlow.add {
+        type = "checkbox",
+        name = ToggleGUI.globalElectricNetworkCheckbox,
+        caption = { "gui." .. ToggleGUI.globalElectricNetworkCheckbox },
+        tooltip = { "gui-description." .. ToggleGUI.globalElectricNetworkCheckbox },
+        state = false,
+        style = BPSB.pfx .. "left-padded-checkbox",
+    }
 
     ToggleGUI.Update(player)
 end
@@ -103,10 +121,10 @@ function ToggleGUI.Update(player)
         return
     end
 
-    ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = global.players[player.index].selectedSandbox
+    ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = storage.players[player.index].selectedSandbox
 
     if Sandbox.IsPlayerInsideSandbox(player) then
-        local playerData = global.players[player.index]
+        local playerData = storage.players[player.index]
 
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, true)
         player.gui.left[ToggleGUI.name].visible = true
@@ -125,6 +143,7 @@ function ToggleGUI.Update(player)
         end
 
         ToggleGUI.FindByName(player, ToggleGUI.daytimeSlider).slider_value = player.surface.daytime
+        ToggleGUI.FindByName(player, ToggleGUI.globalElectricNetworkCheckbox).state = Sandbox.HasGlobalElectricalNetwork(player.surface)
     else
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, false)
         player.gui.left[ToggleGUI.name].visible = false
@@ -146,11 +165,11 @@ function ToggleGUI.OnGuiDropdown(event)
     if event.element.name == ToggleGUI.selectedSandboxDropdown then
         local choice = event.element.selected_index
         if Sandbox.IsEnabled(choice) then
-            global.players[player.index].selectedSandbox = event.element.selected_index
+            storage.players[player.index].selectedSandbox = event.element.selected_index
             Sandbox.Toggle(event.player_index)
         else
             player.print("That Sandbox is not possible.")
-            event.element.selected_index = global.players[player.index].selectedSandbox
+            event.element.selected_index = storage.players[player.index].selectedSandbox
             ToggleGUI.Update(player)
         end
     end
@@ -160,6 +179,9 @@ function ToggleGUI.OnGuiClick(event)
     local player = game.players[event.player_index]
     if event.element.name == ToggleGUI.toggleShortcut then
         Sandbox.Toggle(event.player_index)
+    elseif event.element.name == ToggleGUI.globalElectricNetworkCheckbox then
+        local newState = Sandbox.ToggleGlobalElectricalNetwork(game.players[event.player_index].surface)
+        ToggleGUI.FindByName(player, ToggleGUI.globalElectricNetworkCheckbox).state = newState
     elseif event.element.name == ToggleGUI.resetButton then
         if event.shift then
             return Lab.ResetEquipmentBlueprint(player.surface)

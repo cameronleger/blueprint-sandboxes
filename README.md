@@ -21,8 +21,6 @@ To teach you the basics and provide many more details, the in-game Tips-and-Tric
 
 # FAQ
 
-* Pollution counts towards Evolution.
-* Production Statistics cannot be segregated.
 * Crafting Counts cannot be segregated - this does not work for Lazy Bastard.
 * You can die in the real world while in a Sandbox.
 * When Resetting the Sandbox and the game crashes with any other mod listed in the error - it's _that_ mod's fault for not handling `on_pre_surface_cleared`.

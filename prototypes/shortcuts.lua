@@ -11,15 +11,12 @@ data:extend({
         order = "b[blueprints]-z[sandbox]",
         action = "lua",
         associated_control_input = ToggleGUI.toggleShortcut,
-        style = "green",
+        style = "blue",
         toggleable = true,
-        icon = {
-            filename = BPSB.path .. "/graphics/icon-x64.png",
-            priority = "extra-high-no-scale",
-            size = 64,
-            scale = 0.5,
-            mipmap_count = 3,
-            flags = { "gui-icon" },
-        },
+        icon = BPSB.path .. "/graphics/icon-x32.png",
+        icon_size = 32,
+        -- TODO: Small Icon
+        small_icon = BPSB.path .. "/graphics/icon-x32.png",
+        small_icon_size = 32,
     },
 })

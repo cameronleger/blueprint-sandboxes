@@ -3,7 +3,10 @@ Tiles = require("scripts.tiles")
 
 -- Helpers for Tile Planners
 function shouldSkipTilePlanner(tile)
-    return tile.name ~= "water"
+    if tile.fluid then
+        return false
+    end
+    return true
 end
 
 function createTilePlannerPrototypes(tile)
@@ -17,11 +20,15 @@ function createTilePlannerPrototypes(tile)
             icons = icons,
             subgroup = Tiles.name,
             order = tile.order,
+            hidden_in_factoriopedia = true,
             stack_size = 1000,
             stackable = true,
             place_as_tile = {
                 result = tile.name,
-                condition = {},
+                condition = {
+                    -- TODO: New requirement, investigate: file:///home/cameron/src/factorio/factorio_expansion/doc-html/types/CollisionMaskConnector.html
+                    layers = {}
+                },
                 condition_size = 1,
             },
         },
@@ -30,10 +37,13 @@ function createTilePlannerPrototypes(tile)
             name = Tiles.pfx .. tile.name,
             localised_name = localisedName,
             icons = icons,
+            hidden_in_factoriopedia = true,
             energy_required = 1,
             enabled = false,
             ingredients = {},
-            result = Tiles.pfx .. tile.name,
+            results = {
+                { type = "item", name = Tiles.pfx .. tile.name, amount = 1 },
+            },
             hide_from_stats = true,
         }
     }

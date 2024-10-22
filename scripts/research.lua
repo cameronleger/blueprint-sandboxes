@@ -7,9 +7,10 @@ function Research.Sync(originalForce, sandboxForce)
         sandboxForce.research_all_technologies()
         log("Researching everything for: " .. sandboxForce.name)
     else
-        for tech, _ in pairs(game.technology_prototypes) do
+        for tech, _ in pairs(prototypes.technology) do
             sandboxForce.technologies[tech].researched = originalForce.technologies[tech].researched
             sandboxForce.technologies[tech].level = originalForce.technologies[tech].level
+            -- TODO: Consider file:///home/cameron/src/factorio/factorio_expansion/doc-html/classes/LuaTechnology.html#saved_progress
         end
         log("Copied all Research from: " .. originalForce.name .. " -> " .. sandboxForce.name)
     end
@@ -32,7 +33,7 @@ end
 
 -- Enable the Infinity Input/Output Recipes
 function Research.EnableSandboxSpecificResearch(force)
-    if global.sandboxForces[force.name].hiddenItemsUnlocked == true then
+    if storage.sandboxForces[force.name].hiddenItemsUnlocked == true then
         return
     end
     log("Unlocking hidden Recipes for: " .. force.name)
@@ -55,7 +56,7 @@ function Research.EnableSandboxSpecificResearch(force)
 
     EditorExtensionsCheats.EnableTestingRecipes(force)
 
-    global.sandboxForces[force.name].hiddenItemsUnlocked = true
+    storage.sandboxForces[force.name].hiddenItemsUnlocked = true
 end
 
 -- For all Forces with Sandboxes, Sync their Research
@@ -66,6 +67,19 @@ function Research.SyncAllForces()
             if sandboxForce then
                 Research.Sync(force, sandboxForce)
                 Research.SyncQueue(force, sandboxForce)
+            end
+        end
+    end
+end
+
+-- As a Force's Research Queue changes, keep the Force's Sandboxes in-sync
+function Research.OnResearchReordered(event)
+    if not settings.global[Settings.allowAllTech].value then
+        if not Sandbox.IsSandboxForce(event.force) then
+            local sandboxForce = game.forces[Sandbox.NameFromForce(event.force)]
+            if sandboxForce then
+                log("Research queue reordered: " .. event.force.name .. " -> " .. sandboxForce.name)
+                Research.SyncQueue(event.force, sandboxForce)
             end
         end
     end

@@ -16,3 +16,9 @@ data.raw["gui-style"]["default"][BPSB.pfx .. "sprite-like-tool-button"] = {
     natural_size = 28,
     stretch_image_to_widget_size = true,
 }
+
+data.raw["gui-style"]["default"][BPSB.pfx .. "left-padded-checkbox"] = {
+    type = "checkbox_style",
+    parent = "checkbox",
+    left_margin = 8,
+}

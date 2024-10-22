@@ -1,4 +1,7 @@
 .idea
+.vscode
 *.iml
+*.log
 *.kra
+*~
 release

@@ -5,10 +5,12 @@ function createLockedRecipeForHiddenItem(name)
             {
                 type = "recipe",
                 name = BPSB.pfx .. name,
+                localised_name = {"entity-name." .. name},
+                hidden_in_factoriopedia = true,
                 energy_required = 1,
                 enabled = false,
                 ingredients = {},
-                result = name,
+                results = {{ type = "item", name = name, amount = 1 }},
             }
         })
     end
@@ -32,6 +34,7 @@ for _, recipe in pairs(data.raw.recipe) do
         end
     end
 end
+
 if shouldEnableLoaders then
     createLockedRecipeForHiddenItem("loader")
     createLockedRecipeForHiddenItem("fast-loader")

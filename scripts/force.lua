@@ -1,6 +1,8 @@
 -- Managing Forces and their Sandbox Forces
 local Force = {}
 
+-- TODO: Consider new copy function file:///home/cameron/src/factorio/factorio_expansion/doc-html/classes/LuaForce.html#copy_from
+
 -- Properties from the original Force that are synced to the Sandbox Force (in not-all-tech mode)
 Force.syncedProperties = {
     -- "manual_mining_speed_modifier", Forcibly set
@@ -11,12 +13,14 @@ Force.syncedProperties = {
     "worker_robots_battery_modifier",
     "worker_robots_storage_bonus",
     "inserter_stack_size_bonus",
-    "stack_inserter_capacity_bonus",
+    "bulk_inserter_capacity_bonus",
+    "belt_stack_size_bonus",
     "character_trash_slot_count",
     "maximum_following_robot_count",
     "following_robots_lifetime_modifier",
     "character_running_speed_modifier",
     "artillery_range_modifier",
+    "beacon_distribution_modifier",
     "character_build_distance_bonus",
     "character_item_drop_distance_bonus",
     "character_reach_distance_bonus",
@@ -31,7 +35,7 @@ Force.syncedProperties = {
 
 -- Setup Force, if necessary
 function Force.Init(force)
-    if global.forces[force.name]
+    if storage.forces[force.name]
             or Sandbox.IsSandboxForce(force)
             or #force.players < 1
     then
@@ -42,10 +46,10 @@ function Force.Init(force)
     log("Force.Init: " .. force.name)
     local forceLabName = Lab.NameFromForce(force)
     local sandboxForceName = Sandbox.NameFromForce(force)
-    global.forces[force.name] = {
+    storage.forces[force.name] = {
         sandboxForceName = sandboxForceName,
     }
-    global.sandboxForces[sandboxForceName] = {
+    storage.sandboxForces[sandboxForceName] = {
         forceName = force.name,
         hiddenItemsUnlocked = false,
         labName = forceLabName,
@@ -57,14 +61,14 @@ end
 -- Delete Force's information, if necessary
 function Force.Merge(oldForceName, newForce)
     -- Double-check we know about this Force
-    local oldForceData = global.forces[oldForceName]
-    local newForceData = global.forces[newForce.name]
+    local oldForceData = storage.forces[oldForceName]
+    local newForceData = storage.forces[newForce.name]
     if not oldForceData or not newForceData then
         log("Skip Force.Merge: " .. oldForceName .. " -> " .. newForce.name)
         return
     end
     local sandboxForceName = oldForceData.sandboxForceName
-    local oldSandboxForceData = global.sandboxForces[sandboxForceName]
+    local oldSandboxForceData = storage.sandboxForces[sandboxForceName]
     local oldSandboxForce = game.forces[sandboxForceName]
 
     -- Bounce any Players currently using the older Sandboxes
@@ -87,12 +91,14 @@ function Force.Merge(oldForceName, newForce)
     end
 
     -- Delete the old Force's data
-    global.forces[oldForceName] = nil
-    global.sandboxForces[sandboxForceName] = nil
+    storage.forces[oldForceName] = nil
+    storage.sandboxForces[sandboxForceName] = nil
 end
 
 -- Configure Sandbox Force
 function Force.ConfigureSandboxForce(force, sandboxForce)
+    -- TODO: Ideally, lock the Space Platform; but Cheat Mode forcefully enables
+
     -- Ensure the two Forces don't attack each other
     force.set_cease_fire(sandboxForce, true)
     sandboxForce.set_cease_fire(force, true)
@@ -120,7 +126,7 @@ end
 
 -- Create Sandbox Force, if necessary
 function Force.GetOrCreateSandboxForce(force)
-    local sandboxForceName = global.forces[force.name].sandboxForceName
+    local sandboxForceName = storage.forces[force.name].sandboxForceName
     local sandboxForce = game.forces[sandboxForceName]
     if sandboxForce then
         Force.ConfigureSandboxForce(force, sandboxForce)

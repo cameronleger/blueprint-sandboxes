@@ -52,17 +52,17 @@ function God.Destroy(entity)
     end
 end
 
+-- TODO: Insert Requests when pasting new Entity that generates new Requests
+-- But... what is the Event?
+
 -- Immediately Insert an Entity's Requests
 function God.InsertRequests(entity)
     if entity.valid
             and entity.type == "item-request-proxy"
             and entity.proxy_target then
         -- Insert any Requested Items (like Modules, Fuel)
-        for name, count in pairs(entity.item_requests) do
-            entity.proxy_target.insert({
-                name = name,
-                count = count,
-            })
+        for _, item_request in pairs(entity.item_requests) do
+            entity.proxy_target.insert(item_request)
         end
         entity.destroy()
     end
@@ -81,7 +81,6 @@ function God.Create(entity)
         elseif entity.type == "entity-ghost" then
             -- Entities might also want Items after Reviving
             local _, revived, request = entity.silent_revive({
-                return_item_request_proxy = true,
                 raise_revive = true
             })
 
@@ -97,11 +96,10 @@ function God.Upgrade(entity)
     if entity.valid
             and entity.to_be_upgraded()
     then
-        local target = entity.get_upgrade_target()
-        local direction = entity.get_upgrade_direction()
+        local targetEntity, targetQuality = entity.get_upgrade_target()
 
         if Illusion.IsIllusion(entity.name) and
-            Illusion.GetActualName(entity.name) == target.name
+            Illusion.GetActualName(entity.name) == targetEntity.name
          then
             log("Cancelling an Upgrade from an Illusion to its Real Entity: " .. entity.name)
             entity.cancel_upgrade(entity.force)
@@ -109,9 +107,10 @@ function God.Upgrade(entity)
         end
 
         local options = {
-            name = target.name,
+            name = targetEntity.name,
             position = entity.position,
-            direction = direction or entity.direction,
+            direction = entity.direction,
+            quality = targetQuality,
             force = entity.force,
             fast_replace = true,
             spill = false,
@@ -137,7 +136,7 @@ end
 -- Ensure the God's Inventory is kept in-sync
 function God.OnInventoryChanged(event)
     local player = game.players[event.player_index]
-    local playerData = global.players[event.player_index]
+    local playerData = storage.players[event.player_index]
     if Sandbox.IsPlayerInsideSandbox(player) then
         Inventory.Prune(player)
         playerData.sandboxInventory = Inventory.Persist(
@@ -206,7 +205,7 @@ function God.OnMarkedForDeconstruct(event)
     if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncDeleteRequestsPerTick,
-                global.asyncDestroyQueue,
+                storage.asyncDestroyQueue,
                 God.Destroy,
                 event.entity
         )
@@ -219,7 +218,7 @@ function God.OnMarkedForUpgrade(event)
     if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncUpgradeRequestsPerTick,
-                global.asyncUpgradeQueue,
+                storage.asyncUpgradeQueue,
                 God.Upgrade,
                 event.entity
         )
@@ -227,17 +226,19 @@ function God.OnMarkedForUpgrade(event)
 end
 
 -- Ensure new Ghosts are handled
-function God.OnBuiltEntity(entity)
+function God.OnBuiltEntity(event)
     -- log("Entity Creating: " .. entity.unit_number .. " " .. entity.type)
-    if God.ShouldHandleEntity(entity) then
+    if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncCreateRequestsPerTick,
-                global.asyncCreateQueue,
+                storage.asyncCreateQueue,
                 God.Create,
-                entity
+                event.entity
         )
     end
 end
+
+-- TODO: Consider defines.build_mode
 
 -- For each known Sandbox Surface, handle any async God functionality
 function God.HandleAllSandboxRequests(event)
@@ -246,45 +247,45 @@ function God.HandleAllSandboxRequests(event)
     local deleteRequestsPerTick = settings.global[Settings.godAsyncDeleteRequestsPerTick].value
 
     local destroyRequestsHandled = 0
-    while Queue.Size(global.asyncDestroyQueue) > 0
+    while Queue.Size(storage.asyncDestroyQueue) > 0
             and deleteRequestsPerTick > 0
     do
-        God.Destroy(Queue.Pop(global.asyncDestroyQueue))
+        God.Destroy(Queue.Pop(storage.asyncDestroyQueue))
         destroyRequestsHandled = destroyRequestsHandled + 1
         deleteRequestsPerTick = deleteRequestsPerTick - 1
     end
-    if Queue.Size(global.asyncDestroyQueue) == 0
+    if Queue.Size(storage.asyncDestroyQueue) == 0
             and destroyRequestsHandled > 0
     then
-        global.asyncDestroyQueue = Queue.New()
+        storage.asyncDestroyQueue = Queue.New()
     end
 
     local upgradeRequestsHandled = 0
-    while Queue.Size(global.asyncUpgradeQueue) > 0
+    while Queue.Size(storage.asyncUpgradeQueue) > 0
             and upgradeRequestsPerTick > 0
     do
-        God.Upgrade(Queue.Pop(global.asyncUpgradeQueue))
+        God.Upgrade(Queue.Pop(storage.asyncUpgradeQueue))
         upgradeRequestsHandled = upgradeRequestsHandled + 1
         upgradeRequestsPerTick = upgradeRequestsPerTick - 1
     end
-    if Queue.Size(global.asyncUpgradeQueue) == 0
+    if Queue.Size(storage.asyncUpgradeQueue) == 0
             and upgradeRequestsHandled > 0
     then
-        global.asyncUpgradeQueue = Queue.New()
+        storage.asyncUpgradeQueue = Queue.New()
     end
 
     local createRequestsHandled = 0
-    while Queue.Size(global.asyncCreateQueue) > 0
+    while Queue.Size(storage.asyncCreateQueue) > 0
             and createRequestsPerTick > 0
     do
-        God.Create(Queue.Pop(global.asyncCreateQueue))
+        God.Create(Queue.Pop(storage.asyncCreateQueue))
         createRequestsHandled = createRequestsHandled + 1
         createRequestsPerTick = createRequestsPerTick - 1
     end
-    if Queue.Size(global.asyncCreateQueue) == 0
+    if Queue.Size(storage.asyncCreateQueue) == 0
             and createRequestsHandled > 0
     then
-        global.asyncCreateQueue = Queue.New()
+        storage.asyncCreateQueue = Queue.New()
     end
 end
 

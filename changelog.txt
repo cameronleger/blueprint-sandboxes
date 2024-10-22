@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2024-10-21
+  Changes:
+    - Updated for Factorio 2.0
+    - Planner for replacing Lab Tiles
+    - Alternative Lab Tiles
+    - More generic support for Tiles that produce Fluids
+    - GUI for the Global Electric Network
+---------------------------------------------------------------------------------------------------
 Version: 1.19.1
 Date: 2024-07-06
   Changes:

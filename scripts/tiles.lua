@@ -5,14 +5,21 @@ Tiles.name = BPSB.pfx .. "sandbox-tiles"
 Tiles.pfx = BPSB.pfx .. "sbt-"
 local pfxLength = string.len(Tiles.pfx)
 
+Tiles.labTilePlanner = Tiles.pfx .. "lab-tile-planner"
+
 -- Whether the Thing is a Tile Planner
 function Tiles.IsTilePlanner(name)
     return string.sub(name, 1, pfxLength) == Tiles.pfx
 end
 
--- Extract the Resource Name from a Tile Planner
-function Tiles.GetResourceName(name)
-    return string.sub(name, pfxLength + 1)
+-- Fix checkerboards when a Planner is used
+function Tiles.OnAreaSelected(event)
+    if (Lab.IsLab(event.surface) or SpaceExploration.IsSandbox(event.surface))
+            and event.item == Tiles.labTilePlanner
+    then
+        event.surface.build_checkerboard(event.area)
+        return true
+    end
 end
 
 return Tiles

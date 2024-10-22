@@ -28,7 +28,7 @@ end
 
 -- Determine the amount to spawn for a Resource Planner
 function Resources.GetResourceAmount(resourceName)
-    local resourcePrototype = game.entity_prototypes[resourceName]
+    local resourcePrototype = prototypes.entity[resourceName]
 
     local nameScalar = Resources.nameScalar[resourceName] or Resources.nameScalar["default"]
     local categoryScalar = Resources.categoryScalar[resourcePrototype.resource_category] or Resources.categoryScalar["default"]
@@ -50,7 +50,7 @@ end
 
 -- Determine how often to spawn for a Resource Planner
 function Resources.GetResourceSpacing(resourceName)
-    local box = game.entity_prototypes[resourceName].map_generator_bounding_box
+    local box = prototypes.entity[resourceName].map_generator_bounding_box
     return {
         x = math.max(1, math.ceil(box.right_bottom.x - box.left_top.x)),
         y = math.max(1, math.ceil(box.right_bottom.y - box.left_top.y)),
@@ -81,6 +81,8 @@ function Resources.OnAreaSelectedForRemove(event)
     end
 end
 
+-- TODO: More quality = more resources
+
 -- Add/Remove Resources when a Resource Planner is used
 function Resources.OnAreaSelected(event, add)
     if (Lab.IsLab(event.surface) or SpaceExploration.IsSandbox(event.surface))
@@ -88,9 +90,12 @@ function Resources.OnAreaSelected(event, add)
     then
         if add then
             Resources.OnAreaSelectedForAdd(event)
+            return true
         else
             Resources.OnAreaSelectedForRemove(event)
+            return true
         end
+        return false
     end
 end
 
