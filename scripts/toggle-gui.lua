@@ -95,6 +95,7 @@ function ToggleGUI.Init(player)
     ToggleGUI.Update(player)
 end
 
+---@param player LuaPlayer
 function ToggleGUI.Destroy(player)
     if not player.gui.left[ToggleGUI.name] then
         return
@@ -112,10 +113,12 @@ function ToggleGUI.FindDescendantByName(instance, name)
     end
 end
 
+---@param player LuaPlayer
 function ToggleGUI.FindByName(player, name)
     return ToggleGUI.FindDescendantByName(player.gui.left[ToggleGUI.name], name)
 end
 
+---@param player LuaPlayer
 function ToggleGUI.Update(player)
     if not player.gui.left[ToggleGUI.name] then
         return
@@ -151,6 +154,7 @@ function ToggleGUI.Update(player)
     end
 end
 
+---@param event EventData.on_gui_value_changed
 function ToggleGUI.OnGuiValueChanged(event)
     local player = game.players[event.player_index]
     if event.element.name == ToggleGUI.daytimeSlider then
@@ -160,6 +164,7 @@ function ToggleGUI.OnGuiValueChanged(event)
     end
 end
 
+---@param event EventData.on_gui_selection_state_changed
 function ToggleGUI.OnGuiDropdown(event)
     local player = game.players[event.player_index]
     if event.element.name == ToggleGUI.selectedSandboxDropdown then
@@ -175,6 +180,7 @@ function ToggleGUI.OnGuiDropdown(event)
     end
 end
 
+---@param event EventData.on_gui_click
 function ToggleGUI.OnGuiClick(event)
     local player = game.players[event.player_index]
     if event.element.name == ToggleGUI.toggleShortcut then
@@ -199,6 +205,7 @@ function ToggleGUI.OnGuiClick(event)
     end
 end
 
+---@param event EventData.on_lua_shortcut | EventData.CustomInputEvent
 function ToggleGUI.OnToggleShortcut(event)
     if (event.input_name or event.prototype_name) == ToggleGUI.toggleShortcut then
         Sandbox.Toggle(event.player_index)

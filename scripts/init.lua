@@ -2,6 +2,7 @@
 local Init = {}
 
 -- Setup Player, if necessary
+---@param player LuaPlayer
 function Init.Player(player)
     if storage.players[player.index] then
         log("Skip Init.Player: " .. player.name)

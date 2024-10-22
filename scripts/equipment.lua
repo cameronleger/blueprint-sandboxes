@@ -2,6 +2,7 @@
 local Equipment = {}
 
 -- Initializes an Inventory for the default equipment Blueprint(s)
+---@param default string
 function Equipment.Init(default)
     local equipment = game.create_inventory(1)
     Equipment.Set(equipment, default)
@@ -9,6 +10,8 @@ function Equipment.Init(default)
 end
 
 -- Updates the default equipment Blueprint(s)
+---@param equipment LuaInventory
+---@param default string
 function Equipment.Set(equipment, default)
     equipment[1].import_stack(default)
 end
@@ -24,6 +27,9 @@ building, so we do some work when the surface is generated, then the rest
 as soon as possible (aligning to generated chunks seems faster (in ticks)
 than waiting any number of specific ticks).
 ]]
+---@param stack LuaItemStack
+---@param surface LuaSurface
+---@param forceName ForceID
 function Equipment.Place(stack, surface, forceName)
     if stack.is_blueprint then
         log("Beginning Equipment Placement")
@@ -43,9 +49,12 @@ function Equipment.Place(stack, surface, forceName)
 end
 
 -- Prepares a Surface for an Equipment Blueprint
+---@param stack LuaItemStack
+---@param surface LuaSurface
 function Equipment.Prepare(stack, surface)
     -- We need to know how many Chunks must be generated to fit this Blueprint
     local radius = 0
+    ---@param thing BlueprintEntity | Tile
     local function updateRadius(thing)
         local x = math.abs(thing.position.x)
         local y = math.abs(thing.position.y)
@@ -73,9 +82,12 @@ function Equipment.Prepare(stack, surface)
 end
 
 -- Applies an Equipment Blueprint to a Surface
+---@param stack LuaItemStack
+---@param surface LuaSurface
 function Equipment.IsReadyForBlueprint(stack, surface)
     local entities = stack.get_blueprint_entities()
     local tiles = stack.get_blueprint_tiles()
+    ---@param thing BlueprintEntity | Tile
     local function is_chunk_generated(thing)
         return surface.is_chunk_generated({
             thing.position.x / 32,
@@ -100,6 +112,9 @@ function Equipment.IsReadyForBlueprint(stack, surface)
 end
 
 -- Applies an Equipment Blueprint to a Surface
+---@param stack LuaItemStack
+---@param surface LuaSurface
+---@param forceName ForceID
 function Equipment.BuildBlueprint(stack, surface, forceName)
     local logRetryInterval = 100
     local equipmentData = storage.equipmentInProgress[surface.name]

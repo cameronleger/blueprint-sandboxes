@@ -24,6 +24,7 @@ God.skipHandlingEntities = {
 }
 
 -- Immediately destroy an Entity (and perhaps related Entities)
+---@param entity LuaEntity
 function God.Destroy(entity)
     if entity.valid
             and entity.can_be_destroyed()
@@ -56,6 +57,7 @@ end
 -- But... what is the Event?
 
 -- Immediately Insert an Entity's Requests
+---@param entity LuaEntity
 function God.InsertRequests(entity)
     if entity.valid
             and entity.type == "item-request-proxy"
@@ -69,6 +71,7 @@ function God.InsertRequests(entity)
 end
 
 -- Immediately Revive a Ghost Entity
+---@param entity LuaEntity
 function God.Create(entity)
     Illusion.ReplaceIfNecessary(entity)
     if entity.valid then
@@ -92,6 +95,7 @@ function God.Create(entity)
 end
 
 -- Immediately turn one Entity into another
+---@param entity LuaEntity
 function God.Upgrade(entity)
     if entity.valid
             and entity.to_be_upgraded()
@@ -134,6 +138,7 @@ function God.Upgrade(entity)
 end
 
 -- Ensure the God's Inventory is kept in-sync
+---@param event EventData.on_player_main_inventory_changed
 function God.OnInventoryChanged(event)
     local player = game.players[event.player_index]
     local playerData = storage.players[event.player_index]
@@ -147,6 +152,7 @@ function God.OnInventoryChanged(event)
 end
 
 -- Ensure newly-crafted Items are put into the Cursor for use
+---@param event EventData.on_player_crafted_item
 function God.OnPlayerCraftedItem(event)
     local player = game.players[event.player_index]
     if Sandbox.IsPlayerInsideSandbox(player)
@@ -170,6 +176,7 @@ function God.OnPlayerCraftedItem(event)
     end
 end
 
+---@param entity LuaEntity
 function God.AsyncWrapper(setting, queue, handler, entity)
     if settings.global[setting].value == 0 then
         handler(entity)
@@ -178,6 +185,7 @@ function God.AsyncWrapper(setting, queue, handler, entity)
     end
 end
 
+---@param entity LuaEntity
 function God.ShouldHandleEntity(entity)
     if not settings.global[Settings.godBuilding].value then
         return false
@@ -200,6 +208,7 @@ function God.ShouldHandleEntity(entity)
 end
 
 -- Ensure new Orders are handled
+---@param event EventData.on_marked_for_deconstruction
 function God.OnMarkedForDeconstruct(event)
     -- log("Entity Deconstructing: " .. event.entity.unit_number .. " " .. event.entity.type)
     if God.ShouldHandleEntity(event.entity) then
@@ -213,6 +222,7 @@ function God.OnMarkedForDeconstruct(event)
 end
 
 -- Ensure new Orders are handled
+---@param event EventData.on_marked_for_upgrade
 function God.OnMarkedForUpgrade(event)
     -- log("Entity Upgrading: " .. event.entity.unit_number .. " " .. event.entity.type)
     if God.ShouldHandleEntity(event.entity) then
@@ -226,6 +236,7 @@ function God.OnMarkedForUpgrade(event)
 end
 
 -- Ensure new Ghosts are handled
+---@param event EventData.on_built_entity | EventData.script_raised_built
 function God.OnBuiltEntity(event)
     -- log("Entity Creating: " .. entity.unit_number .. " " .. entity.type)
     if God.ShouldHandleEntity(event.entity) then
@@ -241,6 +252,7 @@ end
 -- TODO: Consider defines.build_mode
 
 -- For each known Sandbox Surface, handle any async God functionality
+---@param event EventData.on_tick
 function God.HandleAllSandboxRequests(event)
     local createRequestsPerTick = settings.global[Settings.godAsyncCreateRequestsPerTick].value
     local upgradeRequestsPerTick = settings.global[Settings.godAsyncUpgradeRequestsPerTick].value

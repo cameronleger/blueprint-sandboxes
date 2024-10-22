@@ -28,6 +28,7 @@ function Settings.SetupConditionalHandlers()
     script.on_nth_tick(settings.global[Settings.godAsyncTick].value, God.HandleAllSandboxRequests)
 end
 
+---@param event EventData.on_runtime_mod_setting_changed
 function Settings.OnRuntimeSettingChanged(event)
     if event.setting == Settings.scanSandboxes then
         Settings.SetupScanSandboxes()

@@ -27,6 +27,8 @@ function Factorissimo.IsFactory(thingWithName)
 end
 
 -- Whether the Surface is a Factory inside of a Sandbox
+---@param surface LuaSurface
+---@param position MapPosition
 function Factorissimo.IsFactoryInsideSandbox(surface, position)
     if not Factorissimo.enabled() then
         return false
@@ -41,11 +43,15 @@ function Factorissimo.IsFactoryInsideSandbox(surface, position)
 end
 
 -- Find a Factory given a Surface and Position (if possible)
+---@param surface LuaSurface
+---@param position MapPosition
 function Factorissimo.GetFactory(surface, position)
     return remote.call(Factorissimo.name, "find_surrounding_factory", surface, position)
 end
 
 -- Find a Factory's Outside Surface recursively
+---@param surface LuaSurface
+---@param position MapPosition
 function Factorissimo.GetOutsideSurfaceForFactory(surface, position)
     if not Factorissimo.IsFactory(surface) then
         return nil

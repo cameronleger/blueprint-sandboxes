@@ -38,6 +38,7 @@ Permissions.disallowedActions = {
 }
 
 -- Create a new Permissions Group based on the Player's existing one
+---@param player LuaPlayer
 function Permissions.GetOrCreate(player)
     local sandboxPermissionsName = Permissions.pfx .. player.name
     local permissions = game.permissions.get_group(sandboxPermissionsName)

@@ -58,6 +58,7 @@ function Resources.GetResourceSpacing(resourceName)
 end
 
 -- Add Resources when a Resource Planner is used
+---@param event EventData.on_player_selected_area | EventData.on_player_alt_selected_area
 function Resources.OnAreaSelectedForAdd(event)
     local resourceName = Resources.GetResourceName(event.item)
     local density = Resources.GetResourceAmount(resourceName)
@@ -75,6 +76,7 @@ function Resources.OnAreaSelectedForAdd(event)
 end
 
 -- Removed Resources when a Resource Planner is used
+---@param event EventData.on_player_selected_area | EventData.on_player_alt_selected_area
 function Resources.OnAreaSelectedForRemove(event)
     for _, entity in pairs(event.entities) do
         entity.destroy({ raise_destroy = true })
@@ -84,6 +86,7 @@ end
 -- TODO: More quality = more resources
 
 -- Add/Remove Resources when a Resource Planner is used
+---@param event EventData.on_player_selected_area | EventData.on_player_alt_selected_area
 function Resources.OnAreaSelected(event, add)
     if (Lab.IsLab(event.surface) or SpaceExploration.IsSandbox(event.surface))
             and Resources.IsResourcePlanner(event.item)

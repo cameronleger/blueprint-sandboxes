@@ -34,6 +34,7 @@ Force.syncedProperties = {
 }
 
 -- Setup Force, if necessary
+---@param force LuaForce
 function Force.Init(force)
     if storage.forces[force.name]
             or Sandbox.IsSandboxForce(force)
@@ -59,6 +60,8 @@ function Force.Init(force)
 end
 
 -- Delete Force's information, if necessary
+---@param oldForceName ForceID
+---@param newForce LuaForce
 function Force.Merge(oldForceName, newForce)
     -- Double-check we know about this Force
     local oldForceData = storage.forces[oldForceName]
@@ -96,6 +99,8 @@ function Force.Merge(oldForceName, newForce)
 end
 
 -- Configure Sandbox Force
+---@param force LuaForce
+---@param sandboxForce LuaForce
 function Force.ConfigureSandboxForce(force, sandboxForce)
     -- TODO: Ideally, lock the Space Platform; but Cheat Mode forcefully enables
 
@@ -125,6 +130,7 @@ function Force.ConfigureSandboxForce(force, sandboxForce)
 end
 
 -- Create Sandbox Force, if necessary
+---@param force LuaForce
 function Force.GetOrCreateSandboxForce(force)
     local sandboxForceName = storage.forces[force.name].sandboxForceName
     local sandboxForce = game.forces[sandboxForceName]

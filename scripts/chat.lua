@@ -2,6 +2,7 @@
 local Chat = {}
 
 -- Proxy Chats between Sandbox Force <-> Original Force
+---@param event EventData.on_console_chat
 function Chat.OnChat(event)
     if event.player_index == nil then
         return

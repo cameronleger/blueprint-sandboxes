@@ -2,6 +2,8 @@
 local Research = {}
 
 -- Set a Force's Sandboxes Research equal to that of the Force's (or all research)
+---@param originalForce LuaForce
+---@param sandboxForce LuaForce
 function Research.Sync(originalForce, sandboxForce)
     if settings.global[Settings.allowAllTech].value then
         sandboxForce.research_all_technologies()
@@ -17,6 +19,8 @@ function Research.Sync(originalForce, sandboxForce)
 end
 
 -- Set a Force's Sandboxes Research Queue equal to that of the Force's
+---@param originalForce LuaForce
+---@param sandboxForce LuaForce
 function Research.SyncQueue(originalForce, sandboxForce)
     if settings.global[Settings.allowAllTech].value then
         sandboxForce.research_queue = nil
@@ -32,6 +36,7 @@ function Research.SyncQueue(originalForce, sandboxForce)
 end
 
 -- Enable the Infinity Input/Output Recipes
+---@param force LuaForce
 function Research.EnableSandboxSpecificResearch(force)
     if storage.sandboxForces[force.name].hiddenItemsUnlocked == true then
         return
@@ -73,6 +78,7 @@ function Research.SyncAllForces()
 end
 
 -- As a Force's Research Queue changes, keep the Force's Sandboxes in-sync
+---@param event EventData.on_research_moved
 function Research.OnResearchReordered(event)
     if not settings.global[Settings.allowAllTech].value then
         if not Sandbox.IsSandboxForce(event.force) then
@@ -86,6 +92,7 @@ function Research.OnResearchReordered(event)
 end
 
 -- As a Force's Research changes, keep the Force's Sandboxes in-sync
+---@param event EventData.on_research_finished | EventData.on_research_reversed
 function Research.OnResearched(event)
     if not settings.global[Settings.allowAllTech].value then
         local force = event.research.force
@@ -103,6 +110,7 @@ function Research.OnResearched(event)
 end
 
 -- As a Force's Research Queue changes, show it in the Force's Sandboxes
+---@param event EventData.on_research_started
 function Research.OnResearchStarted(event)
     if not settings.global[Settings.allowAllTech].value then
         local force = event.research.force

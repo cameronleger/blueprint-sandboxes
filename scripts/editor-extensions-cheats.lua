@@ -7,6 +7,7 @@ function EditorExtensionsCheats.enabled()
 end
 
 -- Enables EE's Recipes for a Force
+---@param force LuaForce
 function EditorExtensionsCheats.EnableTestingRecipes(force)
     if not EditorExtensionsCheats.enabled() then
         return false

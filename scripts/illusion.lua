@@ -42,6 +42,7 @@ function Illusion.GetActualName(name)
 end
 
 -- Extract the Name from an Entity
+---@param entity LuaEntity
 function Illusion.GhostOrRealName(entity)
     local realName = entity.name
     if entity.type == "entity-ghost" then
@@ -51,6 +52,7 @@ function Illusion.GhostOrRealName(entity)
 end
 
 -- Convert a built Entity into an Illusion (if possible)
+---@param entity LuaEntity
 function Illusion.ReplaceIfNecessary(entity)
     if not entity.valid then
         return
@@ -140,6 +142,8 @@ Closing/Confirming Blueprint GUI, from Library or Book in Library:
 ]]
 
 -- Convert an entire Blueprint's contents from Illusions (if possible)
+---@param player LuaPlayer
+---@param potentialItemStacks LuaItemStack[]
 function Illusion.HandleBlueprintEvent(player, potentialItemStacks)
     if not Sandbox.IsPlayerInsideSandbox(player) then
         return
@@ -188,6 +192,7 @@ function Illusion.HandleBlueprintEvent(player, potentialItemStacks)
 end
 
 -- A Player is creating a new Blueprint from a selection
+---@param event EventData.on_player_setup_blueprint | EventData.on_player_configured_blueprint
 function Illusion.OnBlueprintSetup(event)
     local player = game.players[event.player_index]
     Illusion.HandleBlueprintEvent(player, {
@@ -197,6 +202,7 @@ function Illusion.OnBlueprintSetup(event)
 end
 
 -- A Player might be updating an existing Blueprint (only works in the Inventory!)
+---@param event EventData.on_gui_closed
 function Illusion.OnBlueprintGUIClosed(event)
     if not event.item then
         return

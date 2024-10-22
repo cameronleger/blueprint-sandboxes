@@ -13,6 +13,7 @@ function Tiles.IsTilePlanner(name)
 end
 
 -- Fix checkerboards when a Planner is used
+---@param event EventData.on_player_selected_area | EventData.on_player_alt_selected_area
 function Tiles.OnAreaSelected(event)
     if (Lab.IsLab(event.surface) or SpaceExploration.IsSandbox(event.surface))
             and event.item == Tiles.labTilePlanner
