@@ -15,12 +15,12 @@ data:extend({
         name = pfxCategory .. "introduction",
         order = pfxOrder .. "a",
         is_title = true,
-        starting_status = "unlocked",
+        starting_status = "suggested",
         trigger = {
             type = "time-elapsed",
             ticks = 60 * 5 -- 5 seconds
         },
-        image = BPSB.path .. "/graphics/choose-sandbox.png",
+        image = BPSB.path .. "/graphics/sandbox.png",
     },
     {
         type = "tips-and-tricks-item",
@@ -28,12 +28,12 @@ data:extend({
         name = pfxCategory .. "multiple-sandboxes",
         indent = 1,
         order = pfxOrder .. "b",
-        dependencies = { pfxCategory .. "introduction" },
+        starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
         },
-        image = BPSB.path .. "/graphics/toggle-gui.png",
+        image = BPSB.path .. "/graphics/choose-sandbox.png",
     },
     {
         type = "tips-and-tricks-item",
@@ -42,7 +42,7 @@ data:extend({
         name = pfxCategory .. "reset-v2",
         indent = 1,
         order = pfxOrder .. "c",
-        dependencies = { pfxCategory .. "introduction" },
+        starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
@@ -56,7 +56,7 @@ data:extend({
         name = pfxCategory .. "daylight",
         indent = 1,
         order = pfxOrder .. "d",
-        dependencies = { pfxCategory .. "introduction" },
+        starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
@@ -66,10 +66,24 @@ data:extend({
     {
         type = "tips-and-tricks-item",
         category = category,
-        name = pfxCategory .. "sandbox-force",
+        tag = "[img=space-location/nauvis]",
+        name = pfxCategory .. "surface-properties",
         indent = 1,
         order = pfxOrder .. "e",
-        dependencies = { pfxCategory .. "introduction" },
+        starting_status = "unlocked",
+        trigger = {
+            type = "unlock-recipe",
+            recipe = BPSB.pfx .. "electric-energy-interface",
+        },
+        image = BPSB.path .. "/graphics/surface-properties.png",
+    },
+    {
+        type = "tips-and-tricks-item",
+        category = category,
+        name = pfxCategory .. "sandbox-force",
+        indent = 1,
+        order = pfxOrder .. "f",
+        starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
@@ -80,8 +94,8 @@ data:extend({
         category = category,
         name = pfxCategory .. "new-recipes",
         indent = 1,
-        order = pfxOrder .. "f",
-        dependencies = { pfxCategory .. "introduction" },
+        order = pfxOrder .. "g",
+        starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
@@ -93,8 +107,8 @@ data:extend({
         category = category,
         name = pfxCategory .. "god-mode",
         indent = 1,
-        order = pfxOrder .. "g",
-        dependencies = { pfxCategory .. "introduction" },
+        order = pfxOrder .. "h",
+        starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
@@ -105,8 +119,8 @@ data:extend({
         category = category,
         name = pfxCategory .. "auto-building",
         indent = 1,
-        order = pfxOrder .. "h",
-        dependencies = { pfxCategory .. "introduction" },
+        order = pfxOrder .. "i",
+        starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
@@ -143,8 +157,8 @@ data:extend({
         category = category,
         name = pfxCategory .. "illusions",
         indent = 1,
-        order = pfxOrder .. "i",
-        dependencies = { pfxCategory .. "introduction" },
+        order = pfxOrder .. "j",
+        starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",

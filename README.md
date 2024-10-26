@@ -8,12 +8,13 @@ To that end, it supports personal and team Sandbox Surfaces which enable: God-mo
 
 To teach you the basics and provide many more details, the in-game Tips-and-Tricks are used; the first is visible after a few seconds, and the rest after you start using the Sandbox. The rest of this is considered a non-exhaustive summary - if you want to know more, see those Tips/Tricks!
 
-* Multiple Sandboxes: your own and one for your force/team. If you're using Space Exploration, there's also Planetary and Orbital Sandboxes.
+* Multiple Sandboxes: your own and one for your force/team.
 * Blueprint Intput/Output: Copy/Paste, Blueprint Library, and in-Cursor.
 * Item Input/Output: Infinity chests and loaders are available.
 * God-mode: Fly around and construct/deconstruct much faster.
 * Persistent Inventory: Your Inventory is saved and restored when exiting/entering.
 * Automated Construction: Ghosts are automatically built for you.
+* Surface Properties: Adjust gravity, pressure, etc. to mimic other Planets.
 * All Recipes: If desired, use all Technology (instead of what you already know).
 * Resource Generation: Draw then use any kind of Resource Patch.
 * Water placement: Place water, so you can then landfill it (or not).

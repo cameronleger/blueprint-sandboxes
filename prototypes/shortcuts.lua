@@ -19,4 +19,16 @@ data:extend({
         small_icon = BPSB.path .. "/graphics/icon-x32.png",
         small_icon_size = 32,
     },
+    {
+        type = "custom-input",
+        name = SurfacePropsGUI.cancel,
+        key_sequence = "",
+        linked_game_control = "toggle-menu",
+    },
+    {
+        type = "custom-input",
+        name = SurfacePropsGUI.confirm,
+        key_sequence = "",
+        linked_game_control = "confirm-gui",
+    },
 })

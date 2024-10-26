@@ -24,13 +24,16 @@ Migrate = require("scripts.migrate")
 Research = require("scripts.research")
 Resources = require("scripts.resources")
 Tiles = require("scripts.tiles")
-ToggleGUI = require("scripts.toggle-gui")
 
 -- Required by Sandbox
 SpaceExploration = require("scripts.space-exploration")
 
 -- Requires SpaceExploration method immediately
 Sandbox = require("scripts.sandbox")
+
+-- GUIs, they likely depend on the above
+SurfacePropsGUI = require("scripts.surface-props-gui")
+ToggleGUI = require("scripts.toggle-gui")
 
 require('scripts.remote-interface')
 
@@ -39,6 +42,7 @@ require('scripts.remote-interface')
 script.on_init(function()
     Init.FirstTimeInit()
     Settings.SetupConditionalHandlers()
+    SurfacePropsGUI.InitPresets()
 end)
 
 script.on_event(defines.events.on_player_created, function(event)
@@ -73,7 +77,10 @@ end)
 
 -- Conditional Event Listeners
 
-script.on_load(Settings.SetupConditionalHandlers)
+script.on_load(function()
+    Settings.SetupConditionalHandlers()
+    SurfacePropsGUI.InitPresets()
+end)
 
 script.on_event(defines.events.on_runtime_mod_setting_changed, Settings.OnRuntimeSettingChanged)
 
@@ -236,11 +243,34 @@ end)
 script.on_event(ToggleGUI.toggleShortcut, ToggleGUI.OnToggleShortcut)
 script.on_event(defines.events.on_lua_shortcut, ToggleGUI.OnToggleShortcut)
 
--- GUI
+---@param event EventData.CustomInputEvent
+script.on_event(SurfacePropsGUI.cancel, function(event)
+    local player = game.players[event.player_index]
+    if SurfacePropsGUI.IsOpen(player) then
+        SurfacePropsGUI.Destroy(player)
+    end
+end)
 
-script.on_event(defines.events.on_gui_click, ToggleGUI.OnGuiClick)
+---@param event EventData.CustomInputEvent
+script.on_event(SurfacePropsGUI.confirm, function(event)
+    local player = game.players[event.player_index]
+    if SurfacePropsGUI.IsOpen(player) then
+        SurfacePropsGUI.Apply(player)
+        player.play_sound({ path = "utility/confirm" })
+        SurfacePropsGUI.Destroy(player)
+    end
+end)
+
+-- GUI
+---@param event EventData.on_gui_click
+script.on_event(defines.events.on_gui_click, function (event)
+    local _ = ToggleGUI.OnGuiClick(event) or SurfacePropsGUI.OnGuiClick(event)
+end)
 script.on_event(defines.events.on_gui_value_changed, ToggleGUI.OnGuiValueChanged)
-script.on_event(defines.events.on_gui_selection_state_changed, ToggleGUI.OnGuiDropdown)
+---@param event EventData.on_gui_selection_state_changed
+script.on_event(defines.events.on_gui_selection_state_changed, function (event)
+    local _ = ToggleGUI.OnGuiDropdown(event) or SurfacePropsGUI.OnGuiDropdown(event)
+end)
 
 script.on_event(defines.events.on_gui_closed, function(event)
     if (event.gui_type == defines.gui_type.blueprint_library) then

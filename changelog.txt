@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.0
+Date: 2024-10-26
+  Changes:
+    - Resource/Lab Planners are no longer items leftover in your inventory
+    - Surface properties are editable in a new GUI to enable/disable some recipes
+---------------------------------------------------------------------------------------------------
 Version: 2.0.1
 Date: 2024-10-22
   Bugfixes:

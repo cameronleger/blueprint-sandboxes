@@ -204,6 +204,9 @@ function Sandbox.Exit(player)
     end
     log("Exiting Sandbox: " .. player.surface.name)
 
+    -- Don't let anyone attempt to edit Surface Properties of other Surfaces!
+    SurfacePropsGUI.Destroy(player)
+
     -- Store some temporary State to use once outside the Sandbox
     local outputBlueprint = Inventory.GetCursorBlueprintString(player)
 

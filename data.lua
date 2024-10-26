@@ -1,4 +1,5 @@
 BPSB = require("scripts.bpsb")
+SurfacePropsGUI = require("scripts.surface-props-gui")
 ToggleGUI = require("scripts.toggle-gui")
 
 require("prototypes.item-groups")

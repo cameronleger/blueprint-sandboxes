@@ -4,6 +4,7 @@ ToggleGUI.name = BPSB.pfx .. "toggle-gui"
 ToggleGUI.pfx = ToggleGUI.name .. "-"
 ToggleGUI.toggleShortcut = ToggleGUI.pfx .. "sb-toggle-shortcut"
 ToggleGUI.selectedSandboxDropdown = ToggleGUI.pfx .. "selected-sandbox-dropdown"
+ToggleGUI.surfacePropsButton = ToggleGUI.pfx .. "surface-props-button"
 ToggleGUI.resetButton = ToggleGUI.pfx .. "reset-button"
 ToggleGUI.daytimeSlider = ToggleGUI.pfx .. "daytime-slider"
 ToggleGUI.globalElectricNetworkCheckbox = ToggleGUI.pfx .. "global-eletric-network-checkbox"
@@ -50,6 +51,14 @@ function ToggleGUI.Init(player)
         items = Sandbox.choices,
         selected_index = storage.players[player.index].selectedSandbox,
     }.style.horizontally_stretchable = true
+
+    topLineFlow.add {
+        type = "sprite-button",
+        name = ToggleGUI.surfacePropsButton,
+        tooltip = { "gui-description." .. ToggleGUI.surfacePropsButton },
+        style = "frame_action_button",
+        sprite = "tooltip-category-crafting-surface-conditions",
+    }
 
     local daylightFlow = innerFrame.add {
         type = "flow",
@@ -177,7 +186,9 @@ function ToggleGUI.OnGuiDropdown(event)
             event.element.selected_index = storage.players[player.index].selectedSandbox
             ToggleGUI.Update(player)
         end
+        return true
     end
+    return false
 end
 
 ---@param event EventData.on_gui_click
@@ -185,9 +196,14 @@ function ToggleGUI.OnGuiClick(event)
     local player = game.players[event.player_index]
     if event.element.name == ToggleGUI.toggleShortcut then
         Sandbox.Toggle(event.player_index)
+        return true
+    elseif event.element.name == ToggleGUI.surfacePropsButton then
+        SurfacePropsGUI.Init(player)
+        return true
     elseif event.element.name == ToggleGUI.globalElectricNetworkCheckbox then
         local newState = Sandbox.ToggleGlobalElectricalNetwork(game.players[event.player_index].surface)
         ToggleGUI.FindByName(player, ToggleGUI.globalElectricNetworkCheckbox).state = newState
+        return true
     elseif event.element.name == ToggleGUI.resetButton then
         if event.shift then
             return Lab.ResetEquipmentBlueprint(player.surface)
@@ -202,7 +218,9 @@ function ToggleGUI.OnGuiClick(event)
                         or SpaceExploration.Reset(player)
             end
         end
+        return true
     end
+    return false
 end
 
 ---@param event EventData.on_lua_shortcut | EventData.CustomInputEvent
