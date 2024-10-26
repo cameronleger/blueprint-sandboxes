@@ -48,7 +48,6 @@ function createResourcePlannerPrototypes(resource)
             order = resource.order,
             hidden_in_factoriopedia = true,
             stack_size = 1,
-            stackable = false,
             select = {
                 border_color = { r = 0, g = 1, b = 0 },
                 cursor_box_type = "pair",
@@ -61,6 +60,7 @@ function createResourcePlannerPrototypes(resource)
                 entity_filters = { resource.name },
             },
             always_include_tiles = true,
+            flags = { "not-stackable", "only-in-cursor" },
         },
         {
             type = "recipe",

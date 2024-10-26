@@ -22,7 +22,6 @@ function createTilePlannerPrototypes(tile)
             order = tile.order,
             hidden_in_factoriopedia = true,
             stack_size = 1000,
-            stackable = true,
             place_as_tile = {
                 result = tile.name,
                 condition = {

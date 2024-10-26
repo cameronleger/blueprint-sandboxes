@@ -8,7 +8,6 @@ data:extend({
         name = BPSB.name,
         icon = BPSB.path .. "/graphics/icon-x64.png",
         icon_size = 64,
-        inventory_order = "z",
         order = "z",
     },
     {

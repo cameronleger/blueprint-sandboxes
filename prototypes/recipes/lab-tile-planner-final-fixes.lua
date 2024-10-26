@@ -10,7 +10,6 @@ data:extend({
         order = "0",
         hidden_in_factoriopedia = true,
         stack_size = 1,
-        stackable = false,
         select = {
             border_color = { r = 0, g = 0, b = 1 },
             cursor_box_type = "pair",
@@ -22,6 +21,7 @@ data:extend({
             mode = { "any-tile" },
         },
         always_include_tiles = true,
+        flags = { "not-stackable", "only-in-cursor" },
     },
     {
         type = "recipe",
