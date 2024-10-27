@@ -5,8 +5,6 @@ Tiles = require("scripts.tiles")
 function shouldSkipTilePlanner(tile)
     if tile.fluid then
         return false
-    elseif tile.name == "empty-space" then
-        return false
     end
     return true
 end
