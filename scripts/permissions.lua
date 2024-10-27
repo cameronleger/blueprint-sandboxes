@@ -13,6 +13,7 @@ end
 Permissions.disallowedActions = {
     -- Cannot Remotely View other Surfaces
     defines.input_action.remote_view_surface,
+    defines.input_action.remote_view_entity,
     -- Nothing Space Platform related; prevent cheating
     defines.input_action.cancel_delete_space_platform,
     defines.input_action.create_space_platform,

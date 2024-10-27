@@ -34,5 +34,6 @@ data:extend({
             { type = "item", name = Tiles.labTilePlanner, amount = 1 },
         },
         hide_from_stats = true,
+        hide_from_signal_gui = true,
     }
 })

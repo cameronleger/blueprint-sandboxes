@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.1
+Date: 2024-10-27
+  Changes:
+    - A new Tile Planner for Empty Space, enabling more Platform-related functionality
+  Bugfixes:
+    - Internal recipes no longer show up for selections of signals
+    - Other Platforms are no longer visible from the Sandboxes
+---------------------------------------------------------------------------------------------------
 Version: 2.1.0
 Date: 2024-10-26
   Changes:

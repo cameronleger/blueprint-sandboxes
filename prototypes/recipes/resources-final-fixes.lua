@@ -74,6 +74,7 @@ function createResourcePlannerPrototypes(resource)
                 { type = "item", name = Resources.pfx .. resource.name, amount = 1 },
             },
             hide_from_stats = true,
+            hide_from_signal_gui = true,
         }
     }
 end

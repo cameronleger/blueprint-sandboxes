@@ -11,6 +11,7 @@ function createLockedRecipeForHiddenItem(name)
                 enabled = false,
                 ingredients = {},
                 results = {{ type = "item", name = name, amount = 1 }},
+                hide_from_signal_gui = true,
             }
         })
     end

@@ -5,6 +5,8 @@ Tiles = require("scripts.tiles")
 function shouldSkipTilePlanner(tile)
     if tile.fluid then
         return false
+    elseif tile.name == "empty-space" then
+        return false
     end
     return true
 end
@@ -44,6 +46,7 @@ function createTilePlannerPrototypes(tile)
                 { type = "item", name = Tiles.pfx .. tile.name, amount = 1 },
             },
             hide_from_stats = true,
+            hide_from_signal_gui = true,
         }
     }
 end
