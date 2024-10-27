@@ -21,10 +21,6 @@ end
 local shouldEnableLoaders = true
 for _, recipe in pairs(data.raw.recipe) do
     if not recipe.hidden then
-        if recipe.result == "loader" then
-            shouldEnableLoaders = false
-            break
-        end
         if recipe.results then
             for _, result in pairs(recipe.results) do
                 if result.name == "loader" then

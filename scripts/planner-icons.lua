@@ -1,5 +1,6 @@
 local PlannerIcons = {}
 
+---@param prototype data.ResourceEntityPrototype | data.TilePrototype
 function PlannerIcons.CreateLayeredIcon(prototype)
     local backgroundIconSize = 64
     local overallLayeredIconScale = 0.5

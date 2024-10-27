@@ -24,10 +24,7 @@ function createTilePlannerPrototypes(tile)
             stack_size = 1000,
             place_as_tile = {
                 result = tile.name,
-                condition = {
-                    -- TODO: New requirement, investigate: file:///home/cameron/src/factorio/factorio_expansion/doc-html/types/CollisionMaskConnector.html
-                    layers = {}
-                },
+                condition = { layers = {} },
                 condition_size = 1,
             },
         },
@@ -45,7 +42,7 @@ function createTilePlannerPrototypes(tile)
             },
             hide_from_stats = true,
             hide_from_signal_gui = true,
-        }
+        },
     }
 end
 
