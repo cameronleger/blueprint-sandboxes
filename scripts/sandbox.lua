@@ -101,6 +101,17 @@ function Sandbox.Enter(player)
         return
     end
 
+    if player.controller_type == defines.controllers.cutscene then
+        player.print("You are watching a cutscene, so you cannot enter a Sandbox. Wait for it to end first.")
+        return
+    end
+
+    -- TODO: test with real vehicles
+    if player.driving and player.character and not player.vehicle then
+        player.print("You are riding a rocket, so you cannot enter a Sandbox. Land on a planet first.")
+        return
+    end
+
     if player.stashed_controller_type
             and player.stashed_controller_type ~= defines.controllers.editor
     then
@@ -258,6 +269,8 @@ end
 -- Ensure the Player has a Character to go back to
 ---@param player LuaPlayer
 function Sandbox.RecoverPlayerCharacter(player, playerData)
+    -- TODO: Attempt to get physical info from Player
+
     -- Typical situation, there wasn't a Character, or there was a valid one
     if (not playerData.preSandboxCharacter) or playerData.preSandboxCharacter.valid then
         player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
