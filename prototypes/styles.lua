@@ -1,3 +1,19 @@
+data.raw["gui-style"]["default"][BPSB.pfx .. "toggle-frame"] = {
+    type = "frame_style",
+    parent = "frame",
+    title_style = {
+      type = "label_style",
+      parent = "frame_title",
+      font = "heading-2",
+    },
+    header_filler_style = {
+      type = "empty_widget_style",
+      horizontally_stretchable = "on",
+      vertically_stretchable = "on",
+    },
+    horizontally_stretchable = "off",
+}
+
 data.raw["gui-style"]["default"][BPSB.pfx .. "padded-horizontal-flow"] = {
     type = "horizontal_flow_style",
     parent = "horizontal_flow",
@@ -8,6 +24,18 @@ data.raw["gui-style"]["default"][BPSB.pfx .. "centered-horizontal-flow"] = {
     type = "horizontal_flow_style",
     parent = BPSB.pfx .. "padded-horizontal-flow",
     vertical_align = "center",
+}
+
+data.raw["gui-style"]["default"][BPSB.pfx .. "sandbox-dropdown"] = {
+    type = "dropdown_style",
+    parent = "dropdown",
+    minimal_width = 100,
+}
+
+data.raw["gui-style"]["default"][BPSB.pfx .. "daylight-slider"] = {
+    type = "slider_style",
+    parent = "notched_slider",
+    minimal_width = 100,
 }
 
 data.raw["gui-style"]["default"][BPSB.pfx .. "drag-handle"] = {

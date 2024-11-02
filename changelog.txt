@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.5
+Date: 2024-11-02
+  Changes:
+    - Russian translations (thanks Kirill)
+  Bugfixes:
+    - Maximum widths for UI, to handle interactions with other mod UIs better
+---------------------------------------------------------------------------------------------------
 Version: 2.1.4
 Date: 2024-10-31
   Bugfixes:

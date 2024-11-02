@@ -20,6 +20,7 @@ function ToggleGUI.Init(player)
         name = ToggleGUI.name,
         caption = { "gui." .. ToggleGUI.name },
         visible = false,
+        style = BPSB.pfx .. "toggle-frame",
     }
 
     local innerFrame = frame.add {
@@ -50,6 +51,7 @@ function ToggleGUI.Init(player)
         tooltip = { "gui-description." .. ToggleGUI.selectedSandboxDropdown },
         items = Sandbox.choices,
         selected_index = storage.players[player.index].selectedSandbox,
+        style = BPSB.pfx .. "sandbox-dropdown",
     }.style.horizontally_stretchable = true
 
     topLineFlow.add {
@@ -82,7 +84,7 @@ function ToggleGUI.Init(player)
         minimum_value = 0.5,
         maximum_value = 0.975,
         value_step = 0.025,
-        style = "notched_slider",
+        style = BPSB.pfx .. "daylight-slider",
     }.style.horizontally_stretchable = true
 
     local globalElectricNetworkFlow = innerFrame.add {
