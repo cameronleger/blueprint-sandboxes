@@ -106,9 +106,13 @@ function Sandbox.Enter(player)
         return
     end
 
-    -- TODO: test with real vehicles
     if player.driving and player.character and not player.vehicle then
         player.print("You are riding a rocket, so you cannot enter a Sandbox. Land on a planet first.")
+        return
+    end
+
+    if player.character and player.character.name == "character-jetpack" then
+        player.print("You are using a Jetpack, so you cannot enter a Sandbox. Land on the ground first.")
         return
     end
 

@@ -20,6 +20,7 @@ function ToggleGUI.Init(player)
         name = ToggleGUI.name,
         caption = { "gui." .. ToggleGUI.name },
         visible = false,
+        index = 0,
         style = BPSB.pfx .. "toggle-frame",
     }
 

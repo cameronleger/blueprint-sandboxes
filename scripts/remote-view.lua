@@ -1,6 +1,16 @@
 -- Code for Factorio's new Remote controller
 local RemoteView = {}
 
+-- When initialized, setup default hidden states
+function RemoteView.Init()
+    for _, force in pairs(game.forces) do
+        RemoteView.HideAllSandboxes(force)
+        if Sandbox.IsSandboxForce(force) then
+            RemoteView.HideEverythingInSandboxes(force)
+        end
+    end
+end
+
 -- When a Surface is created, hide it from all Sandboxes
 ---@param surface LuaSurface
 function RemoteView.HideFromAllSandboxes(surface)

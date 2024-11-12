@@ -43,6 +43,7 @@ script.on_init(function()
     Init.FirstTimeInit()
     Settings.SetupConditionalHandlers()
     SurfacePropsGUI.InitPresets()
+    RemoteView.Init()
 end)
 
 script.on_event(defines.events.on_player_created, function(event)
@@ -107,6 +108,11 @@ script.on_configuration_changed(function(event)
     Migrate.Run()
     Migrate.RecreateGuis()
     Research.SyncAllForces()
+    for _, force in pairs(game.forces) do
+        if Sandbox.IsSandboxForce(force) then
+            Research.EnableSandboxSpecificResearch(force)
+        end
+    end
 end)
 
 script.on_event(defines.events.on_player_changed_force, function(event)

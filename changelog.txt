@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.6
+Date: 2024-11-12
+  Changes:
+    - Cannot enter the Sandbox while using a jetpack
+  Bugfixes:
+    - UI now prefers to precede all others
+    - Potentially resolved hidden recipes after updating while in a Sandbox
+---------------------------------------------------------------------------------------------------
 Version: 2.1.5
 Date: 2024-11-02
   Changes:

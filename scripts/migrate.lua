@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 020104
+Migrate.version = 020106
 
 function Migrate.Run()
     if not storage.version then
@@ -24,6 +24,7 @@ function Migrate.Run()
         if storage.version < 011604 then Migrate.v1_16_4() end
         if storage.version < 011606 then Migrate.v1_16_6() end
         if storage.version < 020000 then Migrate.v2_0_0() end
+        if storage.version < 020106 then Migrate.v2_1_6() end
     end
 
     storage.version = Migrate.version
@@ -434,6 +435,18 @@ function Migrate.v2_0_0()
     end
 
     log("Migration 2.0.0 Finished")
+end
+
+function Migrate.v2_1_6()
+    --[[
+    2.1.6 attempts to re-initialize some Remote View settings for some users
+    ]]
+
+    log("Migration 2.1.6 Starting")
+
+    RemoteView.Init()
+
+    log("Migration 2.1.6 Finished")
 end
 
 return Migrate
