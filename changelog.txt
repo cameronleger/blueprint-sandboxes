@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.7
+Date: 2024-11-18
+  Changes:
+    - Recipes intended only for the Sandboxes are now always toggled just in time
+    - Item requests are now handled with the newer planning APIs
+  Bugfixes:
+    - Potentially reduced scenarios where pre-Sandbox character information is lost
+---------------------------------------------------------------------------------------------------
 Version: 2.1.6
 Date: 2024-11-12
   Changes:

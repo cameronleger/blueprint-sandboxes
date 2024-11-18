@@ -63,6 +63,7 @@ end
 
 -- Which Surface Name to use for this Player based on their Selected Sandbox
 ---@param player LuaPlayer
+---@return LuaSurface | nil
 function Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     local playerData = storage.players[player.index]
 
@@ -273,8 +274,6 @@ end
 -- Ensure the Player has a Character to go back to
 ---@param player LuaPlayer
 function Sandbox.RecoverPlayerCharacter(player, playerData)
-    -- TODO: Attempt to get physical info from Player
-
     -- Typical situation, there wasn't a Character, or there was a valid one
     if (not playerData.preSandboxCharacter) or playerData.preSandboxCharacter.valid then
         player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
@@ -292,6 +291,18 @@ function Sandbox.RecoverPlayerCharacter(player, playerData)
         player.set_controller({
             type = defines.controllers.character,
             character = fromSpaceExploration
+        })
+        return
+    end
+
+    -- We might at-least have some physical information to lean back on
+    if player.physical_controller_type == defines.controllers.character
+        and player.physical_position
+        and player.physical_surface then
+        player.teleport(player.physical_position, player.physical_surface)
+        player.set_controller({
+            type = player.physical_controller_type,
+            character = player.character,
         })
         return
     end

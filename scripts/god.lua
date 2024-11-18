@@ -60,11 +60,43 @@ end
 ---@param entity LuaEntity
 function God.InsertRequests(entity)
     if entity.valid
-            and entity.type == "item-request-proxy"
-            and entity.proxy_target then
-        -- Insert any Requested Items (like Modules, Fuel)
-        for _, item_request in pairs(entity.item_requests) do
-            entity.proxy_target.insert(item_request)
+        and entity.type == "item-request-proxy"
+        and entity.proxy_target then
+        -- Remove any Requested Items
+        for _, plan in pairs(entity.removal_plan) do
+            if plan.items.in_inventory then
+                for _, position in pairs(plan.items.in_inventory) do
+                    local inventory = entity.proxy_target.get_inventory(position.inventory)
+                    local decrement = position.count or 1
+                    if inventory and inventory.valid and inventory.index == position.inventory then
+                        local stack = inventory[position.stack + 1]
+                        if stack.count > 0 then
+                            stack.count = stack.count - decrement
+                        end
+                    end
+                end
+            end
+        end
+        -- Insert any Requested Items
+        for _, plan in pairs(entity.insert_plan) do
+            if plan.items.in_inventory then
+                for _, position in pairs(plan.items.in_inventory) do
+                    local inventory = entity.proxy_target.get_inventory(position.inventory)
+                    local increment = position.count or 1
+                    if inventory and inventory.valid and inventory.index == position.inventory then
+                        local stack = inventory[position.stack + 1]
+                        if stack.count > 0 then
+                            stack.count = stack.count + increment
+                        else
+                            stack.set_stack {
+                                name = plan.id.name,
+                                quality = plan.id.quality,
+                                count = increment,
+                            }
+                        end
+                    end
+                end
+            end
         end
         entity.destroy()
     end
@@ -210,7 +242,6 @@ end
 -- Ensure new Orders are handled
 ---@param event EventData.on_marked_for_deconstruction
 function God.OnMarkedForDeconstruct(event)
-    -- log("Entity Deconstructing: " .. event.entity.unit_number .. " " .. event.entity.type)
     if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncDeleteRequestsPerTick,
@@ -224,7 +255,6 @@ end
 -- Ensure new Orders are handled
 ---@param event EventData.on_marked_for_upgrade
 function God.OnMarkedForUpgrade(event)
-    -- log("Entity Upgrading: " .. event.entity.unit_number .. " " .. event.entity.type)
     if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncUpgradeRequestsPerTick,
@@ -238,7 +268,6 @@ end
 -- Ensure new Ghosts are handled
 ---@param event EventData.on_built_entity | EventData.script_raised_built
 function God.OnBuiltEntity(event)
-    -- log("Entity Creating: " .. entity.unit_number .. " " .. entity.type)
     if God.ShouldHandleEntity(event.entity) then
         God.AsyncWrapper(
                 Settings.godAsyncCreateRequestsPerTick,

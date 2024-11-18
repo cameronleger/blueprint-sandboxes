@@ -38,9 +38,6 @@ end
 -- Enable the Infinity Input/Output Recipes
 ---@param force LuaForce
 function Research.EnableSandboxSpecificResearch(force)
-    if storage.sandboxForces[force.name].hiddenItemsUnlocked == true then
-        return
-    end
     log("Unlocking hidden Recipes for: " .. force.name)
 
     if force.recipes[BPSB.pfx .. "loader"] then
@@ -60,8 +57,6 @@ function Research.EnableSandboxSpecificResearch(force)
     end
 
     EditorExtensionsCheats.EnableTestingRecipes(force)
-
-    storage.sandboxForces[force.name].hiddenItemsUnlocked = true
 end
 
 -- For all Forces with Sandboxes, Sync their Research

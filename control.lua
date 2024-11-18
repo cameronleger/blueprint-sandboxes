@@ -88,23 +88,6 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, Settings.OnRuntim
 -- Important Game Events
 
 script.on_configuration_changed(function(event)
-    for _, sandboxForceData in pairs(storage.sandboxForces) do
-        -- Ensure that new automatic recipes aren't hidden
-        sandboxForceData.hiddenItemsUnlocked = false
-    end
-    --[[ TODO:
-            There's a bug related to this section if a Player is currently
-            inside of a Sandbox while loading a Save where the Configuration
-            Changed. The above hiddenItemsUnlocked flag is reset, since for
-            some reason the Recipes will have disappeared again, but of
-            course there's nothing here to enable them again!
-            That's because the enabling code doesn't seem to work anywhere
-            outside of right-after the Player has been swapped to their
-            Sandbox Force (see the to-do over there).
-            Currently, if that same code is used here, the flag will be true,
-            but the Recipes are still hidden, so they'll be stuck hidden!
-    ]]
-
     Migrate.Run()
     Migrate.RecreateGuis()
     Research.SyncAllForces()
@@ -218,8 +201,6 @@ script.on_event(defines.events.on_player_main_inventory_changed, God.OnInventory
 
 -- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_player_setup_blueprint
 script.on_event(defines.events.on_player_setup_blueprint, Illusion.OnBlueprintSetup)
-
--- TODO: on_entity_settings_pasted
 
 -- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_player_selected_area
 script.on_event(defines.events.on_player_selected_area, function(event)

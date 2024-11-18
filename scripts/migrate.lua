@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 020106
+Migrate.version = 020107
 
 function Migrate.Run()
     if not storage.version then
@@ -25,6 +25,7 @@ function Migrate.Run()
         if storage.version < 011606 then Migrate.v1_16_6() end
         if storage.version < 020000 then Migrate.v2_0_0() end
         if storage.version < 020106 then Migrate.v2_1_6() end
+        if storage.version < 020107 then Migrate.v2_1_7() end
     end
 
     storage.version = Migrate.version
@@ -447,6 +448,23 @@ function Migrate.v2_1_6()
     RemoteView.Init()
 
     log("Migration 2.1.6 Finished")
+end
+
+function Migrate.v2_1_7()
+    --[[
+    2.1.7 attempts to reduce inconsistencies with hidden recipes
+    ]]
+
+    log("Migration 2.1.7 Starting")
+
+    for _, force in pairs(game.forces) do
+        local sandboxForce = storage.sandboxForces[force.name]
+        if sandboxForce then
+            sandboxForce.hiddenItemsUnlocked = nil
+        end
+    end
+
+    log("Migration 2.1.7 Finished")
 end
 
 return Migrate

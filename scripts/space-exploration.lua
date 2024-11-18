@@ -89,6 +89,7 @@ function SpaceExploration.ChooseZoneForForce(player, sandboxForce, type)
     end
 end
 
+---@return LuaSurface | nil
 function SpaceExploration.GetOrCreateSurface(zoneName)
     if not SpaceExploration.enabled() then
         return
@@ -123,6 +124,7 @@ function SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxFor
 end
 
 -- Chooses a non-home-system Star for a Force's Planetary Sandbox, if necessary
+---@return LuaSurface | nil
 function SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce)
     if not SpaceExploration.enabled() then
         return
