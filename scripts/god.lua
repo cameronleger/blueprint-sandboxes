@@ -109,7 +109,10 @@ function God.Create(entity)
     if entity.valid then
         if entity.type == "tile-ghost" then
             -- Tiles are simple Revives
-            entity.silent_revive({ raise_revive = true })
+            local _, revived, _ = entity.silent_revive({ raise_revive = true })
+            if not revived and entity.valid then
+                Queue.Push(storage.asyncCreateQueue, entity)
+            end
         elseif entity.type == "item-request-proxy" then
             -- Requests are simple
             God.InsertRequests(entity)
@@ -121,6 +124,10 @@ function God.Create(entity)
 
             if revived and request then
                 God.InsertRequests(request)
+            end
+
+            if not revived and entity.valid then
+                Queue.Push(storage.asyncCreateQueue, entity)
             end
         end
     end
@@ -283,9 +290,9 @@ end
 -- For each known Sandbox Surface, handle any async God functionality
 ---@param event EventData.on_tick
 function God.HandleAllSandboxRequests(event)
-    local createRequestsPerTick = settings.global[Settings.godAsyncCreateRequestsPerTick].value
-    local upgradeRequestsPerTick = settings.global[Settings.godAsyncUpgradeRequestsPerTick].value
-    local deleteRequestsPerTick = settings.global[Settings.godAsyncDeleteRequestsPerTick].value
+    local createRequestsPerTick = math.max(1, settings.global[Settings.godAsyncCreateRequestsPerTick].value)
+    local upgradeRequestsPerTick = math.max(1, settings.global[Settings.godAsyncUpgradeRequestsPerTick].value)
+    local deleteRequestsPerTick = math.max(1, settings.global[Settings.godAsyncDeleteRequestsPerTick].value)
 
     local destroyRequestsHandled = 0
     while Queue.Size(storage.asyncDestroyQueue) > 0

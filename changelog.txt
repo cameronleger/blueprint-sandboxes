@@ -4,6 +4,8 @@ Date: 2024-11-18
   Changes:
     - Recipes intended only for the Sandboxes are now always toggled just in time
     - Item requests are now handled with the newer planning APIs
+    - Failed ghost revives are added back into the queue
+    - Ghost reviving queue now always runs, just in case
   Bugfixes:
     - Potentially reduced scenarios where pre-Sandbox character information is lost
 ---------------------------------------------------------------------------------------------------
