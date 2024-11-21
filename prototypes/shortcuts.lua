@@ -13,11 +13,10 @@ data:extend({
         associated_control_input = ToggleGUI.toggleShortcut,
         style = "blue",
         toggleable = true,
-        icon = BPSB.path .. "/graphics/icon-x32.png",
-        icon_size = 32,
-        -- TODO: Small Icon
-        small_icon = BPSB.path .. "/graphics/icon-x32.png",
-        small_icon_size = 32,
+        icon = BPSB.path .. "/graphics/icon-x64.png",
+        icon_size = 64,
+        small_icon = BPSB.path .. "/graphics/icon-x64.png",
+        small_icon_size = 64,
     },
     {
         type = "custom-input",

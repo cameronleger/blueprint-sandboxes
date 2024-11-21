@@ -8,9 +8,9 @@ function PlannerIcons.CreateLayeredIcon(prototype)
 
     local layeredIcons = {
         {
-            icon = BPSB.path .. "/graphics/icon-x64.png",
+            icon = BPSB.path .. "/graphics/wrapper-x64.png",
             icon_size = backgroundIconSize,
-            tint = { r = 0.5, g = 0.5, b = 0.5, a = 1 },
+            tint = { r = 0.5, g = 0.5, b = 0.5, a = 0.5 },
         },
     }
 
