@@ -1,6 +1,3 @@
-Resources = require("scripts.resources")
-Tiles = require("scripts.tiles")
-
 -- New Group for New Recipes
 data:extend({
     {
@@ -21,17 +18,5 @@ data:extend({
         name = BPSB.pfx .. "infinity",
         group = BPSB.name,
         order = "b[infinity]",
-    },
-    {
-        type = "item-subgroup",
-        name = Resources.name,
-        group = BPSB.name,
-        order = "c[resources]",
-    },
-    {
-        type = "item-subgroup",
-        name = Tiles.name,
-        group = BPSB.name,
-        order = "d[tiles]",
     },
 })

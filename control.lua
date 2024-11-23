@@ -22,8 +22,7 @@ Inventory = require("scripts.inventory")
 Lab = require("scripts.lab")
 Migrate = require("scripts.migrate")
 Research = require("scripts.research")
-Resources = require("scripts.resources")
-Tiles = require("scripts.tiles")
+SelectionPlanner = require("scripts.selection-planner")
 
 -- Required by Sandbox
 SpaceExploration = require("scripts.space-exploration")
@@ -202,15 +201,10 @@ script.on_event(defines.events.on_player_main_inventory_changed, God.OnInventory
 -- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_player_setup_blueprint
 script.on_event(defines.events.on_player_setup_blueprint, Illusion.OnBlueprintSetup)
 
--- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_player_selected_area
-script.on_event(defines.events.on_player_selected_area, function(event)
-    local _ = Resources.OnAreaSelected(event, true) or Tiles.OnAreaSelected(event)
-end)
-
--- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_player_alt_selected_area
-script.on_event(defines.events.on_player_alt_selected_area, function(event)
-    local _ = Resources.OnAreaSelected(event, false) or Tiles.OnAreaSelected(event)
-end)
+script.on_event(defines.events.on_player_selected_area, SelectionPlanner.OnAreaSelected)
+script.on_event(defines.events.on_player_alt_selected_area, SelectionPlanner.OnAreaSelected)
+script.on_event(defines.events.on_player_reverse_selected_area, SelectionPlanner.OnAreaSelected)
+script.on_event(defines.events.on_player_alt_reverse_selected_area, SelectionPlanner.OnAreaSelected)
 
 -- Internal
 
@@ -251,13 +245,14 @@ end)
 -- GUI
 ---@param event EventData.on_gui_click
 script.on_event(defines.events.on_gui_click, function (event)
-    local _ = ToggleGUI.OnGuiClick(event) or SurfacePropsGUI.OnGuiClick(event)
+    local _ = ToggleGUI.OnGuiClick(event) or SurfacePropsGUI.OnGuiClick(event) or SelectionPlanner.OnGuiClick(event)
 end)
 script.on_event(defines.events.on_gui_value_changed, ToggleGUI.OnGuiValueChanged)
 ---@param event EventData.on_gui_selection_state_changed
 script.on_event(defines.events.on_gui_selection_state_changed, function (event)
     local _ = ToggleGUI.OnGuiDropdown(event) or SurfacePropsGUI.OnGuiDropdown(event)
 end)
+script.on_event(defines.events.on_gui_elem_changed, SelectionPlanner.OnPrototypeSelected)
 
 script.on_event(defines.events.on_gui_closed, function(event)
     if (event.gui_type == defines.gui_type.blueprint_library) then

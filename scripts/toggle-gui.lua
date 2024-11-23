@@ -6,6 +6,8 @@ ToggleGUI.toggleShortcut = ToggleGUI.pfx .. "sb-toggle-shortcut"
 ToggleGUI.selectedSandboxDropdown = ToggleGUI.pfx .. "selected-sandbox-dropdown"
 ToggleGUI.surfacePropsButton = ToggleGUI.pfx .. "surface-props-button"
 ToggleGUI.resetButton = ToggleGUI.pfx .. "reset-button"
+ToggleGUI.entitySelectionPlannerGenerator = ToggleGUI.pfx .. "entity-selection-planner-generator"
+ToggleGUI.tileSelectionPlannerGenerator = ToggleGUI.pfx .. "tile-selection-planner-generator"
 ToggleGUI.daytimeSlider = ToggleGUI.pfx .. "daytime-slider"
 ToggleGUI.globalElectricNetworkCheckbox = ToggleGUI.pfx .. "global-eletric-network-checkbox"
 
@@ -104,6 +106,55 @@ function ToggleGUI.Init(player)
         style = BPSB.pfx .. "left-padded-checkbox",
     }
 
+    local selectorFlow = innerFrame.add {
+        type = "flow",
+        name = "selectorFlow",
+        direction = "horizontal",
+        style = BPSB.pfx .. "centered-horizontal-flow",
+    }
+
+    selectorFlow.add {
+        type = "label",
+        caption = { "gui." .. ToggleGUI.entitySelectionPlannerGenerator },
+        tooltip = { "gui-description." .. ToggleGUI.entitySelectionPlannerGenerator },
+        style = "caption_label",
+    }
+
+    selectorFlow.add {
+        type = "choose-elem-button",
+        name = ToggleGUI.entitySelectionPlannerGenerator,
+        tooltip = { "gui-description." .. ToggleGUI.entitySelectionPlannerGenerator },
+        elem_type = "entity",
+        -- elem_type = "entity-with-quality",
+        elem_filters = {
+            { filter = "type", type = "resource" },
+            { mode = "or", filter = "type", type = "asteroid" },
+            { mode = "or", filter = "type", type = "tree" },
+            { mode = "or", filter = "type", type = "lightning" },
+            { mode = "or", filter = "type", type = "unit" },
+            { mode = "or", filter = "type", type = "segmented-unit" },
+            { mode = "or", filter = "type", type = "spider-unit" },
+            { mode = "or", filter = "type", type = "unit-spawner" },
+            { mode = "or", filter = "type", type = "turret" },
+            { mode = "or", filter = "type", type = "simple-entity" },
+            { mode = "and", filter = "name", name = "wube-logo-space-platform", invert = true }, -- TODO: Wube's problem
+        },
+    }
+
+    selectorFlow.add {
+        type = "label",
+        caption = { "gui." .. ToggleGUI.tileSelectionPlannerGenerator },
+        tooltip = { "gui-description." .. ToggleGUI.tileSelectionPlannerGenerator },
+        style = "caption_label",
+    }
+
+    selectorFlow.add {
+        type = "choose-elem-button",
+        tooltip = { "gui-description." .. ToggleGUI.tileSelectionPlannerGenerator },
+        name = ToggleGUI.tileSelectionPlannerGenerator,
+        elem_type = "tile",
+    }
+
     ToggleGUI.Update(player)
 end
 
@@ -115,6 +166,9 @@ function ToggleGUI.Destroy(player)
     player.gui.left[ToggleGUI.name].destroy()
 end
 
+---@param instance LuaGuiElement
+---@param name string
+---@return LuaGuiElement | nil
 function ToggleGUI.FindDescendantByName(instance, name)
     for _, child in pairs(instance.children) do
         if child.name == name then
@@ -126,6 +180,8 @@ function ToggleGUI.FindDescendantByName(instance, name)
 end
 
 ---@param player LuaPlayer
+---@param name string
+---@return LuaGuiElement | nil
 function ToggleGUI.FindByName(player, name)
     return ToggleGUI.FindDescendantByName(player.gui.left[ToggleGUI.name], name)
 end

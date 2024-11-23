@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2024-11-23
+  Changes:
+    - Some Entities are available through a Selector that allows spawning them within an area
+    - Tiles are available through a Selector that allows setting them within an area
+    - Removed items/recipes for Tile Planners
+    - Removed items/recipes for Resource Planners
+---------------------------------------------------------------------------------------------------
 Version: 2.1.8
 Date: 2024-11-21
   Changes:

@@ -16,8 +16,8 @@ To teach you the basics and provide many more details, the in-game Tips-and-Tric
 * Automated Construction: Ghosts are automatically built for you.
 * Surface Properties: Adjust gravity, pressure, etc. to mimic other Planets.
 * All Recipes: If desired, use all Technology (instead of what you already know).
-* Resource Generation: Draw then use any kind of Resource Patch.
-* Water placement: Place water, so you can then landfill it (or not).
+* Entity Generation: Place interesting entities like resources, trees, enemies, etc.
+* Tile Placement: Place any kind of tiles wherever you want, or revert back to lab tiles.
 * Default Equipment: You can decide what an empty Sandbox starts with.
 
 # FAQ
@@ -27,6 +27,14 @@ To teach you the basics and provide many more details, the in-game Tips-and-Tric
 * When Resetting the Sandbox and the game crashes with any other mod listed in the error - it's _that_ mod's fault for not handling `on_pre_surface_cleared`.
 
 # Known Issues
+
+### Music disappears while in Sandbox
+
+This is an issue with Factorio's 2.0 music system (which only works for Planets and Platforms), and there's basically nothing this mod can do about it. I'm still providing feedback and attempting workarounds.
+
+### Cannot freeze due to cold, or place lightning collectors
+
+This is again an issue with Factorio's 2.0 surface-specific settings (which only works for Planets and Platforms), and there's basically nothing this mod can do about it. I'm still providing feedback and attempting workarounds.
 
 ### Cannot Undo in (Real World/Sandbox) after coming from (Sandbox/Real World)
 

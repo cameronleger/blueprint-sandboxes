@@ -50,12 +50,6 @@ function Research.EnableSandboxSpecificResearch(force)
     force.recipes[BPSB.pfx .. "infinity-chest"].enabled = true
     force.recipes[BPSB.pfx .. "infinity-pipe"].enabled = true
 
-    for name, recipe in pairs(force.recipes) do
-        if Resources.IsResourcePlanner(name) or Tiles.IsTilePlanner(name) then
-            recipe.enabled = true
-        end
-    end
-
     EditorExtensionsCheats.EnableTestingRecipes(force)
 end
 
