@@ -59,6 +59,13 @@ data:extend({
     },
     {
         type = "bool-setting",
+        name = Settings.qualityEntityPlanners,
+        setting_type = "runtime-per-user",
+        order = "a[player]-b",
+        default_value = false,
+    },
+    {
+        type = "bool-setting",
         name = Settings.godBuilding,
         setting_type = "runtime-global",
         order = "b[god]-a",

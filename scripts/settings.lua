@@ -14,6 +14,7 @@ Settings.godAsyncCreateRequestsPerTick = BPSB.pfx .. "god-async-create-per-tick"
 Settings.godAsyncUpgradeRequestsPerTick = BPSB.pfx .. "god-async-upgrade-per-tick"
 Settings.godAsyncDeleteRequestsPerTick = BPSB.pfx .. "god-async-delete-per-tick"
 Settings.labsAbsorbPollution = BPSB.pfx .. "labs-absorb-pollution"
+Settings.qualityEntityPlanners = BPSB.pfx .. "quality-entity-planners"
 
 function Settings.SetupScanSandboxes()
     if settings.global[Settings.scanSandboxes].value then
@@ -38,6 +39,10 @@ function Settings.OnRuntimeSettingChanged(event)
         for _, player in pairs(game.players) do
             ToggleGUI.Update(player)
         end
+    elseif event.setting == Settings.qualityEntityPlanners then
+        local player = game.players[event.player_index]
+        ToggleGUI.Destroy(player)
+        ToggleGUI.Init(player)
     elseif event.setting == Settings.bonusInventorySlots then
         Force.SyncAllForces()
     elseif event.setting == Settings.extraMiningSpeed then

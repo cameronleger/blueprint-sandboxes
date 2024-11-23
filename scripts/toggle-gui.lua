@@ -120,12 +120,15 @@ function ToggleGUI.Init(player)
         style = "caption_label",
     }
 
+    local entitySelectionType = "entity"
+    if player.mod_settings[Settings.qualityEntityPlanners].value then
+        entitySelectionType = "entity-with-quality"
+    end
     selectorFlow.add {
         type = "choose-elem-button",
         name = ToggleGUI.entitySelectionPlannerGenerator,
         tooltip = { "gui-description." .. ToggleGUI.entitySelectionPlannerGenerator },
-        elem_type = "entity",
-        -- elem_type = "entity-with-quality",
+        elem_type = entitySelectionType,
         elem_filters = {
             { filter = "type", type = "resource" },
             { mode = "or", filter = "type", type = "asteroid" },
