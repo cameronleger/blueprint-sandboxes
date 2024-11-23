@@ -92,7 +92,7 @@ data:extend({
     {
         type = "tips-and-tricks-item",
         category = category,
-        name = pfxCategory .. "new-recipes",
+        name = pfxCategory .. "new-recipes-v2",
         indent = 1,
         order = pfxOrder .. "g",
         starting_status = "unlocked",
