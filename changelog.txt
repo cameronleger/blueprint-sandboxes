@@ -5,6 +5,7 @@ Date: ????
     - Auto-exiting of Remote View to enter the Sandbox is possible in more cases
   Bugfixes:
     - Teleportations using Remote View work properly
+    - Better detections for entering/exiting Sandboxes
 ---------------------------------------------------------------------------------------------------
 Version: 2.2.0
 Date: 2024-11-23

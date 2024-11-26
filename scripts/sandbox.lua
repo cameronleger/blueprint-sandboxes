@@ -41,8 +41,7 @@ end
 -- Whether something is any type of Sandbox
 ---@param player LuaPlayer
 function Sandbox.IsPlayerInsideSandbox(player)
-    return storage.players[player.index].preSandboxPosition ~= nil
-            and Sandbox.IsSandbox(player.surface)
+    return Sandbox.IsSandbox(player.surface)
 end
 
 -- Whether a Sandbox choice is allowed
@@ -145,7 +144,6 @@ function Sandbox.Enter(player)
     player.clear_cursor()
 
     -- Store the Player's previous State (that must be referenced to Exit)
-    playerData.insideSandbox = playerData.selectedSandbox
     playerData.preSandboxForceName = player.force.name
     playerData.preSandboxCharacter = player.character
     playerData.preSandboxController = player.controller_type
@@ -247,7 +245,6 @@ function Sandbox.Exit(player)
     end
 
     -- Reset the Player's previous State
-    playerData.insideSandbox = nil
     playerData.preSandboxForceName = nil
     playerData.preSandboxCharacter = nil
     playerData.preSandboxController = nil
@@ -274,6 +271,15 @@ end
 -- Ensure the Player has a Character to go back to
 ---@param player LuaPlayer
 function Sandbox.RecoverPlayerCharacter(player, playerData)
+    -- The Remote View is an easy exit
+    if player.controller_type == defines.controllers.remote
+        and player.physical_controller_type == defines.controllers.character
+        then
+            if RemoteView.EnsureSafeExit(player) then
+                return
+            end
+    end
+
     -- Typical situation, there wasn't a Character, or there was a valid one
     if (not playerData.preSandboxCharacter) or playerData.preSandboxCharacter.valid then
         player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
@@ -291,18 +297,6 @@ function Sandbox.RecoverPlayerCharacter(player, playerData)
         player.set_controller({
             type = defines.controllers.character,
             character = fromSpaceExploration
-        })
-        return
-    end
-
-    -- We might at-least have some physical information to lean back on
-    if player.physical_controller_type == defines.controllers.character
-        and player.physical_position
-        and player.physical_surface then
-        player.teleport(player.physical_position, player.physical_surface)
-        player.set_controller({
-            type = player.physical_controller_type,
-            character = player.character,
         })
         return
     end
@@ -359,8 +353,6 @@ function Sandbox.Transfer(player)
     log("Transferring to Sandbox: " .. surface.name)
     playerData.lastSandboxPositions[player.surface.name] = player.position
     Teleport.ToPositionOnSurface(player, surface, playerData.lastSandboxPositions[surface.name] or { 0, 0 })
-
-    playerData.insideSandbox = playerData.selectedSandbox
 end
 
 -- Update Sandboxes Player if a Player actually changes Forces (outside of this mod)
@@ -428,9 +420,8 @@ end
 -- Update whether the Player is inside a known Sandbox
 ---@param player LuaPlayer
 function Sandbox.OnPlayerSurfaceChanged(player)
-    if Sandbox.IsPlayerInsideSandbox(player) then
-        storage.players[player.index].insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
-    end
+    local insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
+    storage.players[player.index].insideSandbox = insideSandbox
 end
 
 -- Enter, Exit, or Transfer a Player across Sandboxes

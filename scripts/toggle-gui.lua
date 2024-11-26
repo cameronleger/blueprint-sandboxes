@@ -195,7 +195,7 @@ function ToggleGUI.Update(player)
         return
     end
 
-    ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = storage.players[player.index].selectedSandbox
+    ToggleGUI.FindByName(player, ToggleGUI.selectedSandboxDropdown).selected_index = Sandbox.GetSandboxChoiceFor(player, player.surface) or storage.players[player.index].selectedSandbox
 
     if Sandbox.IsPlayerInsideSandbox(player) then
         local playerData = storage.players[player.index]
