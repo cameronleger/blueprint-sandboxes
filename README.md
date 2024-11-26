@@ -20,17 +20,15 @@ To teach you the basics and provide many more details, the in-game Tips-and-Tric
 * Tile Placement: Place any kind of tiles wherever you want, or revert back to lab tiles.
 * Default Equipment: You can decide what an empty Sandbox starts with.
 
-# FAQ
-
-* Crafting Counts cannot be segregated - this does not work for Lazy Bastard.
-* You can die in the real world while in a Sandbox.
-* When Resetting the Sandbox and the game crashes with any other mod listed in the error - it's _that_ mod's fault for not handling `on_pre_surface_cleared`.
-
-# Known Issues
+# Known Issues / Frequently Asked Questions
 
 ### Music disappears while in Sandbox
 
 This is an issue with Factorio's 2.0 music system (which only works for Planets and Platforms), and there's basically nothing this mod can do about it. I'm still providing feedback and attempting workarounds.
+
+### Map/Logistics/Pins locked while in Sandbox
+
+These features are disabled to prevent confusion and cheating. You are not on the same force as you are outside of the Sandbox; you do not have access to your normal buildings, building new ghosts would do nothing since your original force would not see them, and you would have full cheat-mode access to all other Planets and Platforms.
 
 ### Cannot freeze due to cold, or place lightning collectors
 
@@ -39,6 +37,14 @@ This is again an issue with Factorio's 2.0 surface-specific settings (which only
 ### Cannot Undo in (Real World/Sandbox) after coming from (Sandbox/Real World)
 
 This is an issue with Factorio, and there's nothing this mod can do about it (while still being this mod).
+
+### `on_pre_surface_cleared` in error message
+
+When Resetting the Sandbox and the game crashes with any other mod listed in the error - it's _that_ mod's fault for not handling `on_pre_surface_cleared`.
+
+### Crafting in Sandbox works towards Lazy Bastard
+
+Crafting Counts cannot be segregated in the way that you want - this does not work for Lazy Bastard.
 
 ### Space Exploration Sandboxes report incorrect Daylight on their first use
 

@@ -168,7 +168,11 @@ function Sandbox.Enter(player)
     end
 
     -- Harmlessly detach the Player from their Character
+    local character = player.character
     player.set_controller({ type = defines.controllers.god })
+    if character and not character.associated_player then
+        player.associate_character(character)
+    end
 
     -- Harmlessly teleport their God-body to the Sandbox
     player.teleport(playerData.lastSandboxPositions[surface.name] or { 0, 0 }, surface)
@@ -250,25 +254,59 @@ function Sandbox.Exit(player)
     end
 end
 
+---@param player LuaPlayer
+---@param character LuaEntity
+local function AttachPlayerToCharacter(player, character)
+    player.teleport(character.position, character.surface)
+    player.set_controller({
+        type = defines.controllers.character,
+        character = character
+    })
+end
+
 -- Ensure the Player has a Character to go back to
 ---@param player LuaPlayer
 function Sandbox.RecoverPlayerCharacter(player, playerData)
     -- The Remote View is an easy exit
     if player.controller_type == defines.controllers.remote
         and player.physical_controller_type == defines.controllers.character
-        then
-            if RemoteView.EnsureSafeExit(player) then
-                return
-            end
+    then
+        if RemoteView.EnsureSafeExit(player) then
+            return
+        end
     end
 
-    -- Typical situation, there wasn't a Character, or there was a valid one
-    if (not playerData.preSandboxCharacter) or playerData.preSandboxCharacter.valid then
+    -- Hopeful situation: we directly know about the last valid character
+    if playerData.preSandboxController == defines.controllers.character
+        and playerData.preSandboxCharacter
+        and playerData.preSandboxCharacter.valid
+    then
+        AttachPlayerToCharacter(player, playerData.preSandboxCharacter)
+        return
+    end
+
+    -- Still hopeful situation: the player was associated to the character somehow
+    local characters = player.get_associated_characters()
+    if #characters > 0 then
+        if #characters > 1 then
+            player.print("Warning: you have multiple associated characters but the Sandbox does not know exactly which one you wanted")
+        end
+        for _, character in ipairs(characters) do
+            if character.valid and not character.player then
+                AttachPlayerToCharacter(player, character)
+                return
+            end
+        end
+    end
+
+    -- Still hopeful situation: we know about the last non-character controller and location
+    if playerData.preSandboxController
+        and playerData.preSandboxController ~= defines.controllers.character
+        and playerData.preSandboxPosition
+        and playerData.preSandboxSurfaceName
+    then
         player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
-        player.set_controller({
-            type = playerData.preSandboxController,
-            character = playerData.preSandboxCharacter
-        })
+        player.set_controller({ type = playerData.preSandboxController })
         return
     end
 
@@ -284,17 +322,21 @@ function Sandbox.RecoverPlayerCharacter(player, playerData)
     end
 
     -- We might at-least have a Surface to go back to
-    if playerData.preSandboxSurfaceName and game.surfaces[playerData.preSandboxSurfaceName] then
+    if playerData.preSandboxController == defines.controllers.character
+        and playerData.preSandboxPosition
+        and playerData.preSandboxSurfaceName
+        and game.surfaces[playerData.preSandboxSurfaceName]
+    then
         player.print("Unfortunately, your previous Character was lost, so it had to be recreated.")
         player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
         local recreated = game.surfaces[playerData.preSandboxSurfaceName].create_entity {
             name = "character",
             position = playerData.preSandboxPosition,
-            force = playerData.preSandboxForceName,
+            force = playerData.preSandboxForceName or "player",
             raise_built = true,
         }
         player.set_controller({
-            type = playerData.preSandboxController,
+            type = defines.controllers.character,
             character = recreated
         })
         return
@@ -306,11 +348,11 @@ function Sandbox.RecoverPlayerCharacter(player, playerData)
     local recreated = game.surfaces["nauvis"].create_entity {
         name = "character",
         position = { 0, 0 },
-        force = playerData.preSandboxForceName,
+        force = playerData.preSandboxForceName or "player",
         raise_built = true,
     }
     player.set_controller({
-        type = playerData.preSandboxController,
+        type = defines.controllers.character,
         character = recreated
     })
 end
@@ -447,7 +489,7 @@ function Sandbox.OnPlayerSurfaceChanged(player)
         playerData.preSandboxSurfaceName = nil
     end
 
-    storage.players[player.index].insideSandbox = insideSandbox
+    playerData.insideSandbox = insideSandbox
 end
 
 -- Enter, Exit, or Transfer a Player across Sandboxes

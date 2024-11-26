@@ -26,6 +26,7 @@ function Migrate.Run()
         if storage.version < 020000 then Migrate.v2_0_0() end
         if storage.version < 020106 then Migrate.v2_1_6() end
         if storage.version < 020107 then Migrate.v2_1_7() end
+        if storage.version < 020201 then Migrate.v2_2_1() end
     end
 
     storage.version = Migrate.version
@@ -465,6 +466,26 @@ function Migrate.v2_1_7()
     end
 
     log("Migration 2.1.7 Finished")
+end
+
+function Migrate.v2_2_1()
+    --[[
+    2.2.1 associated players with their characters when entering sandboxes
+    ]]
+
+    log("Migration 2.2.1 Starting")
+    
+    for index, player in pairs(game.players) do
+        local character = storage.players[index].preSandboxCharacter
+        if character and character.valid
+            and not character.associated_player
+            and player.controller_type ~= defines.controllers.character
+        then
+            character.associated_player = player
+        end
+    end
+
+    log("Migration 2.2.1 Finished")
 end
 
 return Migrate
