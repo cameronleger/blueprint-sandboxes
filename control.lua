@@ -23,6 +23,7 @@ Lab = require("scripts.lab")
 Migrate = require("scripts.migrate")
 Research = require("scripts.research")
 SelectionPlanner = require("scripts.selection-planner")
+Teleport = require("scripts.teleport")
 
 -- Required by Sandbox
 SpaceExploration = require("scripts.space-exploration")

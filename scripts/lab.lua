@@ -128,15 +128,14 @@ end
 -- Reset the Lab a Player is currently in
 ---@param player LuaPlayer
 function Lab.Reset(player)
-    if Lab.IsLab(player.surface) then
-        log("Resetting Lab: " .. player.surface.name)
-        player.teleport({ 0, 0 }, player.surface.name)
-        player.surface.clear(false)
-        return true
-    else
+    if not Lab.IsLab(player.surface) then
         log("Not a Lab, won't Reset: " .. player.surface.name)
         return false
     end
+    log("Resetting Lab: " .. player.surface.name)
+    Teleport.ToCenterOfSurface(player)
+    player.surface.clear(false)
+    return true
 end
 
 -- Set some important Surface settings for a Lab

@@ -358,7 +358,7 @@ function Sandbox.Transfer(player)
 
     log("Transferring to Sandbox: " .. surface.name)
     playerData.lastSandboxPositions[player.surface.name] = player.position
-    player.teleport(playerData.lastSandboxPositions[surface.name] or { 0, 0 }, surface)
+    Teleport.ToPositionOnSurface(player, surface, playerData.lastSandboxPositions[surface.name] or { 0, 0 })
 
     playerData.insideSandbox = playerData.selectedSandbox
 end

@@ -211,12 +211,7 @@ function SpaceExploration.Reset(player)
         return
     end
 
-    if SpaceExploration.IsSandbox(player.surface) then
-        log("Resetting SE Sandbox: " .. player.surface.name)
-        player.teleport({ 0, 0 }, player.surface.name)
-        player.surface.clear(false)
-        return true
-    else
+    if not SpaceExploration.IsSandbox(player.surface) then
         log("Not a SE Sandbox, won't Reset: " .. player.surface.name)
         return false
     end

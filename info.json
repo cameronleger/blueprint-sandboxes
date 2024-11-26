@@ -11,6 +11,7 @@
     "? EditorExtensions >= 2.3.0",
     "? factorissimo-2-notnotmelon",
     "! space-exploration",
-    "! Factorissimo2"
+    "! Factorissimo2",
+    "! Factorissimo2-Space-Age-Port"
   ]
 }
