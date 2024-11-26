@@ -215,6 +215,11 @@ function SpaceExploration.Reset(player)
         log("Not a SE Sandbox, won't Reset: " .. player.surface.name)
         return false
     end
+    
+    log("Resetting SE Sandbox: " .. player.surface.name)
+    Teleport.ToCenterOfSurface(player)
+    player.surface.clear(false)
+    return true
 end
 
 -- Return a Sandbox to the available Zones
