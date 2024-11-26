@@ -98,7 +98,7 @@ function Sandbox.Enter(player)
     end
 
     if not RemoteView.EnsureSafeExit(player) then
-        player.print("You are using a remote view, so you cannot enter a Sandbox. Return to your Character first.")
+        player.print("You are using a remote view that cannot be safely closed, so you cannot enter a Sandbox. Return to your Character first.")
         return
     end
 

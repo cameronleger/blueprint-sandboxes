@@ -63,24 +63,34 @@ function RemoteView.EnsureSafeExit(player)
     if not RemoteView.IsUsingRemoteView(player) then
         return true
     end
-    return false
-    -- TODO: It seems impossible to actually safely exit the view
-    -- local character = player.character
-    -- if not character then
-    --     local surface = player.physical_surface
-    --     if not surface then
-    --         return false
-    --     end
-    --     character = surface.find_entity("character", player.physical_position)
-    --     if not character then
-    --         return false
-    --     end
-    -- end
-    -- player.set_controller({
-    --     type = defines.controllers.character,
-    --     character = character,
-    -- })
-    -- return true
+    if player.physical_controller_type == defines.controllers.character then
+        local character = player.character
+        if not character then
+            -- Cannot close a Remote View without a real Character
+            return false
+        end
+        if character.surface.platform then
+            -- Being on a Platform means the Remote View must remain open
+            return false
+        end
+        if character.driving then
+            -- Somehow swapping to the Character while driving exits the vehicle
+            return false
+        end
+        
+        if character.surface_index ~= player.surface_index then
+            Teleport.ToPositionOnSurface(player, character.surface, character.position)
+        end
+        player.set_controller({
+            type = defines.controllers.character,
+            character = character,
+        })
+        return true
+    else
+        player.set_controller({
+            type = player.physical_controller_type,
+        })
+    end
 end
 
 ---@param surface LuaSurface
