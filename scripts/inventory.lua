@@ -50,8 +50,7 @@ end
 
 -- Whether a Player's Inventory is vulnerable to going missing due to lack of a body
 function Inventory.ShouldPersist(controller)
-    -- TODO: Potentially not for remote
-    return controller ~= defines.controllers.character
+    return controller ~= nil and controller ~= defines.controllers.god
 end
 
 -- Ensure a Player's Inventory isn't full

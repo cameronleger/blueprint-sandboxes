@@ -216,25 +216,18 @@ function Sandbox.Exit(player)
         log("Already outside Sandbox")
         return
     end
-    log("Exiting Sandbox: " .. player.surface.name)
 
-    -- Don't let anyone attempt to edit Surface Properties of other Surfaces!
-    SurfacePropsGUI.Destroy(player)
-
-    -- Store some temporary State to use once outside the Sandbox
-    local outputBlueprint = Inventory.GetCursorBlueprintString(player)
+    -- Capture the cursor's blueprint to reimport it after exiting, if necessary
+    local outputBlueprint = nil
+    if not RemoteView.IsUsingRemoteView(player) then
+        outputBlueprint = Inventory.GetCursorBlueprintString(player)
+    end
 
     -- Remember where they left off
     playerData.lastSandboxPositions[player.surface.name] = player.position
 
     -- Attach the Player back to their original Character (also changes force)
     Sandbox.RecoverPlayerCharacter(player, playerData)
-
-    -- Swap to their original Force (in case they're not sent back to a Character)
-    player.force = playerData.preSandboxForceName
-
-    -- Toggle Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
-    player.cheat_mode = playerData.preSandboxCheatMode or false
 
     -- Sometimes a Player is already a God (like in Sandbox), and their Inventory wasn't on a body
     if Inventory.ShouldPersist(playerData.preSandboxController) then
@@ -245,17 +238,6 @@ function Sandbox.Exit(player)
     end
 
     -- Reset the Player's previous State
-    playerData.preSandboxForceName = nil
-    playerData.preSandboxCharacter = nil
-    playerData.preSandboxController = nil
-    playerData.preSandboxPosition = nil
-    playerData.preSandboxSurfaceName = nil
-    playerData.preSandboxCheatMode = nil
-    if playerData.preSandboxPermissionGroupId then
-        player.permission_group = game.permissions.get_group(playerData.preSandboxPermissionGroupId)
-    else
-        player.permission_group = nil
-    end
     if playerData.preSandboxInventory then
         playerData.preSandboxInventory.destroy()
         playerData.preSandboxInventory = nil
@@ -420,7 +402,51 @@ end
 -- Update whether the Player is inside a known Sandbox
 ---@param player LuaPlayer
 function Sandbox.OnPlayerSurfaceChanged(player)
+    local playerData = storage.players[player.index]
     local insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
+    local lastKnownSandbox = storage.players[player.index].insideSandbox
+
+    local wasInSandbox = lastKnownSandbox ~= nil
+    local nowInSandbox = not not insideSandbox
+
+    if not wasInSandbox and nowInSandbox then
+        log("Entered a Sandbox: " .. player.surface.name)
+    elseif wasInSandbox and not nowInSandbox then
+        log("Exiting last known Sandbox " .. lastKnownSandbox .. " to new Surface: " .. player.surface.name)
+
+        -- Don't let anyone attempt to edit Surface Properties of other Surfaces!
+        SurfacePropsGUI.Destroy(player)
+
+        -- Swap to their original Force (in case they're not sent back to a Character)
+        if playerData.preSandboxForceName and player.force.name ~= playerData.preSandboxForceName then
+            player.force = playerData.preSandboxForceName
+        end
+    
+        -- Toggle Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
+        local desiredCheatMode = playerData.preSandboxCheatMode or false
+        if player.cheat_mode ~= desiredCheatMode then
+            player.cheat_mode = desiredCheatMode
+        end
+
+        -- Swap to their original Permissions
+        if playerData.preSandboxPermissionGroupId then
+            player.permission_group = game.permissions.get_group(playerData.preSandboxPermissionGroupId)
+        else
+            player.permission_group = nil
+        end
+
+        -- Cleanup some restored states that may go stale and cannot be relied on later
+        playerData.preSandboxForceName = nil
+        playerData.preSandboxCheatMode = nil
+        playerData.preSandboxPermissionGroupId = nil
+
+        -- Cleanup some unused states that may go stale and cannot be relied on later
+        playerData.preSandboxCharacter = nil
+        playerData.preSandboxController = nil
+        playerData.preSandboxPosition = nil
+        playerData.preSandboxSurfaceName = nil
+    end
+
     storage.players[player.index].insideSandbox = insideSandbox
 end
 
