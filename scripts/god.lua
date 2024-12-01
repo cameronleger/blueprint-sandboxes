@@ -285,7 +285,96 @@ function God.OnBuiltEntity(event)
     end
 end
 
--- TODO: Consider defines.build_mode
+-- Ensure remaining Ghosts are handled
+---@param player LuaPlayer
+---@param deleteRequests number
+---@param upgradeRequests number
+---@param createRequests number
+function God.QueueUnhandledEntities(player, deleteRequests, upgradeRequests, createRequests)
+    local surface = player.surface
+    local radius = 32 * 6 -- 6 chunk radius
+
+    if deleteRequests > 0 then
+        local deconstructs = surface.find_entities_filtered({
+            position = player.position,
+            radius = radius,
+            force = player.force,
+            to_be_deconstructed = true,
+            to_be_upgraded = false,
+            limit = 100,
+        })
+        for _, entity in pairs(deconstructs) do
+            if God.ShouldHandleEntity(entity) then
+                God.AsyncWrapper(
+                    Settings.godAsyncDeleteRequestsPerTick,
+                    storage.asyncDestroyQueue,
+                    God.Destroy,
+                    entity
+                )
+            end
+        end
+    end
+
+    if upgradeRequests > 0 then
+        local upgrades = surface.find_entities_filtered({
+            position = player.position,
+            radius = radius,
+            force = player.force,
+            to_be_deconstructed = false,
+            to_be_upgraded = true,
+            limit = 100,
+        })
+        for _, entity in pairs(upgrades) do
+            if God.ShouldHandleEntity(entity) then
+                God.AsyncWrapper(
+                    Settings.godAsyncUpgradeRequestsPerTick,
+                    storage.asyncUpgradeQueue,
+                    God.Upgrade,
+                    entity
+                )
+            end
+        end
+    end
+
+    if createRequests > 0 then
+        local ghosts = surface.find_entities_filtered({
+            position = player.position,
+            radius = radius,
+            force = player.force,
+            type = {
+                "tile-ghost",
+                "entity-ghost",
+                "item-request-proxy",
+            },
+            to_be_deconstructed = false,
+            to_be_upgraded = false,
+            limit = 100,
+        })
+        for _, entity in pairs(ghosts) do
+            if God.ShouldHandleEntity(entity) then
+                God.AsyncWrapper(
+                    Settings.godAsyncCreateRequestsPerTick,
+                    storage.asyncCreateQueue,
+                    God.Create,
+                    entity
+                )
+            end
+        end
+    end
+end
+
+-- TODO: This is basically only necessary because of missing item-request-proxy and super-force-building events
+-- Ensure remaining Ghosts are handled
+---@param deleteRequests number
+---@param upgradeRequests number
+---@param createRequests number
+function God.QueueUnhandledEntitiesInOccupiedSandboxes(deleteRequests, upgradeRequests, createRequests)
+    for _, player in pairs(game.players) do
+        if player.connected and Sandbox.IsSandbox(player.surface) then
+            God.QueueUnhandledEntities(player, deleteRequests, upgradeRequests, createRequests)
+        end
+    end
+end
 
 -- For each known Sandbox Surface, handle any async God functionality
 ---@param event EventData.on_tick
@@ -334,6 +423,10 @@ function God.HandleAllSandboxRequests(event)
             and createRequestsHandled > 0
     then
         storage.asyncCreateQueue = Queue.New()
+    end
+
+    if (deleteRequestsPerTick + upgradeRequestsPerTick + createRequestsPerTick) > 0 then
+        God.QueueUnhandledEntitiesInOccupiedSandboxes(deleteRequestsPerTick, upgradeRequestsPerTick, createRequestsPerTick)
     end
 end
 

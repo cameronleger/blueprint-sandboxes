@@ -1,8 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.2.2
-Date: ????
+Date: 2024-12-01
   Changes:
     - Improved support for newly revived Sandbox Scenario
+    - Temporary background scanning for auto-building, due to missing events
   Bugfixes:
     - Inventory management regression fixed for some cases involving volatile inventories
 ---------------------------------------------------------------------------------------------------
