@@ -155,7 +155,7 @@ function Sandbox.Enter(player)
     end
 
     -- Sometimes a Player has a volatile Inventory that needs restoring later
-    if Inventory.ShouldPersist(playerData.preSandboxController) then
+    if Inventory.ShouldPersist(player.controller_type) then
         playerData.preSandboxInventory = Inventory.Persist(
                 player.get_main_inventory(),
                 playerData.preSandboxInventory
@@ -199,6 +199,9 @@ function Sandbox.Enter(player)
     Research.EnableSandboxSpecificResearch(sandboxForce)
 
     -- Now that everything has taken effect, restoring the Inventory is safe
+    if not playerData.sandboxInventory then
+        playerData.sandboxInventory = Inventory.Initialize(player.get_main_inventory())
+    end
     Inventory.Restore(
             playerData.sandboxInventory,
             player.get_main_inventory()
@@ -213,35 +216,30 @@ end
 
 -- Convert the Player to their previous State, and leave Selected Sandbox
 ---@param player LuaPlayer
-function Sandbox.Exit(player)
+local function ExitAsRemoteView(player)
+    local playerData = storage.players[player.index]
+    -- Attach the Player back to their original controller (may also change force for character)
+    Sandbox.RecoverPlayerCharacter(player, playerData)
+end
+
+-- Convert the Player to their previous State, and leave Selected Sandbox
+---@param player LuaPlayer
+local function ExitAsGod(player)
     local playerData = storage.players[player.index]
 
-    if not Sandbox.IsPlayerInsideSandbox(player) then
-        log("Already outside Sandbox")
-        return
-    end
+    -- Store some temporary State to use once outside the Sandbox
+    local outputBlueprint = Inventory.GetCursorBlueprintString(player)
 
-    -- Capture the cursor's blueprint to reimport it after exiting, if necessary
-    local outputBlueprint = nil
-    if not RemoteView.IsUsingRemoteView(player) then
-        outputBlueprint = Inventory.GetCursorBlueprintString(player)
-    end
-
-    -- Remember where they left off
-    playerData.lastSandboxPositions[player.surface.name] = player.position
-
-    -- Attach the Player back to their original Character (also changes force)
+    -- Attach the Player back to their original controller (may also change force for character)
     Sandbox.RecoverPlayerCharacter(player, playerData)
 
     -- Sometimes a Player is already a God (like in Sandbox), and their Inventory wasn't on a body
-    if Inventory.ShouldPersist(playerData.preSandboxController) then
+    if Inventory.ShouldPersist(player.controller_type) and playerData.preSandboxInventory then
         Inventory.Restore(
                 playerData.preSandboxInventory,
                 player.get_main_inventory()
         )
     end
-
-    -- Reset the Player's previous State
     if playerData.preSandboxInventory then
         playerData.preSandboxInventory.destroy()
         playerData.preSandboxInventory = nil
@@ -251,6 +249,30 @@ function Sandbox.Exit(player)
     if outputBlueprint and Inventory.WasCursorSafelyCleared(player) then
         player.cursor_stack.import_stack(outputBlueprint)
         player.cursor_stack_temporary = true
+    end
+end
+
+-- Convert the Player to their previous State, and leave Selected Sandbox
+---@param player LuaPlayer
+function Sandbox.Exit(player)
+    local playerData = storage.players[player.index]
+
+    if not Sandbox.IsPlayerInsideSandbox(player) then
+        log("Already outside Sandbox")
+        return
+    end
+    log("Exiting Sandbox: " .. player.surface.name)
+
+    -- Remember where they left off
+    playerData.lastSandboxPositions[player.surface.name] = player.position
+
+    if player.controller_type == defines.controllers.god then
+        ExitAsGod(player)
+    elseif player.controller_type == defines.controllers.remote then
+        ExitAsRemoteView(player)
+    else
+        log("Unknown controller type: " .. player.controller_type)
+        Sandbox.RecoverPlayerCharacter(player, playerData)
     end
 end
 

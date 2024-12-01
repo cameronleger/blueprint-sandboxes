@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.2
+Date: ????
+  Changes:
+    - Improved support for newly revived Sandbox Scenario
+  Bugfixes:
+    - Inventory management regression fixed for some cases involving volatile inventories
+---------------------------------------------------------------------------------------------------
 Version: 2.2.1
 Date: 2024-11-26
   Changes:

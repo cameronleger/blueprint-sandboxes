@@ -50,7 +50,7 @@ end
 
 -- Whether a Player's Inventory is vulnerable to going missing due to lack of a body
 function Inventory.ShouldPersist(controller)
-    return controller ~= nil and controller ~= defines.controllers.god
+    return controller ~= nil and (controller == defines.controllers.god or controller == defines.controllers.editor)
 end
 
 -- Ensure a Player's Inventory isn't full
@@ -72,9 +72,18 @@ function Inventory.Prune(player)
     end
 end
 
+-- Create a backing inventory the same size as another
+---@param from LuaInventory
+function Inventory.Initialize(from)
+    if not from then
+        return nil
+    end
+    return game.create_inventory(#from)
+end
+
 -- Persist one Inventory into another mod-created one
 ---@param from LuaInventory
----@param to LuaInventory
+---@param to LuaInventory | nil
 function Inventory.Persist(from, to)
     if not from then
         return nil
