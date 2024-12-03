@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.0
+Date: 2024-12-02
+  Changes:
+    - New Scenario for an enhanced Sandbox/Editor-mode
+    - Include the Turbo Loader in Sandbox items
+    - Include the Heat Interface in Sandbox items
+---------------------------------------------------------------------------------------------------
 Version: 2.2.2
 Date: 2024-12-01
   Changes:
