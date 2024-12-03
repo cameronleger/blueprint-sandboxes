@@ -36,9 +36,11 @@ if shouldEnableLoaders then
     createLockedRecipeForHiddenItem("loader")
     createLockedRecipeForHiddenItem("fast-loader")
     createLockedRecipeForHiddenItem("express-loader")
+    createLockedRecipeForHiddenItem("turbo-loader")
 end
 
 -- Infinity Entities will always be enabled
+createLockedRecipeForHiddenItem("heat-interface")
 createLockedRecipeForHiddenItem("electric-energy-interface")
 createLockedRecipeForHiddenItem("infinity-chest")
 createLockedRecipeForHiddenItem("infinity-pipe")

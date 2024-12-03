@@ -39,16 +39,18 @@ end
 ---@param force LuaForce
 function Research.EnableSandboxSpecificResearch(force)
     log("Unlocking hidden Recipes for: " .. force.name)
-
-    if force.recipes[BPSB.pfx .. "loader"] then
-        force.recipes[BPSB.pfx .. "loader"].enabled = true
-        force.recipes[BPSB.pfx .. "fast-loader"].enabled = true
-        force.recipes[BPSB.pfx .. "express-loader"].enabled = true
+    function enable(name)
+        if force.recipes[name] then force.recipes[name].enabled = true end
     end
 
-    force.recipes[BPSB.pfx .. "electric-energy-interface"].enabled = true
-    force.recipes[BPSB.pfx .. "infinity-chest"].enabled = true
-    force.recipes[BPSB.pfx .. "infinity-pipe"].enabled = true
+    enable(BPSB.pfx .. "loader")
+    enable(BPSB.pfx .. "fast-loader")
+    enable(BPSB.pfx .. "express-loader")
+    enable(BPSB.pfx .. "turbo-loader")
+    enable(BPSB.pfx .. "heat-interface")
+    enable(BPSB.pfx .. "electric-energy-interface")
+    enable(BPSB.pfx .. "infinity-chest")
+    enable(BPSB.pfx .. "infinity-pipe")
 
     EditorExtensionsCheats.EnableTestingRecipes(force)
 end
