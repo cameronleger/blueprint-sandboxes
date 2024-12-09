@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.1
+Date: 2024-12-09
+  Changes:
+    - More Russian translations (thanks dodther)
+  Bugfixes:
+    - Potential fix for crashes related to invalid ghosts in Sandboxes
+---------------------------------------------------------------------------------------------------
 Version: 2.3.0
 Date: 2024-12-02
   Changes:

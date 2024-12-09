@@ -226,6 +226,7 @@ end
 
 ---@param entity LuaEntity
 function God.ShouldHandleEntity(entity)
+    if not entity.valid then return false end
     if not settings.global[Settings.godBuilding].value then
         return false
     end

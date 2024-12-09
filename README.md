@@ -88,4 +88,4 @@ When Editor Extensions is enabled, its Lab Setting is disabled because it is inc
 
 ## Credits
 * undermark5: Factorissimo Performance Improvements
-* KirillNaumkin: Russian translations
+* KirillNaumkin and dodther: Russian translations
