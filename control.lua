@@ -14,6 +14,7 @@ RemoteView = require("scripts.remote-view")
 -- Required, but not ordered importantly
 Init = require("scripts.init")
 Chat = require("scripts.chat")
+Controllers = require("scripts.controllers")
 Equipment = require("scripts.equipment")
 Factorissimo = require("scripts.factorissimo")
 Force = require("scripts.force")
