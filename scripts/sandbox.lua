@@ -489,7 +489,7 @@ function Sandbox.OnPlayerSurfaceChanged(player)
         if playerData.preSandboxForceName and player.force.name ~= playerData.preSandboxForceName then
             player.force = playerData.preSandboxForceName
         end
-    
+
         -- Toggle Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
         local desiredCheatMode = playerData.preSandboxCheatMode or false
         if player.cheat_mode ~= desiredCheatMode then

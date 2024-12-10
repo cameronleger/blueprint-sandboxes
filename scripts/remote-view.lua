@@ -125,10 +125,7 @@ function RemoteView.EnsureSafeExit(player, playerData)
         })
         return true
     else
-        player.set_controller({
-            type = player.physical_controller_type,
-        })
-        return true
+        return false
     end
 end
 
