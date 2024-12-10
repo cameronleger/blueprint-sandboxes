@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.2
+Date: ????
+  Changes:
+    - Entering the Sandbox from a Remote View will later return you to that same view, instead of your character
+---------------------------------------------------------------------------------------------------
 Version: 2.3.1
 Date: 2024-12-09
   Changes:

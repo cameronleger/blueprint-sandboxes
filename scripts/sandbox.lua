@@ -96,7 +96,7 @@ function Sandbox.Enter(player)
         return
     end
 
-    if not RemoteView.EnsureSafeExit(player) then
+    if not RemoteView.EnsureSafeExit(player, playerData) then
         player.print("You are using a remote view that cannot be safely closed, so you cannot enter a Sandbox. Return to your Character first.")
         return
     end
@@ -289,11 +289,14 @@ end
 -- Ensure the Player has a Character to go back to
 ---@param player LuaPlayer
 function Sandbox.RecoverPlayerCharacter(player, playerData)
+    -- It's possible there's nothing to do
+    if player.controller_type == defines.controllers.character then return end
+
     -- The Remote View is an easy exit
     if player.controller_type == defines.controllers.remote
         and player.physical_controller_type == defines.controllers.character
     then
-        if RemoteView.EnsureSafeExit(player) then
+        if RemoteView.EnsureSafeExit(player, playerData) then
             return
         end
     end
@@ -405,6 +408,7 @@ end
 ---@param player LuaPlayer
 function Sandbox.OnPlayerForceChanged(player)
     local playerData = storage.players[player.index]
+    ---@type LuaForce
     local force = player.force
     if not Sandbox.IsSandboxForce(force)
             and playerData.forceName ~= force.name
@@ -498,6 +502,9 @@ function Sandbox.OnPlayerSurfaceChanged(player)
         else
             player.permission_group = nil
         end
+
+        -- If they were using a Remote View before, take them back to that same view
+        RemoteView.RestoreState(player, playerData)
 
         -- Cleanup some restored states that may go stale and cannot be relied on later
         playerData.preSandboxForceName = nil

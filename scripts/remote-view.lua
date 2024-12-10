@@ -57,12 +57,50 @@ function RemoteView.IsUsingRemoteView(player)
     return player.controller_type == defines.controllers.remote
 end
 
+-- Store the last known Remote View state for potentially returning later
+---@param player LuaPlayer
+---@return boolean stored
+function RemoteView.StoreState(player, playerData)
+    if not RemoteView.IsUsingRemoteView(player) then
+        return false
+    end
+    if Sandbox.IsSandbox(player.surface) then
+        return false
+    end
+    playerData.preSandboxRemotePosition = player.position
+    playerData.preSandboxRemoteSurfaceName = player.surface.name
+    return true
+end
+
+-- Store the last known Remote View state for potentially returning later
+---@param player LuaPlayer
+---@return boolean restored
+function RemoteView.RestoreState(player, playerData)
+    if not playerData.preSandboxRemotePosition
+        or not playerData.preSandboxRemoteSurfaceName
+        or not game.surfaces[playerData.preSandboxRemoteSurfaceName] then
+        return false
+    end
+    local preSandboxRemotePosition = playerData.preSandboxRemotePosition
+    local preSandboxRemoteSurfaceName = playerData.preSandboxRemoteSurfaceName
+    playerData.preSandboxRemotePosition = nil
+    playerData.preSandboxRemoteSurfaceName = nil
+    player.set_controller({
+        type = defines.controllers.remote,
+        surface = preSandboxRemoteSurfaceName,
+        position = preSandboxRemotePosition,
+    })
+    return true
+end
+
 -- If using Remote View, attempt to go back to the Character
 ---@param player LuaPlayer
-function RemoteView.EnsureSafeExit(player)
+---@return boolean success
+function RemoteView.EnsureSafeExit(player, playerData)
     if not RemoteView.IsUsingRemoteView(player) then
         return true
     end
+    RemoteView.StoreState(player, playerData)
     if player.physical_controller_type == defines.controllers.character then
         local character = player.character
         if not character then
@@ -77,7 +115,7 @@ function RemoteView.EnsureSafeExit(player)
             -- Somehow swapping to the Character while driving exits the vehicle
             return false
         end
-        
+
         if character.surface_index ~= player.surface_index then
             Teleport.ToPositionOnSurface(player, character.surface, character.position)
         end
@@ -90,6 +128,7 @@ function RemoteView.EnsureSafeExit(player)
         player.set_controller({
             type = player.physical_controller_type,
         })
+        return true
     end
 end
 
