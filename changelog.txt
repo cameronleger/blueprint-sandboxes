@@ -3,6 +3,7 @@ Version: 2.3.2
 Date: ????
   Changes:
     - Entering the Sandbox from a Remote View will later return you to that same view, instead of your character
+    - Prevent seeing any other Surfaces in Remote View, if within a Sandbox
   Bugfixes:
     - Remote Views won't be automatically closed for Gods or Editors, to prevent losing their inventories
 ---------------------------------------------------------------------------------------------------

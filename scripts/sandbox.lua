@@ -150,6 +150,7 @@ function Sandbox.Enter(player)
     playerData.preSandboxPosition = player.position
     playerData.preSandboxSurfaceName = player.surface.name
     playerData.preSandboxCheatMode = player.cheat_mode
+    playerData.preSandboxSurfaceList = player.game_view_settings.show_surface_list
     if player.permission_group then
         playerData.preSandboxPermissionGroupId = player.permission_group.name
     end
@@ -193,6 +194,7 @@ function Sandbox.Enter(player)
     if newPermissions then
         player.permission_group = newPermissions
     end
+    player.game_view_settings.show_surface_list = false
 
     -- Harmlessly ensure our own Recipes are enabled
     -- TODO: It's unclear why this must happen _after_ the above code
@@ -479,6 +481,7 @@ function Sandbox.OnPlayerSurfaceChanged(player)
 
     if not wasInSandbox and nowInSandbox then
         log("Entered a Sandbox: " .. player.surface.name)
+
     elseif wasInSandbox and not nowInSandbox then
         log("Exiting last known Sandbox " .. lastKnownSandbox .. " to new Surface: " .. player.surface.name)
 
@@ -503,12 +506,19 @@ function Sandbox.OnPlayerSurfaceChanged(player)
             player.permission_group = nil
         end
 
+        -- Swap to their original surface-list setting
+        local desiredSurfaceList = playerData.preSandboxSurfaceList or true
+        if player.game_view_settings.show_surface_list ~= desiredSurfaceList then
+            player.game_view_settings.show_surface_list = desiredSurfaceList
+        end
+
         -- If they were using a Remote View before, take them back to that same view
         RemoteView.RestoreState(player, playerData)
 
         -- Cleanup some restored states that may go stale and cannot be relied on later
         playerData.preSandboxForceName = nil
         playerData.preSandboxCheatMode = nil
+        playerData.preSandboxSurfaceList = nil
         playerData.preSandboxPermissionGroupId = nil
 
         -- Cleanup some unused states that may go stale and cannot be relied on later

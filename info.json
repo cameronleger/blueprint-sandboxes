@@ -7,7 +7,7 @@
   "description": "Temporary Editor-lite permissions in Lab-like environments for designing and experimenting.",
   "homepage": "https://github.com/cameronleger/blueprint-sandboxes",
   "dependencies": [
-    "base >= 2.0.0",
+    "base >= 2.0.22",
     "? EditorExtensions >= 2.3.0",
     "? factorissimo-2-notnotmelon",
     "! space-exploration",

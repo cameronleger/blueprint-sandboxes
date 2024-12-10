@@ -78,6 +78,7 @@ function Equipment.Prepare(stack, surface)
     log("Requesting Chunks for Blueprint Placement: " .. chunkRadius)
     surface.request_to_generate_chunks({ x = 0, y = 0 }, chunkRadius)
     surface.force_generate_chunk_requests()
+    -- TODO: depend on 2.0.24 and clean up a lot of this code
     log("Chunks allegedly generated")
 end
 
