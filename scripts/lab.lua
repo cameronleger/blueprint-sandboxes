@@ -26,6 +26,28 @@ function Lab.IsLab(thingWithName)
     -- return not not storage.labSurfaces[thingWithName.name]
 end
 
+-- A human-readable Lab Name
+---@param labName string
+---@return LocalisedString
+function Lab.LocalisedNameFromLabName(labName)
+    local identifier = string.sub(labName, pfxLength + 3)
+    local type = string.sub(labName, pfxLength + 1, pfxLength + 1)
+    if type == "p" then
+        type = "[img=entity.character]"
+    elseif type == "f" then
+        type = "[img=utility.force_editor_icon]"
+    else
+        type = ""
+    end
+    return {
+        "",
+        "[img=item-group." .. BPSB.name .. "]",
+        " ",
+        identifier,
+        type,
+    }
+end
+
 -- Create a new Lab Surface, if necessary
 ---@param sandboxForce LuaForce
 function Lab.GetOrCreateSurface(labName, sandboxForce)
@@ -165,6 +187,7 @@ function Lab.AfterCreate(surface)
     surface.daytime = 0.95
     surface.show_clouds = false
     surface.generate_with_lab_tiles = true
+    surface.localised_name = Lab.LocalisedNameFromLabName(surface.name)
 
     return true
 end

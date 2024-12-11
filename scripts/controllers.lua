@@ -44,7 +44,6 @@ function Controllers.CanBeSafelyReplaced(player, skipRetry)
     end
 
     -- Using the Editor, so the real state isn't accessible
-    -- TODO: Perhaps toggling the map editor to get back to their old state is useful?
     if Controllers.IsUsingEditor(player) then
         player.toggle_map_editor()
         if skipRetry then
@@ -172,7 +171,7 @@ function Controllers.RestoreLastController(player, playerData)
     if player.controller_type == defines.controllers.character then return true end
 
     -- The Remote View is an easy exit
-    if player.controller_type == defines.controllers.remote
+    if Controllers.IsUsingRemoteView(player)
         and player.physical_controller_type == defines.controllers.character
     then
         if Controllers.SafelyCloseRemoteView(player, playerData) then
@@ -180,12 +179,14 @@ function Controllers.RestoreLastController(player, playerData)
         end
     end
 
-    -- The Editor needs another layer of exiting
     if Controllers.IsUsingEditor(player) then
-        player.toggle_map_editor()
-        if player.controller_type == defines.controllers.character then
+        -- The Editor might be how they came in
+        if playerData.preSandboxController == nil then
             return true
         end
+
+        -- The Editor needs another layer of exiting otherwise
+        player.toggle_map_editor()
     end
 
     -- Hopeful situation: we directly know about the last valid character
