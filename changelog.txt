@@ -1,16 +1,21 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.3
+Date: 2024-12-11
+  Changes:
+    - Entering the Sandbox from the Editor will first attempt to close the Editor
+    - Localised names for Labs
+  Bugfixes:
+    - Entering/Exiting the Sandbox from the Editor is usually more successful
+    - Entering the Sandbox from the Remote View is usually more successful
+    - Catching "escapes" from Sandbox via Remote View, to enforce the proper exit routine
+---------------------------------------------------------------------------------------------------
 Version: 2.3.2
 Date: 2024-12-11
   Changes:
     - Entering the Sandbox from a Remote View will later return you to that same view, instead of your character
-    - Entering the Sandbox from the Editor will first attempt to close the Editor
     - Prevent seeing any other Surfaces in Remote View, if within a Sandbox
-    - Localised names for Labs
   Bugfixes:
     - Remote Views won't be automatically closed for Gods or Editors, to prevent losing their inventories
-    - Entering/Exiting the Sandbox from the Editor is usually more successful
-    - Entering the Sandbox from the Remote View is usually more successful
-    - Catching "escapes" from Sandbox via Remote View, to enforce the proper exit routine
 ---------------------------------------------------------------------------------------------------
 Version: 2.3.1
 Date: 2024-12-09

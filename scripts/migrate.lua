@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 020302
+Migrate.version = 020303
 
 function Migrate.Run()
     if not storage.version then
@@ -27,7 +27,7 @@ function Migrate.Run()
         if storage.version < 020106 then Migrate.v2_1_6() end
         if storage.version < 020107 then Migrate.v2_1_7() end
         if storage.version < 020201 then Migrate.v2_2_1() end
-        if storage.version < 020302 then Migrate.v2_3_2() end
+        if storage.version < 020303 then Migrate.v2_3_3() end
     end
 
     storage.version = Migrate.version
@@ -489,12 +489,12 @@ function Migrate.v2_2_1()
     log("Migration 2.2.1 Finished")
 end
 
-function Migrate.v2_3_2()
+function Migrate.v2_3_3()
     --[[
-    2.3.2 sets localised strings for each sandbox surface
+    2.3.3 sets localised strings for each sandbox surface
     ]]
 
-    log("Migration 2.3.2 Starting")
+    log("Migration 2.3.3 Starting")
 
     for _, surface in pairs(game.surfaces) do
         if Lab.IsLab(surface) then
@@ -502,7 +502,7 @@ function Migrate.v2_3_2()
         end
     end
 
-    log("Migration 2.3.2 Finished")
+    log("Migration 2.3.3 Finished")
 end
 
 return Migrate
