@@ -133,6 +133,7 @@ function ToggleGUI.Init(player)
             { filter = "type", type = "resource" },
             { mode = "or", filter = "type", type = "asteroid" },
             { mode = "or", filter = "type", type = "tree" },
+            { mode = "or", filter = "type", type = "plant" },
             { mode = "or", filter = "type", type = "lightning" },
             { mode = "or", filter = "type", type = "unit" },
             { mode = "or", filter = "type", type = "segmented-unit" },
