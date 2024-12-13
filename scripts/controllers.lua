@@ -126,8 +126,9 @@ function Controllers.StoreRemoteView(player, playerData)
     if Sandbox.IsSandbox(player.surface) then
         return false
     end
-    playerData.preSandboxRemotePosition = player.position
     playerData.preSandboxRemoteSurfaceName = player.surface.name
+    playerData.preSandboxRemotePosition = player.position
+    playerData.preSandboxRemoteCenteredOn = player.centered_on
     return true
 end
 
@@ -143,13 +144,18 @@ function Controllers.RestoreRemoteView(player, playerData)
     end
     local preSandboxRemotePosition = playerData.preSandboxRemotePosition
     local preSandboxRemoteSurfaceName = playerData.preSandboxRemoteSurfaceName
+    local preSandboxRemoteCenteredOn = playerData.preSandboxRemoteCenteredOn
     playerData.preSandboxRemotePosition = nil
     playerData.preSandboxRemoteSurfaceName = nil
+    playerData.preSandboxRemoteCenteredOn = nil
     player.set_controller({
         type = defines.controllers.remote,
         surface = preSandboxRemoteSurfaceName,
         position = preSandboxRemotePosition,
     })
+    if preSandboxRemoteCenteredOn and preSandboxRemoteCenteredOn.valid then
+        player.centered_on = preSandboxRemoteCenteredOn
+    end
     return true
 end
 

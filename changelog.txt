@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.6
+Date: ????
+  Changes:
+    - Removed "Chart all Labs" Setting; it's no longer optional
+    - Restored Remote Views now continue following the original Entity, if any
+---------------------------------------------------------------------------------------------------
 Version: 2.3.5
 Date: 2024-12-13
   Bugfixes:

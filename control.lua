@@ -261,3 +261,6 @@ script.on_event(defines.events.on_gui_closed, function(event)
         Illusion.OnBlueprintGUIClosed(event)
     end
 end)
+
+-- Periodic
+script.on_nth_tick(RemoteView.chartAllSandboxesTick, RemoteView.ChartAllOccupiedSandboxes)

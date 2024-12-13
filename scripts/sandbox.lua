@@ -460,6 +460,7 @@ function Sandbox.OnPlayerSurfaceChanged(player)
         EnableSandboxFeatures(player, playerData)
         EnforceSandboxPermissions(player)
         RestoreSandboxState(player, playerData)
+        player.force.chart_all(player.surface)
 
     elseif wasInSandbox and not nowInSandbox then
         log(player.name .. " exiting last known Sandbox " .. lastKnownSandbox .. " to new Surface: " .. player.surface.name)
@@ -470,6 +471,11 @@ function Sandbox.OnPlayerSurfaceChanged(player)
         RestoreCursorBlueprint(player, playerData)
         Controllers.RestoreRemoteView(player, playerData)
         CleanStates(playerData)
+
+    elseif wasInSandbox and nowInSandbox then
+        log(player.name .. " transferred from last known Sandbox " .. lastKnownSandbox .. " to new Surface: " .. player.surface.name)
+
+        player.force.chart_all(player.surface)
     end
 end
 

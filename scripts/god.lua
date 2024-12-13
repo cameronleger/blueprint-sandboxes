@@ -431,18 +431,4 @@ function God.HandleAllSandboxRequests(event)
     end
 end
 
--- Charts each Sandbox that a Player is currently inside of
-function God.ChartAllOccupiedSandboxes()
-    if settings.global[Settings.scanSandboxes].value then
-        local charted = {}
-        for _, player in pairs(game.players) do
-            local hash = player.force.name .. player.surface.name
-            if Sandbox.IsSandbox(player.surface) and not charted[hash] then
-                player.force.chart_all(player.surface)
-                charted[hash] = true
-            end
-        end
-    end
-end
-
 return God

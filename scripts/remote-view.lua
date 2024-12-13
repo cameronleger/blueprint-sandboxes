@@ -1,6 +1,8 @@
 -- Code for Factorio's new Remote controller
 local RemoteView = {}
 
+RemoteView.chartAllSandboxesTick = 300
+
 -- When initialized, setup default hidden states
 function RemoteView.Init()
     for _, force in pairs(game.forces) do
@@ -55,6 +57,18 @@ end
 ---@param force LuaForce
 function RemoteView.Hide(surface, force)
     force.set_surface_hidden(surface, true)
+end
+
+-- Charts each Sandbox that a Player is currently inside of
+function RemoteView.ChartAllOccupiedSandboxes()
+    local charted = {}
+    for _, player in pairs(game.players) do
+        local hash = player.force.name .. player.surface.name
+        if Sandbox.IsSandbox(player.surface) and not charted[hash] then
+            player.force.chart_all(player.surface)
+            charted[hash] = true
+        end
+    end
 end
 
 return RemoteView
