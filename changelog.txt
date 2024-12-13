@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.5
+Date: 2024-12-13
+  Bugfixes:
+    - Much better detections for entering/exiting Sandboxes
+    - Special handling for Players changing Forces who haven't been seen yet
+---------------------------------------------------------------------------------------------------
 Version: 2.3.4
 Date: 2024-12-12
   Bugfixes:

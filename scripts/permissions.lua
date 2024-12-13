@@ -52,12 +52,13 @@ function Permissions.GetOrCreate(player)
         return
     end
 
-    if player.permission_group
-            and not Permissions.IsSandboxPermissions(player.permission_group.name)
+    local playerPermissions = player.permission_group
+    if playerPermissions
+            and not Permissions.IsSandboxPermissions(playerPermissions.name)
     then
-        log("Synchronizing permissions group for player " .. player.name)
+        log("Synchronizing permissions groups " .. playerPermissions.name .. " -> " .. permissions.name)
         for _, action in pairs(defines.input_action) do
-            local allowsAction = player.permission_group.allows_action(action)
+            local allowsAction = playerPermissions.allows_action(action)
             if permissions.allows_action(action) ~= allowsAction then
                 permissions.set_allows_action(action, allowsAction)
             end

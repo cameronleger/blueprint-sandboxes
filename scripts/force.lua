@@ -40,11 +40,9 @@ function Force.Init(force)
             or Sandbox.IsSandboxForce(force)
             or #force.players < 1
     then
-        log("Skip Force.Init: " .. force.name)
         return
     end
 
-    log("Force.Init: " .. force.name)
     local forceLabName = Lab.NameFromForce(force)
     local sandboxForceName = Sandbox.NameFromForce(force)
     storage.forces[force.name] = {
@@ -102,6 +100,7 @@ end
 ---@param force LuaForce
 ---@param sandboxForce LuaForce
 function Force.ConfigureSandboxForce(force, sandboxForce)
+    log("Syncing Forces: " .. force.name .. " -> " .. sandboxForce.name)
     -- TODO: Ideally, lock the Space Platform; but Cheat Mode forcefully enables
 
     -- Ensure the two Forces don't attack each other
@@ -139,7 +138,7 @@ function Force.GetOrCreateSandboxForce(force)
         return sandboxForce
     end
 
-    log("Creating Sandbox Force: " .. sandboxForceName)
+    log("Creating a new Sandbox Force: " .. force.name .. " -> " .. sandboxForceName)
     sandboxForce = game.create_force(sandboxForceName)
     Force.ConfigureSandboxForce(force, sandboxForce)
     Research.Sync(force, sandboxForce)

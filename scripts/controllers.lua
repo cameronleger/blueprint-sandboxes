@@ -1,6 +1,20 @@
 -- Managing multiple overlapping Controllers for each Player
 local Controllers = {}
 
+-- Determine if the Character is being used
+---@param player LuaPlayer
+---@return boolean
+function Controllers.IsCharacter(player)
+    return player.controller_type == defines.controllers.character
+end
+
+-- Determine if the God is being used
+---@param player LuaPlayer
+---@return boolean
+function Controllers.IsGod(player)
+    return player.controller_type == defines.controllers.god
+end
+
 -- Determine if the Remote View is being used
 ---@param player LuaPlayer
 ---@return boolean
@@ -20,6 +34,22 @@ end
 ---@return boolean
 function Controllers.IsRidingRocket(player)
     return player.driving and player.character ~= nil and player.vehicle == nil
+end
+
+-- Determine if the Player's Controller is valid for use as-is with the Sandbox
+---@param player LuaPlayer
+---@return boolean
+function Controllers.IsSandboxCompatible(player)
+    return player.controller_type == defines.controllers.god
+end
+
+-- Determine if the Player's Controller is valid for use within the Sandbox
+---@param player LuaPlayer
+---@return boolean
+function Controllers.IsSandboxSupported(player)
+    return player.controller_type == defines.controllers.god
+        or player.controller_type == defines.controllers.remote
+        or player.controller_type == defines.controllers.editor
 end
 
 ---@param player LuaPlayer

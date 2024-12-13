@@ -5,11 +5,9 @@ local Init = {}
 ---@param player LuaPlayer
 function Init.Player(player)
     if storage.players[player.index] then
-        log("Skip Init.Player: " .. player.name)
         return
     end
 
-    log("Init.Player: " .. player.name)
     local playerLabName = Lab.NameFromPlayer(player)
     local sandboxForceName = Sandbox.NameFromForce(player.force)
     storage.players[player.index] = {
@@ -26,7 +24,6 @@ end
 
 -- Reset all Mod data
 function Init.FirstTimeInit()
-    log("Init.FirstTimeInit")
     storage.version = Migrate.version
     storage.forces = {}
     storage.players = {}

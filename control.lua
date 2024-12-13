@@ -49,14 +49,12 @@ end)
 
 script.on_event(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
-    log("on_player_created index: " .. event.player_index)
     Force.Init(player.force)
     Init.Player(player)
 end)
 
 script.on_event(defines.events.on_player_removed, function(event)
     local playerData = storage.players[event.player_index]
-    log("on_player_removed index: " .. event.player_index)
     Lab.DeleteLab(playerData.labName)
     if playerData.sandboxInventory then
         playerData.sandboxInventory.destroy()
@@ -68,7 +66,6 @@ script.on_event(defines.events.on_player_removed, function(event)
 end)
 
 script.on_event(defines.events.on_force_created, function(event)
-    log("on_force_created name: " .. event.force.name)
     Force.Init(event.force)
     if Sandbox.IsSandboxForce(event.force) then
         RemoteView.HideEverythingInSandboxes(event.force)

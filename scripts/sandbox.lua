@@ -86,6 +86,62 @@ function Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     end
 end
 
+---@param player LuaPlayer
+local function StoreCursorBlueprint(player, playerData)
+    if playerData.transitionaryBlueprintString == nil then
+        playerData.transitionaryBlueprintString = Inventory.GetCursorBlueprintString(player)
+    end
+end
+
+---@param player LuaPlayer
+local function RestoreCursorBlueprint(player, playerData)
+    if playerData.transitionaryBlueprintString ~= nil then
+        if Inventory.WasCursorSafelyCleared(player) then
+            player.cursor_stack.import_stack(playerData.transitionaryBlueprintString)
+            player.cursor_stack_temporary = true
+            playerData.transitionaryBlueprintString = nil
+        end
+    end
+end
+
+---@param player LuaPlayer
+local function StorePreSandboxStateBeforeEntrance(player, playerData)
+    playerData.preSandboxSurfaceName = player.surface.name
+    playerData.preSandboxPosition = player.position
+    playerData.preSandboxController = player.controller_type
+
+    if playerData.preSandboxCharacter == nil or player.character ~= nil then
+        playerData.preSandboxCharacter = player.character
+    end
+
+    -- Sometimes a Player has a volatile Inventory that needs restoring later
+    if Inventory.ShouldPersist(player.controller_type) then
+        log(player.name .. " has a volatile inventory; must persist it before entrance")
+        playerData.preSandboxInventory = Inventory.Persist(
+                player.get_main_inventory(),
+                playerData.preSandboxInventory
+        )
+    else
+        if playerData.preSandboxInventory then
+            playerData.preSandboxInventory.destroy()
+            playerData.preSandboxInventory = nil
+        end
+    end
+
+    if not Controllers.IsSandboxCompatible(player) then
+        StoreCursorBlueprint(player, playerData)
+
+        --[[
+        Otherwise, there is a Factorio "bug" that can destroy what was in the Cursor.
+        It seems to happen with something from the Inventory being in the Stack, then
+        entering the Sandbox, then copying something from the Sandbox, then exiting the
+        Sandbox. At this point, the Cursor Stack is still fine and valid, but it seems
+        to have lost its original location, so "clearing" it out will destroy it.
+        ]]
+        player.clear_cursor()
+    end
+end
+
 -- Convert the Player to God-mode, save their previous State, and enter Selected Sandbox
 ---@param player LuaPlayer
 function Sandbox.Enter(player)
@@ -109,44 +165,9 @@ function Sandbox.Enter(player)
         log("Completely Unknown Sandbox Surface, cannot use")
         return
     end
-    log("Entering Sandbox: " .. surface.name)
-
-    -- Store some temporary State to use once inside the Sandbox
-    local inputBlueprint = Inventory.GetCursorBlueprintString(player)
-
-    --[[
-    Otherwise, there is a Factorio "bug" that can destroy what was in the Cursor.
-    It seems to happen with something from the Inventory being in the Stack, then
-    entering the Sandbox, then copying something from the Sandbox, then exiting the
-    Sandbox. At this point, the Cursor Stack is still fine and valid, but it seems
-    to have lost its original location, so "clearing" it out will destroy it.
-    ]]
-    player.clear_cursor()
 
     -- Store the Player's previous State (that must be referenced to Exit)
-    playerData.preSandboxForceName = player.force.name
-    playerData.preSandboxCharacter = player.character
-    playerData.preSandboxController = player.controller_type
-    playerData.preSandboxPosition = player.position
-    playerData.preSandboxSurfaceName = player.surface.name
-    playerData.preSandboxCheatMode = player.cheat_mode
-    playerData.preSandboxSurfaceList = player.game_view_settings.show_surface_list
-    if player.permission_group then
-        playerData.preSandboxPermissionGroupId = player.permission_group.name
-    end
-
-    -- Sometimes a Player has a volatile Inventory that needs restoring later
-    if Inventory.ShouldPersist(player.controller_type) then
-        playerData.preSandboxInventory = Inventory.Persist(
-                player.get_main_inventory(),
-                playerData.preSandboxInventory
-        )
-    else
-        if playerData.preSandboxInventory then
-            playerData.preSandboxInventory.destroy()
-            playerData.preSandboxInventory = nil
-        end
-    end
+    StorePreSandboxStateBeforeEntrance(player, playerData)
 
     -- Harmlessly detach the Player from their Character
     local character = player.character
@@ -156,80 +177,7 @@ function Sandbox.Enter(player)
     end
 
     -- Harmlessly teleport their God-body to the Sandbox
-    player.teleport(playerData.lastSandboxPositions[surface.name] or { 0, 0 }, surface)
-
-    -- Swap to the new Force; it has different bonuses!
-    player.force = sandboxForce
-
-    -- Since the Sandbox might have Cheat Mode enabled, EditorExtensions won't receive an Event for this otherwise
-    if player.cheat_mode then player.cheat_mode = false end
-    -- Enable Cheat mode _afterwards_, since EditorExtensions will alter the Force (now the Sandbox Force) based on this
-    player.cheat_mode = true
-
-    -- Set some Permissions so the Player cannot affect their other Surfaces
-    local newPermissions = Permissions.GetOrCreate(player)
-    if newPermissions then
-        player.permission_group = newPermissions
-    end
-    player.game_view_settings.show_surface_list = false
-
-    -- Harmlessly ensure our own Recipes are enabled
-    -- TODO: It's unclear why this must happen _after_ the above code
-    Research.EnableSandboxSpecificResearch(sandboxForce)
-
-    -- Now that everything has taken effect, restoring the Inventory is safe
-    if not playerData.sandboxInventory then
-        playerData.sandboxInventory = Inventory.Initialize(player.get_main_inventory())
-    end
-    Inventory.Restore(
-            playerData.sandboxInventory,
-            player.get_main_inventory()
-    )
-
-    -- Then, restore the Blueprint in the Cursor
-    if inputBlueprint then
-        player.cursor_stack.import_stack(inputBlueprint)
-        player.cursor_stack_temporary = true
-    end
-end
-
--- Convert the Player to their previous State, and leave Selected Sandbox
----@param player LuaPlayer
-local function ExitAsRemoteView(player)
-    local playerData = storage.players[player.index]
-    -- Attach the Player back to their original controller (may also change force for character)
-    Controllers.RestoreLastController(player, playerData)
-end
-
--- Convert the Player to their previous State, and leave Selected Sandbox
----@param player LuaPlayer
-local function ExitAsGod(player)
-    local playerData = storage.players[player.index]
-
-    -- Store some temporary State to use once outside the Sandbox
-    local outputBlueprint = Inventory.GetCursorBlueprintString(player)
-
-    -- Attach the Player back to their original controller (may also change force for character)
-    Controllers.RestoreLastController(player, playerData)
-
-    -- TODO: Inventory is lost when exiting via pins
-    -- Sometimes a Player is already a God (like in Sandbox), and their Inventory wasn't on a body
-    if Inventory.ShouldPersist(player.controller_type) and playerData.preSandboxInventory then
-        Inventory.Restore(
-                playerData.preSandboxInventory,
-                player.get_main_inventory()
-        )
-    end
-    if playerData.preSandboxInventory then
-        playerData.preSandboxInventory.destroy()
-        playerData.preSandboxInventory = nil
-    end
-
-    -- Potentially, restore the Blueprint in the Cursor
-    if outputBlueprint and Inventory.WasCursorSafelyCleared(player) then
-        player.cursor_stack.import_stack(outputBlueprint)
-        player.cursor_stack_temporary = true
-    end
+    Teleport.ToPositionOnSurface(player, surface, playerData.lastSandboxPositions[surface.name] or { 0, 0 })
 end
 
 -- Convert the Player to their previous State, and leave Selected Sandbox
@@ -241,19 +189,23 @@ function Sandbox.Exit(player)
         log("Already outside Sandbox")
         return
     end
-    log("Exiting Sandbox: " .. player.surface.name)
 
     -- Remember where they left off
     playerData.lastSandboxPositions[player.surface.name] = player.position
 
-    if player.controller_type == defines.controllers.god then
-        ExitAsGod(player)
-    elseif player.controller_type == defines.controllers.remote then
-        ExitAsRemoteView(player)
-    else
-        log("Unknown controller type: " .. player.controller_type)
+    if not Controllers.IsUsingRemoteView(player) and not playerData.preSandboxSurfaceName then
+        log(player.name .. " has no last known Surface, so they cannot exit the Sandbox normally")
+        player.print("You must not have come into the Sandbox in an expected way, because it does not know where you came from. What happens next might be unexpected.")
         Controllers.RestoreLastController(player, playerData)
+        return
     end
+
+    -- Harmlessly teleport them out of the Sandbox
+    Teleport.ToPositionOnSurface(
+        player,
+        playerData.preSandboxSurfaceName,
+        playerData.preSandboxPosition or { 0, 0 }
+    )
 end
 
 -- Keep a Player's God-state, but change between Selected Sandboxes
@@ -262,7 +214,7 @@ function Sandbox.Transfer(player)
     local playerData = storage.players[player.index]
 
     if not Sandbox.IsPlayerInsideSandbox(player) then
-        log("Outside Sandbox, cannot transfer")
+        log(player.name .. " was outside Sandbox, so cannot be transferred")
         return
     end
 
@@ -273,7 +225,7 @@ function Sandbox.Transfer(player)
         return
     end
 
-    log("Transferring to Sandbox: " .. surface.name)
+    log(player.name .. " transferring Sandboxes: " .. player.surface.name .. " -> " .. surface.name)
     playerData.lastSandboxPositions[player.surface.name] = player.position
     Teleport.ToPositionOnSurface(player, surface, playerData.lastSandboxPositions[surface.name] or { 0, 0 })
 end
@@ -282,6 +234,7 @@ end
 ---@param player LuaPlayer
 function Sandbox.OnPlayerForceChanged(player)
     local playerData = storage.players[player.index]
+    if not playerData then return end
     ---@type LuaForce
     local force = player.force
     if not Sandbox.IsSandboxForce(force)
@@ -341,12 +294,154 @@ function Sandbox.GetSandboxChoiceFor(player, surface)
     return nil
 end
 
+---@param player LuaPlayer
+local function StorePreSandboxStateOnArrival(player, playerData)
+    if playerData.preSandboxForceName == nil then
+        if Sandbox.IsSandboxForce(player.force) then
+            log(player.name .. " entered a Sandbox as the Sandbox Force; assuming the player force")
+            playerData.preSandboxForceName = "player"
+        else
+            playerData.preSandboxForceName = player.force.name
+        end
+    end
+
+    if player.permission_group then
+        if Permissions.IsSandboxPermissions(player.permission_group.name) then
+            log(player.name .. " entered a Sandbox with the Sandbox Permissions; assuming none")
+            playerData.preSandboxPermissionGroupId = nil
+        else
+            playerData.preSandboxPermissionGroupId = player.permission_group.name
+        end
+    else
+        playerData.preSandboxPermissionGroupId = nil
+    end
+
+    if playerData.preSandboxCheatMode == nil then
+        playerData.preSandboxCheatMode = player.cheat_mode
+    end
+
+    if playerData.preSandboxSurfaceList == nil then
+        playerData.preSandboxSurfaceList = player.game_view_settings.show_surface_list
+    end
+end
+
+---@param player LuaPlayer
+local function EnableSandboxFeatures(player, playerData)
+    -- Swap to the new Force; it has different bonuses!
+    local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
+    player.force = sandboxForce
+
+    -- Since the Sandbox might have Cheat Mode enabled, EditorExtensions won't receive an Event for this otherwise
+    if player.cheat_mode then player.cheat_mode = false end
+    -- Enable Cheat mode _afterwards_, since EditorExtensions will alter the Force (now the Sandbox Force) based on this
+    player.cheat_mode = true
+
+    -- Harmlessly ensure our own Recipes are enabled
+    Research.EnableSandboxSpecificResearch(sandboxForce)
+end
+
+---@param player LuaPlayer
+local function EnforceSandboxPermissions(player)
+    -- Set some Permissions so the Player cannot affect their other Surfaces
+    local newPermissions = Permissions.GetOrCreate(player)
+    if newPermissions then
+        log("Setting new Player Permissions: " .. player.name .. " -> " .. newPermissions.name)
+        player.permission_group = newPermissions
+    end
+
+    -- This list allows creating platforms (which is blocked by permissions) and no other surfaces (since this isn't their force)
+    player.game_view_settings.show_surface_list = false
+end
+
+---@param player LuaPlayer
+local function RestoreSandboxState(player, playerData)
+    if Controllers.IsGod(player) then
+        if not playerData.sandboxInventory then
+            playerData.sandboxInventory = Inventory.Initialize(player.get_main_inventory())
+        end
+        Inventory.Restore(
+                playerData.sandboxInventory,
+                player.get_main_inventory()
+        )
+    end
+
+    RestoreCursorBlueprint(player, playerData)
+end
+
+---@param player LuaPlayer
+local function RestorePreSandboxController(player, playerData)
+    -- TODO: Only if it's not actually restored already (since they entered as remote view)
+    -- When exiting directly to a Remote View, we first need to restore the physical settings (if they exist)
+    if player.controller_type == defines.controllers.remote then
+        Controllers.SafelyCloseRemoteView(player, playerData)
+    end
+    Controllers.RestoreLastController(player, playerData)
+
+    -- Sometimes a Player is already a God (like in Sandbox), and their Inventory wasn't on a body
+    if Inventory.ShouldPersist(player.controller_type) and playerData.preSandboxInventory then
+        Inventory.Restore(
+                playerData.preSandboxInventory,
+                player.get_main_inventory()
+        )
+    end
+    if playerData.preSandboxInventory then
+        playerData.preSandboxInventory.destroy()
+        playerData.preSandboxInventory = nil
+    end
+end
+
+---@param player LuaPlayer
+local function RestorePreSandboxPermissions(player, playerData)
+    -- Don't let anyone attempt to edit Surface Properties of other Surfaces!
+    SurfacePropsGUI.Destroy(player)
+
+    -- Swap to their original Force (in case they're not sent back to a Character)
+    if playerData.preSandboxForceName and player.force.name ~= playerData.preSandboxForceName then
+        player.force = playerData.preSandboxForceName
+    end
+
+    -- Toggle Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
+    local desiredCheatMode = playerData.preSandboxCheatMode or false
+    if player.cheat_mode ~= desiredCheatMode then
+        player.cheat_mode = desiredCheatMode
+    end
+
+    -- Swap to their original Permissions
+    if playerData.preSandboxPermissionGroupId then
+        log("Restoring Player Permissions: " .. player.name .. " -> " .. playerData.preSandboxPermissionGroupId)
+        player.permission_group = game.permissions.get_group(playerData.preSandboxPermissionGroupId)
+    else
+        log("Removing Player Permissions: " .. player.name)
+        player.permission_group = nil
+    end
+
+    -- Swap to their original surface-list setting
+    local desiredSurfaceList = playerData.preSandboxSurfaceList or true
+    if player.game_view_settings.show_surface_list ~= desiredSurfaceList then
+        player.game_view_settings.show_surface_list = desiredSurfaceList
+    end
+end
+
+local function CleanStates(playerData)
+    -- Cleanup some restored states that may go stale and cannot be relied on later
+    playerData.preSandboxForceName = nil
+    playerData.preSandboxCheatMode = nil
+    playerData.preSandboxSurfaceList = nil
+    playerData.preSandboxPermissionGroupId = nil
+
+    -- Cleanup some unused states that may go stale and cannot be relied on later
+    playerData.preSandboxCharacter = nil
+    playerData.preSandboxController = nil
+    playerData.preSandboxPosition = nil
+    playerData.preSandboxSurfaceName = nil
+end
+
 -- Update whether the Player is inside a known Sandbox
 ---@param player LuaPlayer
 function Sandbox.OnPlayerSurfaceChanged(player)
     local playerData = storage.players[player.index]
     local insideSandbox = Sandbox.GetSandboxChoiceFor(player, player.surface)
-    local lastKnownSandbox = storage.players[player.index].insideSandbox
+    local lastKnownSandbox = playerData.insideSandbox
 
     local wasInSandbox = lastKnownSandbox ~= nil
     local nowInSandbox = not not insideSandbox
@@ -354,63 +449,27 @@ function Sandbox.OnPlayerSurfaceChanged(player)
     playerData.insideSandbox = insideSandbox
 
     if not wasInSandbox and nowInSandbox then
-        log("Entered a Sandbox: " .. player.surface.name)
+        log(player.name .." entered a Sandbox: " .. player.surface.name)
 
-        if Controllers.IsUsingEditor(player) then
-            player.print("WARNING: You have entered a Sandbox, probably on your own, while using the Editor. This is not a supportable situation; you are on your own.")
-            return
+        if not Controllers.IsSandboxSupported(player) then
+            log(player.name .. " entered a Sandbox with the Controller ID " .. player.controller_type .. "; bailing out.")
+            player.print("WARNING: You have entered a Sandbox in an odd way, and using an unsupported Controller. You are on your own.")
         end
+
+        StorePreSandboxStateOnArrival(player, playerData)
+        EnableSandboxFeatures(player, playerData)
+        EnforceSandboxPermissions(player)
+        RestoreSandboxState(player, playerData)
 
     elseif wasInSandbox and not nowInSandbox then
-        log("Exiting last known Sandbox " .. lastKnownSandbox .. " to new Surface: " .. player.surface.name)
+        log(player.name .. " exiting last known Sandbox " .. lastKnownSandbox .. " to new Surface: " .. player.surface.name)
 
-        -- Don't let anyone attempt to edit Surface Properties of other Surfaces!
-        SurfacePropsGUI.Destroy(player)
-
-        -- When exiting directly to a Remote View, we first need to restore the physical settings (if they exist)
-        if player.controller_type == defines.controllers.remote then
-            Controllers.SafelyCloseRemoteView(player, playerData)
-        end
-        Controllers.RestoreLastController(player, playerData)
-
-        -- Swap to their original Force (in case they're not sent back to a Character)
-        if playerData.preSandboxForceName and player.force.name ~= playerData.preSandboxForceName then
-            player.force = playerData.preSandboxForceName
-        end
-
-        -- Toggle Cheat mode _afterwards_, just in case EditorExtensions ever listens to this Event
-        local desiredCheatMode = playerData.preSandboxCheatMode or false
-        if player.cheat_mode ~= desiredCheatMode then
-            player.cheat_mode = desiredCheatMode
-        end
-
-        -- Swap to their original Permissions
-        if playerData.preSandboxPermissionGroupId then
-            player.permission_group = game.permissions.get_group(playerData.preSandboxPermissionGroupId)
-        else
-            player.permission_group = nil
-        end
-
-        -- Swap to their original surface-list setting
-        local desiredSurfaceList = playerData.preSandboxSurfaceList or true
-        if player.game_view_settings.show_surface_list ~= desiredSurfaceList then
-            player.game_view_settings.show_surface_list = desiredSurfaceList
-        end
-
-        -- If they were using a Remote View before, take them back to that same view
+        StoreCursorBlueprint(player, playerData)
+        RestorePreSandboxController(player, playerData)
+        RestorePreSandboxPermissions(player, playerData)
+        RestoreCursorBlueprint(player, playerData)
         Controllers.RestoreRemoteView(player, playerData)
-
-        -- Cleanup some restored states that may go stale and cannot be relied on later
-        playerData.preSandboxForceName = nil
-        playerData.preSandboxCheatMode = nil
-        playerData.preSandboxSurfaceList = nil
-        playerData.preSandboxPermissionGroupId = nil
-
-        -- Cleanup some unused states that may go stale and cannot be relied on later
-        playerData.preSandboxCharacter = nil
-        playerData.preSandboxController = nil
-        playerData.preSandboxPosition = nil
-        playerData.preSandboxSurfaceName = nil
+        CleanStates(playerData)
     end
 end
 
