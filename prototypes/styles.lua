@@ -59,7 +59,7 @@ data.raw["gui-style"]["default"][BPSB.pfx .. "left-padded-checkbox"] = {
     left_margin = 8,
 }
 
-data.raw["gui-style"]["default"][BPSB.pfx .. "surface-property-table"] = {
+data.raw["gui-style"]["default"][BPSB.pfx .. "three-column-table"] = {
     type = "table_style",
     wide_as_column_count = true,
     margin = 8,
@@ -74,6 +74,22 @@ data.raw["gui-style"]["default"][BPSB.pfx .. "surface-property-table"] = {
         },
         { -- unit
             column = 3,
+            alignment = "left",
+        },
+    },
+}
+
+data.raw["gui-style"]["default"][BPSB.pfx .. "two-column-table"] = {
+    type = "table_style",
+    wide_as_column_count = true,
+    margin = 8,
+    column_alignments = {
+        { -- property
+            column = 1,
+            alignment = "right",
+        },
+        { -- input
+            column = 2,
             alignment = "left",
         },
     },

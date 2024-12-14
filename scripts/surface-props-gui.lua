@@ -3,27 +3,40 @@ local SurfacePropsGUI = {}
 SurfacePropsGUI.name = BPSB.pfx .. "surface-props-gui"
 SurfacePropsGUI.pfx = SurfacePropsGUI.name .. "-"
 
-SurfacePropsGUI.presetDefault = SurfacePropsGUI.pfx .. "preset-default"
-SurfacePropsGUI.presetDropDown = SurfacePropsGUI.pfx .. "preset-drop-down"
-SurfacePropsGUI.presetReset = SurfacePropsGUI.pfx .. "preset-reset"
+SurfacePropsGUI.dayNightTab = SurfacePropsGUI.pfx .. "day-night-tab"
+SurfacePropsGUI.forcedDaytimeCheckbox = SurfacePropsGUI.pfx .. "forced-daytime"
+SurfacePropsGUI.daytimeSlider = SurfacePropsGUI.pfx .. "daytime-slider"
 
+SurfacePropsGUI.propertyTab = SurfacePropsGUI.pfx .. "property-tab"
+SurfacePropsGUI.propertyPresets = {}
+SurfacePropsGUI.propertyPresetDefault = SurfacePropsGUI.pfx .. "property-preset-default"
+SurfacePropsGUI.propertyPresetDropDown = SurfacePropsGUI.pfx .. "property-preset-drop-down"
+SurfacePropsGUI.propertyPresetReset = SurfacePropsGUI.pfx .. "property-preset-reset"
 SurfacePropsGUI.propertyTable = SurfacePropsGUI.pfx .. "property-table"
 SurfacePropsGUI.propertyTag = SurfacePropsGUI.pfx .. "property"
+SurfacePropsGUI.propertiesWithNoRuntimeEffect = {
+    ["solar-power"] = true,
+    ["day-night-cycle"] = true,
+}
 
 SurfacePropsGUI.cancel = SurfacePropsGUI.pfx .. "cancel"
 SurfacePropsGUI.confirm = SurfacePropsGUI.pfx .. "confirm"
 
-SurfacePropsGUI.presets = {}
-
 function SurfacePropsGUI.InitPresets()
+    local function addPropertyValues(preset, source)
+        for propId, prop in pairs(prototypes.surface_property) do
+            if not SurfacePropsGUI.propertiesWithNoRuntimeEffect[propId] then
+                preset.propValues[propId] = source[propId] or prop.default_value
+            end
+        end
+    end
+
     local defaults = {
-        name = { "gui." .. SurfacePropsGUI.presetDefault },
+        name = { "gui." .. SurfacePropsGUI.propertyPresetDefault },
         propValues = {},
     }
-    for propId, prop in pairs(prototypes.surface_property) do
-        defaults.propValues[propId] = prop.default_value
-    end
-    table.insert(SurfacePropsGUI.presets, defaults)
+    addPropertyValues(defaults, {})
+    table.insert(SurfacePropsGUI.propertyPresets, defaults)
 
     for _, location in pairs(prototypes.space_location) do
         if not location.hidden and location.surface_properties then
@@ -36,10 +49,8 @@ function SurfacePropsGUI.InitPresets()
                 },
                 propValues = {},
             }
-            for propId, prop in pairs(prototypes.surface_property) do
-                preset.propValues[propId] = location.surface_properties[propId] or prop.default_value
-            end
-            table.insert(SurfacePropsGUI.presets, preset)
+            addPropertyValues(preset, location.surface_properties)
+            table.insert(SurfacePropsGUI.propertyPresets, preset)
         end
     end
 
@@ -54,10 +65,8 @@ function SurfacePropsGUI.InitPresets()
                 },
                 propValues = {},
             }
-            for propId, prop in pairs(prototypes.surface_property) do
-                preset.propValues[propId] = surface.surface_properties[propId] or prop.default_value
-            end
-            table.insert(SurfacePropsGUI.presets, preset)
+            addPropertyValues(preset, surface.surface_properties)
+            table.insert(SurfacePropsGUI.propertyPresets, preset)
         end
     end
 end
@@ -70,26 +79,68 @@ function SurfacePropsGUI.IsOpen(player)
     return false
 end
 
----@param player LuaPlayer
-function SurfacePropsGUI.Init(player)
-    if SurfacePropsGUI.IsOpen(player) then
-        return
-    end
-
-    local frame = player.gui.screen.add {
-        type = "frame",
-        name = SurfacePropsGUI.name,
-        caption = { "gui." .. SurfacePropsGUI.name },
-        visible = true,
-        direction = "vertical",
+---@param pane LuaGuiElement
+---@param surface LuaSurface
+local function AddDayNightTab(pane, surface)
+    local tab = pane.add {
+        type = "tab",
+        caption = { "gui." .. SurfacePropsGUI.dayNightTab }
     }
 
-    local innerFrame = frame.add {
-        type = "frame",
-        name = "innerFrame",
+    local innerFrame = pane.add {
+        type = "scroll-pane",
         direction = "vertical",
-        style = "inside_shallow_frame",
+        style = "tab_scroll_pane",
     }
+
+    local daylightFlow = innerFrame.add {
+        type = "flow",
+        direction = "horizontal",
+        style = BPSB.pfx .. "centered-horizontal-flow",
+    }
+    daylightFlow.style.left_margin = 10
+    daylightFlow.style.right_margin = 10
+
+    daylightFlow.add {
+        type = "checkbox",
+        name = SurfacePropsGUI.forcedDaytimeCheckbox,
+        tooltip = { "gui." .. SurfacePropsGUI.forcedDaytimeCheckbox },
+        state = surface.freeze_daytime,
+    }
+
+    daylightFlow.add {
+        type = "label",
+        caption = { "", { "gui." .. SurfacePropsGUI.daytimeSlider }, ":" },
+        style = "semibold_caption_label"
+    }
+
+    daylightFlow.add {
+        type = "slider",
+        name = SurfacePropsGUI.daytimeSlider,
+        value = surface.daytime,
+        minimum_value = 0.5,
+        maximum_value = 0.975,
+        value_step = 0.025,
+        style = "notched_slider",
+    }.style.horizontally_stretchable = true
+
+    pane.add_tab(tab, innerFrame)
+end
+
+---@param pane LuaGuiElement
+---@param surface LuaSurface
+local function AddSurfacePropertiesTab(pane, surface)
+    local tab = pane.add {
+        type = "tab",
+        caption = { "gui." .. SurfacePropsGUI.propertyTab }
+    }
+
+    local innerFrame = pane.add {
+        type = "scroll-pane",
+        direction = "vertical",
+        style = "tab_scroll_pane",
+    }
+    innerFrame.style.padding = 0
 
     local planetPresetFlow = innerFrame.add {
         type = "frame",
@@ -101,25 +152,25 @@ function SurfacePropsGUI.Init(player)
 
     planetPresetFlow.add {
         type = "label",
-        caption = { "gui." .. SurfacePropsGUI.presetDropDown },
+        caption = { "gui." .. SurfacePropsGUI.propertyPresetDropDown },
         style = "caption_label",
     }
 
     local planetPresetItems = {}
-    for _, preset in pairs(SurfacePropsGUI.presets) do
+    for _, preset in pairs(SurfacePropsGUI.propertyPresets) do
         table.insert(planetPresetItems, preset.name)
     end
     planetPresetFlow.add {
         type = "drop-down",
-        name = SurfacePropsGUI.presetDropDown,
+        name = SurfacePropsGUI.propertyPresetDropDown,
         items = planetPresetItems,
-        tooltip = { "gui-description." .. SurfacePropsGUI.presetDropDown },
+        tooltip = { "gui-description." .. SurfacePropsGUI.propertyPresetDropDown },
     }
 
     planetPresetFlow.add {
         type = "sprite-button",
-        name = SurfacePropsGUI.presetReset,
-        tooltip = { "gui-description." .. SurfacePropsGUI.presetReset },
+        name = SurfacePropsGUI.propertyPresetReset,
+        tooltip = { "gui-description." .. SurfacePropsGUI.propertyPresetReset },
         style = "tool_button_red",
         sprite = "utility/reset",
     }
@@ -134,11 +185,11 @@ function SurfacePropsGUI.Init(player)
         type = "table",
         name = SurfacePropsGUI.propertyTable,
         column_count = 3,
-        style = BPSB.pfx .. "surface-property-table",
+        style = BPSB.pfx .. "three-column-table",
     }
 
     for propId, prop in pairs(prototypes.surface_property) do
-        if not prop.hidden then
+        if not prop.hidden and not SurfacePropsGUI.propertiesWithNoRuntimeEffect[propId] then
             propertiesTable.add {
                 type = "label",
                 caption = { "", prop.localised_name, ":" },
@@ -147,7 +198,7 @@ function SurfacePropsGUI.Init(player)
 
             propertiesTable.add {
                 type = "textfield",
-                text = tostring(player.surface.get_property(propId)),
+                text = tostring(surface.get_property(propId)),
                 numeric = true,
                 allow_decimal = true,
                 style = "short_number_textfield",
@@ -160,6 +211,38 @@ function SurfacePropsGUI.Init(player)
             }
         end
     end
+
+    pane.add_tab(tab, innerFrame)
+end
+
+---@param player LuaPlayer
+function SurfacePropsGUI.Init(player)
+    if SurfacePropsGUI.IsOpen(player) then
+        return
+    end
+
+    local surface = player.surface
+
+    local frame = player.gui.screen.add {
+        type = "frame",
+        name = SurfacePropsGUI.name,
+        caption = { "gui." .. SurfacePropsGUI.name },
+        visible = true,
+        direction = "vertical",
+    }
+
+    local innerFrame = frame.add {
+        type = "frame",
+        direction = "vertical",
+        style = "inside_deep_frame",
+    }
+
+    local tabs = innerFrame.add {
+        type = "tabbed-pane",
+        style = "tabbed_pane_with_no_side_padding",
+    }
+    AddDayNightTab(tabs, surface)
+    AddSurfacePropertiesTab(tabs, surface)
 
     local actionsFlow = frame.add {
         type = "flow",
@@ -230,13 +313,13 @@ function SurfacePropsGUI.LoadPreset(player)
         return
     end
 
-    local planetIndex = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.presetDropDown).selected_index
+    local planetIndex = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.propertyPresetDropDown).selected_index
     if not planetIndex then
         log("Cannot import Surface Properties without a selected preset")
         return
     end
 
-    local preset = SurfacePropsGUI.presets[planetIndex]
+    local preset = SurfacePropsGUI.propertyPresets[planetIndex]
     if not preset then
         log("Cannot import Surface Properties without a matching preset")
         return
@@ -258,18 +341,23 @@ function SurfacePropsGUI.Apply(player)
         return
     end
 
-    local propertiesTable = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.propertyTable)
-    if not propertiesTable then
-        log("Cannot apply Surface Properties without an open GUI")
-        return
-    end
-
     local sandboxSurface = player.surface
     if not (Lab.IsLab(sandboxSurface) or SpaceExploration.IsSandbox(sandboxSurface)) then
         log("Cannot apply Surface Properties outside of a Sandbox")
         return
     end
 
+    local forcedDaytime = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.forcedDaytimeCheckbox).state
+    player.surface.freeze_daytime = forcedDaytime
+
+    local daytime = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.daytimeSlider).slider_value
+    player.surface.daytime = daytime
+
+    local propertiesTable = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.propertyTable)
+    if not propertiesTable then
+        log("Cannot apply Surface Properties without an open GUI")
+        return
+    end
     for _, child in pairs(propertiesTable.children) do
         local propId = child.tags[SurfacePropsGUI.propertyTag] --[[@as string]]
         if propId then
@@ -286,9 +374,9 @@ end
 ---@param event EventData.on_gui_selection_state_changed
 function SurfacePropsGUI.OnGuiDropdown(event)
     local player = game.players[event.player_index]
-    if event.element.name == SurfacePropsGUI.presetDropDown then
+    if event.element.name == SurfacePropsGUI.propertyPresetDropDown then
         SurfacePropsGUI.LoadPreset(player)
-        local reset = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.presetReset)
+        local reset = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.propertyPresetReset)
         if reset and reset.enabled == false then
             reset.enabled = true
         end
@@ -303,7 +391,7 @@ function SurfacePropsGUI.OnGuiClick(event)
     elseif event.element.name == SurfacePropsGUI.confirm then
         SurfacePropsGUI.Apply(player)
         SurfacePropsGUI.Destroy(player)
-    elseif event.element.name == SurfacePropsGUI.presetReset then
+    elseif event.element.name == SurfacePropsGUI.propertyPresetReset then
         SurfacePropsGUI.LoadPreset(player)
     end
 end

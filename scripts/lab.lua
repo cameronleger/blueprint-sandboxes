@@ -67,7 +67,6 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
     storage.labSurfaces[labName] = {
         sandboxForceName = sandboxForce.name,
         equipmentBlueprints = Equipment.Init(Lab.equipmentString),
-        daytime = 0.95,
     }
     if not surface then
         surface = game.create_surface(labName, {
@@ -77,21 +76,6 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
     end
 
     return surface
-end
-
--- Set a Lab's Daytime to a specific value
----@param player LuaPlayer
----@param surface LuaSurface
-function Lab.SetDayTime(player, surface, daytime)
-    if Lab.IsLab(surface) then
-        surface.freeze_daytime = true
-        surface.daytime = daytime
-        storage.labSurfaces[surface.name].daytime = daytime
-        Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
-        return true
-    else
-        return false
-    end
 end
 
 -- Delete a Lab Surface, if present

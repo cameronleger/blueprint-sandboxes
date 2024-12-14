@@ -1,6 +1,5 @@
 -- Required by basically everything immediately
 BPSB = require("scripts.bpsb")
-Events = require("scripts.events")
 Settings = require("scripts.settings")
 Debug = require("scripts.debug")
 Queue = require("scripts.queue")
@@ -210,19 +209,6 @@ script.on_event(defines.events.on_player_alt_selected_area, SelectionPlanner.OnA
 script.on_event(defines.events.on_player_reverse_selected_area, SelectionPlanner.OnAreaSelected)
 script.on_event(defines.events.on_player_alt_reverse_selected_area, SelectionPlanner.OnAreaSelected)
 
--- Internal
-
-script.on_event(Events.on_daylight_changed_event, function(event)
-    log("on_daylight_changed_event from player: " .. event.player_index)
-    for _, player in pairs(game.players) do
-        if player.index ~= event.player_index
-                and player.surface.name == event.surface_name
-        then
-            ToggleGUI.Update(player)
-        end
-    end
-end)
-
 -- Shortcuts
 
 script.on_event(ToggleGUI.toggleShortcut, ToggleGUI.OnToggleShortcut)
@@ -251,7 +237,6 @@ end)
 script.on_event(defines.events.on_gui_click, function (event)
     local _ = ToggleGUI.OnGuiClick(event) or SurfacePropsGUI.OnGuiClick(event) or SelectionPlanner.OnGuiClick(event)
 end)
-script.on_event(defines.events.on_gui_value_changed, ToggleGUI.OnGuiValueChanged)
 ---@param event EventData.on_gui_selection_state_changed
 script.on_event(defines.events.on_gui_selection_state_changed, function (event)
     local _ = ToggleGUI.OnGuiDropdown(event) or SurfacePropsGUI.OnGuiDropdown(event)

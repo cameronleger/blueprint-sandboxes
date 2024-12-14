@@ -115,7 +115,6 @@ function SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxFor
         storage.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
             equipmentBlueprints = Equipment.Init(Lab.equipmentString),
-            daytime = 0.95,
             orbital = false,
         }
     end
@@ -137,25 +136,11 @@ function SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce
         storage.seSurfaces[zoneName] = {
             sandboxForceName = sandboxForce.name,
             equipmentBlueprints = Equipment.Init(SpaceExploration.orbitalEquipmentString),
-            daytime = 0.95,
             orbital = true,
         }
     end
 
     return SpaceExploration.GetOrCreateSurface(zoneName)
-end
-
--- Set a Sandbox's Daytime to a specific value
-function SpaceExploration.SetDayTime(player, surface, daytime)
-    if SpaceExploration.IsSandbox(surface) then
-        surface.freeze_daytime = true
-        surface.daytime = daytime
-        storage.seSurfaces[surface.name].daytime = daytime
-        Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
-        return true
-    else
-        return false
-    end
 end
 
 -- Reset the Sandbox's equipment Blueprint for a Surface

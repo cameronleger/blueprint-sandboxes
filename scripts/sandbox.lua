@@ -397,7 +397,7 @@ end
 
 ---@param player LuaPlayer
 local function RestorePreSandboxController(player, playerData)
-        -- When exiting directly to a Remote View, we first need to restore the physical settings (if they exist)
+    -- When exiting directly to a Remote View, we first need to restore the physical settings (if they exist)
     if Controllers.IsUsingRemoteView(player) and player.physical_controller_type ~= playerData.preSandboxController then
         Controllers.StoreRemoteView(player, playerData)
         Controllers.SafelyCloseRemoteView(player)
@@ -575,6 +575,7 @@ function Sandbox.Toggle(player_index)
         Sandbox.Exit(player)
     else
         SpaceExploration.ExitRemoteView(player)
+        -- Sandbox.View(player)
         Sandbox.Enter(player)
     end
 end

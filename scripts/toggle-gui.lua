@@ -8,7 +8,6 @@ ToggleGUI.surfacePropsButton = ToggleGUI.pfx .. "surface-props-button"
 ToggleGUI.resetButton = ToggleGUI.pfx .. "reset-button"
 ToggleGUI.entitySelectionPlannerGenerator = ToggleGUI.pfx .. "entity-selection-planner-generator"
 ToggleGUI.tileSelectionPlannerGenerator = ToggleGUI.pfx .. "tile-selection-planner-generator"
-ToggleGUI.daytimeSlider = ToggleGUI.pfx .. "daytime-slider"
 ToggleGUI.globalElectricNetworkCheckbox = ToggleGUI.pfx .. "global-eletric-network-checkbox"
 ToggleGUI.entranceButton = ToggleGUI.pfx .. "enter"
 
@@ -79,31 +78,6 @@ function ToggleGUI.Init(player)
         name = ToggleGUI.entranceButton,
         caption = { "gui." .. ToggleGUI.entranceButton },
         tooltip = { "gui-description." .. ToggleGUI.entranceButton },
-    }.style.horizontally_stretchable = true
-
-    local daylightFlow = innerFrame.add {
-        type = "flow",
-        name = "daylightFlow",
-        direction = "horizontal",
-        style = BPSB.pfx .. "centered-horizontal-flow",
-    }
-
-    daylightFlow.add {
-        type = "sprite",
-        tooltip = { "gui-description." .. ToggleGUI.daytimeSlider },
-        sprite = "utility/select_icon_white",
-        resize_to_sprite = false,
-        style = BPSB.pfx .. "sprite-like-tool-button",
-    }
-
-    daylightFlow.add {
-        type = "slider",
-        name = ToggleGUI.daytimeSlider,
-        value = 0.0,
-        minimum_value = 0.5,
-        maximum_value = 0.975,
-        value_step = 0.025,
-        style = BPSB.pfx .. "daylight-slider",
     }.style.horizontally_stretchable = true
 
     local globalElectricNetworkFlow = innerFrame.add {
@@ -233,7 +207,6 @@ function ToggleGUI.Update(player)
             resetButton.tooltip = { "gui-description." .. ToggleGUI.resetButton }
         end
 
-        ToggleGUI.FindByName(player, ToggleGUI.daytimeSlider).slider_value = player.surface.daytime
         ToggleGUI.FindByName(player, ToggleGUI.globalElectricNetworkCheckbox).state = Sandbox.HasGlobalElectricalNetwork(player.surface)
 
         ToggleGUI.FindByName(player, ToggleGUI.entranceButton).enabled = Sandbox.CanEnter(player)
@@ -242,16 +215,6 @@ function ToggleGUI.Update(player)
         player.gui.left[ToggleGUI.name].visible = false
         ToggleGUI.FindByName(player, ToggleGUI.resetButton).enabled = false
         ToggleGUI.FindByName(player, ToggleGUI.entranceButton).enabled = false
-    end
-end
-
----@param event EventData.on_gui_value_changed
-function ToggleGUI.OnGuiValueChanged(event)
-    local player = game.players[event.player_index]
-    if event.element.name == ToggleGUI.daytimeSlider then
-        local daytime = event.element.slider_value
-        return Lab.SetDayTime(player, player.surface, daytime)
-                or SpaceExploration.SetDayTime(player, player.surface, daytime)
     end
 end
 
