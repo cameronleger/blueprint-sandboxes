@@ -19,6 +19,9 @@ SurfacePropsGUI.propertiesWithNoRuntimeEffect = {
     ["day-night-cycle"] = true,
 }
 
+SurfacePropsGUI.electricalTab = SurfacePropsGUI.pfx .. "electrical-tab"
+SurfacePropsGUI.globalElectricNetworkCheckbox = SurfacePropsGUI.pfx .. "global-eletric-network-checkbox"
+
 SurfacePropsGUI.cancel = SurfacePropsGUI.pfx .. "cancel"
 SurfacePropsGUI.confirm = SurfacePropsGUI.pfx .. "confirm"
 
@@ -104,14 +107,9 @@ local function AddDayNightTab(pane, surface)
     daylightFlow.add {
         type = "checkbox",
         name = SurfacePropsGUI.forcedDaytimeCheckbox,
+        caption = { "gui." .. SurfacePropsGUI.daytimeSlider },
         tooltip = { "gui." .. SurfacePropsGUI.forcedDaytimeCheckbox },
         state = surface.freeze_daytime,
-    }
-
-    daylightFlow.add {
-        type = "label",
-        caption = { "", { "gui." .. SurfacePropsGUI.daytimeSlider }, ":" },
-        style = "semibold_caption_label"
     }
 
     daylightFlow.add {
@@ -215,6 +213,39 @@ local function AddSurfacePropertiesTab(pane, surface)
     pane.add_tab(tab, innerFrame)
 end
 
+---@param pane LuaGuiElement
+---@param surface LuaSurface
+local function AddElectricalTab(pane, surface)
+    local tab = pane.add {
+        type = "tab",
+        caption = { "gui." .. SurfacePropsGUI.electricalTab }
+    }
+
+    local innerFrame = pane.add {
+        type = "scroll-pane",
+        direction = "vertical",
+        style = "tab_scroll_pane",
+    }
+
+    local globalElectricNetworkFlow = innerFrame.add {
+        type = "flow",
+        direction = "horizontal",
+        style = BPSB.pfx .. "centered-horizontal-flow",
+    }
+    globalElectricNetworkFlow.style.left_margin = 10
+    globalElectricNetworkFlow.style.right_margin = 10
+
+    globalElectricNetworkFlow.add {
+        type = "checkbox",
+        name = SurfacePropsGUI.globalElectricNetworkCheckbox,
+        caption = { "gui." .. SurfacePropsGUI.globalElectricNetworkCheckbox },
+        tooltip = { "gui-description." .. SurfacePropsGUI.globalElectricNetworkCheckbox },
+        state = surface.has_global_electric_network,
+    }
+
+    pane.add_tab(tab, innerFrame)
+end
+
 ---@param player LuaPlayer
 function SurfacePropsGUI.Init(player)
     if SurfacePropsGUI.IsOpen(player) then
@@ -243,6 +274,7 @@ function SurfacePropsGUI.Init(player)
     }
     AddDayNightTab(tabs, surface)
     AddSurfacePropertiesTab(tabs, surface)
+    AddElectricalTab(tabs, surface)
 
     local actionsFlow = frame.add {
         type = "flow",
@@ -368,6 +400,13 @@ function SurfacePropsGUI.Apply(player)
                 player.print("Not applying your edits because an invalid value was found for " .. propId)
             end
         end
+    end
+
+    local globalElectricNetwork = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.globalElectricNetworkCheckbox).state
+    if globalElectricNetwork then
+        player.surface.create_global_electric_network()
+    else
+        player.surface.destroy_global_electric_network()
     end
 end
 

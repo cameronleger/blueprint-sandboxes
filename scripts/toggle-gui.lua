@@ -8,7 +8,6 @@ ToggleGUI.surfacePropsButton = ToggleGUI.pfx .. "surface-props-button"
 ToggleGUI.resetButton = ToggleGUI.pfx .. "reset-button"
 ToggleGUI.entitySelectionPlannerGenerator = ToggleGUI.pfx .. "entity-selection-planner-generator"
 ToggleGUI.tileSelectionPlannerGenerator = ToggleGUI.pfx .. "tile-selection-planner-generator"
-ToggleGUI.globalElectricNetworkCheckbox = ToggleGUI.pfx .. "global-eletric-network-checkbox"
 ToggleGUI.entranceButton = ToggleGUI.pfx .. "enter"
 
 ---@param player LuaPlayer
@@ -79,22 +78,6 @@ function ToggleGUI.Init(player)
         caption = { "gui." .. ToggleGUI.entranceButton },
         tooltip = { "gui-description." .. ToggleGUI.entranceButton },
     }.style.horizontally_stretchable = true
-
-    local globalElectricNetworkFlow = innerFrame.add {
-        type = "flow",
-        name = "globalElectricNetworkFlow",
-        direction = "horizontal",
-        style = BPSB.pfx .. "centered-horizontal-flow",
-    }
-
-    globalElectricNetworkFlow.add {
-        type = "checkbox",
-        name = ToggleGUI.globalElectricNetworkCheckbox,
-        caption = { "gui." .. ToggleGUI.globalElectricNetworkCheckbox },
-        tooltip = { "gui-description." .. ToggleGUI.globalElectricNetworkCheckbox },
-        state = false,
-        style = BPSB.pfx .. "left-padded-checkbox",
-    }
 
     local selectorFlow = innerFrame.add {
         type = "flow",
@@ -207,8 +190,6 @@ function ToggleGUI.Update(player)
             resetButton.tooltip = { "gui-description." .. ToggleGUI.resetButton }
         end
 
-        ToggleGUI.FindByName(player, ToggleGUI.globalElectricNetworkCheckbox).state = Sandbox.HasGlobalElectricalNetwork(player.surface)
-
         ToggleGUI.FindByName(player, ToggleGUI.entranceButton).enabled = Sandbox.CanEnter(player)
     else
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, false)
@@ -247,10 +228,6 @@ function ToggleGUI.OnGuiClick(event)
         return true
     elseif event.element.name == ToggleGUI.surfacePropsButton then
         SurfacePropsGUI.Init(player)
-        return true
-    elseif event.element.name == ToggleGUI.globalElectricNetworkCheckbox then
-        local newState = Sandbox.ToggleGlobalElectricalNetwork(game.players[event.player_index].surface)
-        ToggleGUI.FindByName(player, ToggleGUI.globalElectricNetworkCheckbox).state = newState
         return true
     elseif event.element.name == ToggleGUI.resetButton then
         if event.shift then

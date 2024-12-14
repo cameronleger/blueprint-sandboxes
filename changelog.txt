@@ -2,6 +2,8 @@
 Version: 2.3.6
 Date: ????
   Changes:
+    - Daylight and Electrical inputs are moved into the Surface Properties GUI (now the Sandbox Settings GUI)
+    - Add more Daylight and Electrical related settings
     - Removed "Chart all Labs" Setting; it's no longer optional
     - Restored Remote Views now continue following the original Entity, if any
 ---------------------------------------------------------------------------------------------------

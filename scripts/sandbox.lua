@@ -580,30 +580,4 @@ function Sandbox.Toggle(player_index)
     end
 end
 
--- Whether the Global Electrical Network of a Sandbox exists
----@param surface LuaSurface
----@return boolean
-function Sandbox.HasGlobalElectricalNetwork(surface)
-    if Lab.IsLab(surface) or SpaceExploration.IsSandbox(surface) then
-        return surface.has_global_electric_network
-    else
-        return false
-    end
-end
-
--- Toggle the Global Electrical Network of a Sandbox
----@param surface LuaSurface
----@return boolean | nil
-function Sandbox.ToggleGlobalElectricalNetwork(surface)
-    if Lab.IsLab(surface) or SpaceExploration.IsSandbox(surface) then
-        if surface.has_global_electric_network then
-            surface.destroy_global_electric_network()
-            return false
-        else
-            surface.create_global_electric_network()
-            return true
-        end
-    end
-end
-
 return Sandbox
