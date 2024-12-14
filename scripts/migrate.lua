@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 020305
+Migrate.version = 020400
 
 function Migrate.Run()
     if not storage.version then
@@ -8,7 +8,6 @@ function Migrate.Run()
     end
 
     if storage.version < Migrate.version then
-        if storage.version < 010003 then Migrate.v1_0_3() end
         if storage.version < 010100 then Migrate.v1_1_0() end
         if storage.version < 010401 then Migrate.v1_4_1() end
         if storage.version < 010500 then Migrate.v1_5_0() end
@@ -17,7 +16,6 @@ function Migrate.Run()
         if storage.version < 010703 then Migrate.v1_7_3() end
         if storage.version < 010704 then Migrate.v1_7_4() end
         if storage.version < 011000 then Migrate.v1_10_0() end
-        if storage.version < 011001 then Migrate.v1_10_1() end
         if storage.version < 011101 then Migrate.v1_11_1() end
         if storage.version < 011103 then Migrate.v1_11_3() end
         if storage.version < 011500 then Migrate.v1_15_0() end
@@ -28,6 +26,7 @@ function Migrate.Run()
         if storage.version < 020107 then Migrate.v2_1_7() end
         if storage.version < 020201 then Migrate.v2_2_1() end
         if storage.version < 020303 then Migrate.v2_3_3() end
+        if storage.version < 020400 then Migrate.v2_4_0() end
     end
 
     storage.version = Migrate.version
@@ -38,58 +37,6 @@ function Migrate.RecreateGuis()
         ToggleGUI.Destroy(player)
         ToggleGUI.Init(player)
     end
-end
-
-function Migrate.v1_0_3()
-    --[[
-    It was discovered that in on_configuration_changed Space Exploration would
-    "fix" all Tiles for all Zones that it knows of, which causes problems
-    specifically for the Planetary Sandbox, which initially used Stars.
-    At this point, we unfortunately have to completely remove those Sandboxes,
-    which is unavoidable because by the nature of this update we would have
-    triggered the complete-reset of that Surface anyway.
-    ]]
-
-    log("Migration 1.0.3 Starting")
-
-    if SpaceExploration.enabled() then
-        local planetaryLabId = 3
-        local planetaryLabsOnStars = {}
-        local playersToKickFromPlanetaryLabs = {}
-
-        for name, surfaceData in pairs(storage.seSurfaces) do
-            if (not surfaceData.orbital) and SpaceExploration.IsStar(name) then
-                table.insert(planetaryLabsOnStars, {
-                    zoneName = name,
-                    sandboxForceName = surfaceData.sandboxForceName,
-                })
-            end
-        end
-
-        for index, player in pairs(game.players) do
-            local playerData = storage.players[index]
-            if playerData.insideSandbox == planetaryLabId
-                    and SpaceExploration.IsStar(player.surface.name)
-            then
-                table.insert(playersToKickFromPlanetaryLabs, player)
-            end
-        end
-
-        for _, player in pairs(playersToKickFromPlanetaryLabs) do
-            log("Kicking Player out of Planetary Lab: " .. player.name)
-            Sandbox.Exit(player)
-        end
-
-        for _, surfaceData in pairs(planetaryLabsOnStars) do
-            log("Destroying Planetary Lab inside Star: " .. surfaceData.zoneName)
-            SpaceExploration.DeleteSandbox(
-                    storage.sandboxForces[surfaceData.sandboxForceName],
-                    surfaceData.zoneName
-            )
-        end
-    end
-
-    log("Migration 1.0.3 Finished")
 end
 
 function Migrate.v1_1_0()
@@ -170,16 +117,6 @@ function Migrate.v1_7_0()
         end
     end
 
-    for surfaceName, _ in pairs(storage.seSurfaces) do
-        local surface = game.surfaces[surfaceName]
-        if surface then
-            surface.always_day = false
-            surface.freeze_daytime = true
-            surface.daytime = 0.95
-            storage.seSurfaces[surfaceName].daytime = 0.95
-        end
-    end
-
     Migrate.RecreateGuis()
 
     log("Migration 1.7.0 Finished")
@@ -233,74 +170,7 @@ function Migrate.v1_10_0()
         surfaceData.hasRequests = nil
     end
 
-    for _, surfaceData in pairs(storage.seSurfaces) do
-        surfaceData.hasRequests = nil
-    end
-
     log("Migration 1.10.0 Finished")
-end
-
-function Migrate.v1_10_1()
-    --[[
-    Planetary Labs were possibly created within a Player's Home System
-    and on Planets that could be dangerous.
-    ]]
-
-    log("Migration 1.10.1 Starting")
-
-    if SpaceExploration.enabled() then
-        local planetaryLabId = 3
-        local badPlanetaryLabs = {}
-        local badPlanetaryLabNames = {}
-        local playersToKickFromPlanetaryLabs = {}
-        local zoneIndex = remote.call(SpaceExploration.name, "get_zone_index", {})
-
-        for name, surfaceData in pairs(storage.seSurfaces) do
-            if not surfaceData.orbital then
-                local zone = remote.call(SpaceExploration.name, "get_zone_from_name", {
-                    zone_name = name,
-                })
-                local rootZone = SpaceExploration.GetRootZone(zoneIndex, zone)
-                if SpaceExploration.IsZoneThreatening(zone)
-                        or rootZone.special_type == "homesystem" then
-                    table.insert(badPlanetaryLabs, {
-                        zoneName = name,
-                        sandboxForceName = surfaceData.sandboxForceName,
-                    })
-                    badPlanetaryLabNames[name] = true
-                end
-            end
-        end
-
-        for index, player in pairs(game.players) do
-            local playerData = storage.players[index]
-            if playerData.insideSandbox == planetaryLabId
-                    and badPlanetaryLabNames[player.surface.name]
-            then
-                table.insert(playersToKickFromPlanetaryLabs, player)
-            end
-        end
-
-        for _, player in pairs(playersToKickFromPlanetaryLabs) do
-            log("Kicking Player out of Planetary Lab: " .. player.name)
-            Sandbox.Exit(player)
-        end
-
-        for _, surfaceData in pairs(badPlanetaryLabs) do
-            log("Destroying Planetary Lab: " .. surfaceData.zoneName)
-            SpaceExploration.DeleteSandbox(
-                    storage.sandboxForces[surfaceData.sandboxForceName],
-                    surfaceData.zoneName
-            )
-            local message = "Unfortunately, your Planetary Sandbox was generated in a " ..
-                    "non-ideal or dangerous location, so it was destroyed. Accessing " ..
-                    "the Sandbox again will create a new one in a safer location."
-            game.forces[surfaceData.sandboxForceName].print(message)
-            game.forces[storage.sandboxForces[surfaceData.sandboxForceName].forceName].print(message)
-        end
-    end
-
-    log("Migration 1.10.1 Finished")
 end
 
 function Migrate.v1_11_1()
@@ -349,10 +219,6 @@ function Migrate.v1_11_3()
         Migrate.v1_11_3_surface(surfaceName)
     end
 
-    for surfaceName, _ in pairs(storage.seSurfaces) do
-        Migrate.v1_11_3_surface(surfaceName)
-    end
-
     log("Migration 1.11.3 Finished")
 end
 
@@ -365,14 +231,6 @@ function Migrate.v1_15_0()
 
     for surfaceName, surfaceData in pairs(storage.labSurfaces) do
         surfaceData.equipmentBlueprints = Equipment.Init(Lab.equipmentString)
-    end
-
-    for surfaceName, surfaceData in pairs(storage.seSurfaces) do
-        if (surfaceData.orbital) then
-            surfaceData.equipmentBlueprints = Equipment.Init(SpaceExploration.orbitalEquipmentString)
-        else
-            surfaceData.equipmentBlueprints = Equipment.Init(Lab.equipmentString)
-        end
     end
 
     log("Migration 1.15.0 Finished")
@@ -503,6 +361,23 @@ function Migrate.v2_3_3()
     end
 
     log("Migration 2.3.3 Finished")
+end
+
+function Migrate.v2_4_0()
+    --[[
+    2.4.0 removes Space Exploration integration
+    ]]
+
+    log("Migration 2.4.0 Starting")
+
+    storage.seSurfaces = nil
+
+    for _, sandboxForce in pairs(storage.sandboxForces) do
+        sandboxForce.sePlanetaryLabZoneName = nil
+        sandboxForce.seOrbitalSandboxZoneName = nil
+    end
+
+    log("Migration 2.4.0 Finished")
 end
 
 return Migrate

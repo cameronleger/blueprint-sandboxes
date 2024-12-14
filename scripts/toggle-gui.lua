@@ -232,15 +232,12 @@ function ToggleGUI.OnGuiClick(event)
     elseif event.element.name == ToggleGUI.resetButton then
         if event.shift then
             return Lab.ResetEquipmentBlueprint(player.surface)
-                    or SpaceExploration.ResetEquipmentBlueprint(player.surface)
         else
             local blueprintString = Inventory.GetCursorBlueprintString(player)
             if blueprintString then
                 return Lab.SetEquipmentBlueprint(player.surface, blueprintString)
-                        or SpaceExploration.SetEquipmentBlueprint(player.surface, blueprintString)
             else
                 return Lab.Reset(player)
-                        or SpaceExploration.Reset(player)
             end
         end
         return true

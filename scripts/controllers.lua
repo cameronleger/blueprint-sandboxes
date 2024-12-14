@@ -256,17 +256,6 @@ function Controllers.RestoreLastController(player, playerData)
         return true
     end
 
-    -- Space Exploration deletes and recreates Characters; check that out next
-    local fromSpaceExploration = SpaceExploration.GetPlayerCharacter(player)
-    if fromSpaceExploration and fromSpaceExploration.valid then
-        player.teleport(fromSpaceExploration.position, fromSpaceExploration.surface.name)
-        player.set_controller({
-            type = defines.controllers.character,
-            character = fromSpaceExploration
-        })
-        return true
-    end
-
     -- We might at-least have a Surface to go back to
     if playerData.preSandboxController == defines.controllers.character
         and playerData.preSandboxPosition

@@ -374,16 +374,16 @@ function SurfacePropsGUI.Apply(player)
     end
 
     local sandboxSurface = player.surface
-    if not (Lab.IsLab(sandboxSurface) or SpaceExploration.IsSandbox(sandboxSurface)) then
+    if not Lab.IsLab(sandboxSurface) then
         log("Cannot apply Surface Properties outside of a Sandbox")
         return
     end
 
     local forcedDaytime = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.forcedDaytimeCheckbox).state
-    player.surface.freeze_daytime = forcedDaytime
+    sandboxSurface.freeze_daytime = forcedDaytime
 
     local daytime = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.daytimeSlider).slider_value
-    player.surface.daytime = daytime
+    sandboxSurface.daytime = daytime
 
     local propertiesTable = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.propertyTable)
     if not propertiesTable then
@@ -404,9 +404,9 @@ function SurfacePropsGUI.Apply(player)
 
     local globalElectricNetwork = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.globalElectricNetworkCheckbox).state
     if globalElectricNetwork then
-        player.surface.create_global_electric_network()
+        sandboxSurface.create_global_electric_network()
     else
-        player.surface.destroy_global_electric_network()
+        sandboxSurface.destroy_global_electric_network()
     end
 end
 

@@ -8,16 +8,10 @@ Sandbox.choices = {
     { "sandbox." .. Sandbox.pfx .. "player-lab" },
     { "sandbox." .. Sandbox.pfx .. "force-lab" },
 }
-if SpaceExploration.enabled() then
-    Sandbox.choices[3] = { "sandbox." .. Sandbox.pfx .. "force-lab-space-exploration" }
-    Sandbox.choices[4] = { "sandbox." .. Sandbox.pfx .. "force-orbit-space-exploration" }
-end
 
 -- Constants to represent indexes for Sandbox.choices
 Sandbox.player = 1
 Sandbox.force = 2
-Sandbox.forcePlanetaryLab = 3
-Sandbox.forceOrbitalSandbox = 4
 
 -- A unique per-Force Sandbox Name
 ---@param force LuaForce
@@ -35,7 +29,6 @@ end
 -- Whether something is any type of Sandbox
 function Sandbox.IsSandbox(thingWithName)
     return Lab.IsLab(thingWithName)
-            or SpaceExploration.IsSandbox(thingWithName)
 end
 
 -- Whether something is any type of Sandbox
@@ -50,10 +43,6 @@ function Sandbox.IsEnabled(selectedSandbox)
         return true
     elseif selectedSandbox == Sandbox.force then
         return true
-    elseif selectedSandbox == Sandbox.forceOrbitalSandbox then
-        return SpaceExploration.enabled()
-    elseif selectedSandbox == Sandbox.forcePlanetaryLab then
-        return SpaceExploration.enabled()
     else
         log("Impossible Choice for Sandbox: " .. selectedSandbox)
         return false
@@ -72,14 +61,6 @@ function Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
     elseif playerData.selectedSandbox == Sandbox.force
     then
         return Lab.GetOrCreateSurface(storage.sandboxForces[sandboxForce.name].labName, sandboxForce)
-    elseif SpaceExploration.enabled()
-            and playerData.selectedSandbox == Sandbox.forceOrbitalSandbox
-    then
-        return SpaceExploration.GetOrCreateOrbitalSurfaceForForce(player, sandboxForce)
-    elseif SpaceExploration.enabled()
-            and playerData.selectedSandbox == Sandbox.forcePlanetaryLab
-    then
-        return SpaceExploration.GetOrCreatePlanetarySurfaceForForce(player, sandboxForce)
     else
         log("Impossible Choice for Sandbox: " .. playerData.selectedSandbox)
         return
@@ -305,10 +286,6 @@ function Sandbox.GetSandboxChoiceFor(player, surface)
         return Sandbox.player
     elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].labName then
         return Sandbox.force
-    elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].seOrbitalSandboxZoneName then
-        return Sandbox.forceOrbitalSandbox
-    elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].sePlanetaryLabZoneName then
-        return Sandbox.forcePlanetaryLab
     elseif Factorissimo.IsFactory(surface) then
         local outsideSurface = Factorissimo.GetOutsideSurfaceForFactory(
                 surface,
@@ -574,8 +551,6 @@ function Sandbox.Toggle(player_index)
     elseif Sandbox.IsPlayerInsideSandbox(player) then
         Sandbox.Exit(player)
     else
-        SpaceExploration.ExitRemoteView(player)
-        -- Sandbox.View(player)
         Sandbox.Enter(player)
     end
 end

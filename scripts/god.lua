@@ -242,7 +242,6 @@ function God.ShouldHandleEntity(entity)
     end
 
     return Lab.IsLab(entity.surface)
-            or SpaceExploration.IsSandbox(entity.surface)
             or (Factorissimo.IsFactory(entity.surface)
             and Factorissimo.IsFactoryInsideSandbox(entity.surface, entity.position))
 end

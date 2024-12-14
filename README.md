@@ -46,20 +46,6 @@ When Resetting the Sandbox and the game crashes with any other mod listed in the
 
 Crafting Counts cannot be segregated in the way that you want - this does not work for Lazy Bastard.
 
-### Space Exploration Sandboxes report incorrect Daylight on their first use
-
-This also seems to be an issue with Factorio. Although the Daylight property is forcefully set and told to not change, the next read of the value will be zero (or perhaps what the value originally was). It's purely a cosmetic bug.
-
-### Space Exploration sometimes blocks placements due to Zone/Force issues
-
-In its original form, this mod had great compatibility with Space Exploration - from this mod's POV. From SE's POV, however, at least two things were bad. First, it's technically possible to cheat (well, it _always_ is, since you're in control of the games you play), even though this mod discourages it and aims to prevent it. Second, SE's handling of Forces had some assumptions that were not true when using this mod. As such, there were a few bugs, like having twice as many CMEs as normal.
-
-Recently, SE became "aware" of this mod and have made changes to _prevent_ placement of some important SE Entities. Around the same time, this mod introduced "Illusions" to safely swap out scripted Entities with basic placeholders.
-
-At this time, _most_ of those Entities cannot _normally_ be placed within the Sandboxes - you will get an error from SE instead. They _can_ be Ghost-built (holding shift, or using a Blueprint), in _most_ cases. This is because SE does not check the types of the Ghosts, and this mod can safely replace them with Illusions. For the real Entities, SE blocks the placement _before_ this mod can do anything about it.
-
-I've reached out to their team to improve the compatibility, but nothing came of it.
-
 ### Selecting new contents for some Blueprints will include Illusions instead of Real Entities
 
 There is a significant flaw in Factorio's handling of Blueprints that have already been created when you want to "select new contents" for them; to quote a Factorio dev, it's "kind of a giant hack in my opinion and I don't see it getting re-worked any time soon." This is the only real acknowledgement of this issue, whereas all other responses seem to deflect or feign ignorance. As far as I have found, this is the only (and for our purposes, quite a large) shortcoming of the otherwise excellent Modding API.

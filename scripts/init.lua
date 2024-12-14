@@ -29,7 +29,6 @@ function Init.FirstTimeInit()
     storage.players = {}
     storage.labSurfaces = {}
     storage.sandboxForces = {}
-    storage.seSurfaces = {}
     storage.equipmentInProgress = {}
     storage.asyncCreateQueue = Queue.New()
     storage.asyncUpgradeQueue = Queue.New()

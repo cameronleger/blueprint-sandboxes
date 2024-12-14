@@ -24,11 +24,6 @@ Migrate = require("scripts.migrate")
 Research = require("scripts.research")
 SelectionPlanner = require("scripts.selection-planner")
 Teleport = require("scripts.teleport")
-
--- Required by Sandbox
-SpaceExploration = require("scripts.space-exploration")
-
--- Requires SpaceExploration method immediately
 Sandbox = require("scripts.sandbox")
 
 -- GUIs, they likely depend on the above
@@ -142,13 +137,12 @@ script.on_event(defines.events.on_surface_created, function(event)
         return
     end
     RemoteView.HideSandboxFromEveryone(surface)
-    local _ = Lab.AfterCreate(surface) or SpaceExploration.AfterCreate(surface)
-    local _ = Lab.Equip(surface) or SpaceExploration.Equip(surface)
+    Lab.AfterCreate(surface)
+    Lab.Equip(surface)
 end)
 
 script.on_event(defines.events.on_surface_cleared, function(event)
-    local _ = Lab.Equip(game.surfaces[event.surface_index])
-            or SpaceExploration.Equip(game.surfaces[event.surface_index])
+    Lab.Equip(game.surfaces[event.surface_index])
 end)
 
 script.on_event(defines.events.on_chunk_generated, function(event)
@@ -167,11 +161,6 @@ script.on_event(defines.events.on_pre_surface_deleted, function(event)
     if storage.labSurfaces[surface.name] then
         storage.labSurfaces[surface.name] = nil
     end
-    local surfaceData = storage.seSurfaces[surface.name]
-    if surfaceData then
-        local sandboxForceData = storage.sandboxForces[surfaceData.sandboxForceName]
-        SpaceExploration.PreDeleteSandbox(sandboxForceData, surface.name)
-    end
 end)
 
 script.on_event(defines.events.on_surface_renamed, function(event)
@@ -179,18 +168,6 @@ script.on_event(defines.events.on_surface_renamed, function(event)
     if storage.labSurfaces[event.old_name] then
         storage.labSurfaces[event.new_name] = storage.labSurfaces[event.old_name]
         storage.labSurfaces[event.old_name] = nil
-    end
-    local surfaceData = storage.seSurfaces[event.old_name]
-    if surfaceData then
-        local sandboxForceData = storage.sandboxForces[surfaceData.sandboxForceName]
-        if sandboxForceData.sePlanetaryLabZoneName == event.old_name then
-            sandboxForceData.sePlanetaryLabZoneName = event.new_name
-        end
-        if sandboxForceData.seOrbitalSandboxZoneName == event.old_name then
-            sandboxForceData.seOrbitalSandboxZoneName = event.new_name
-        end
-        storage.seSurfaces[event.new_name] = storage.seSurfaces[event.old_name]
-        storage.seSurfaces[event.old_name] = nil
     end
 end)
 

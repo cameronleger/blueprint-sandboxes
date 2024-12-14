@@ -52,8 +52,6 @@ function Force.Init(force)
         forceName = force.name,
         hiddenItemsUnlocked = false,
         labName = forceLabName,
-        sePlanetaryLabZoneName = nil,
-        seOrbitalSandboxZoneName = nil,
     }
 end
 
@@ -84,8 +82,6 @@ function Force.Merge(oldForceName, newForce)
 
     -- Delete the old Force-related Surfaces/Forces
     Lab.DeleteLab(oldSandboxForceData.labName)
-    SpaceExploration.DeleteSandbox(oldSandboxForceData, oldSandboxForceData.sePlanetaryLabZoneName)
-    SpaceExploration.DeleteSandbox(oldSandboxForceData, oldSandboxForceData.seOrbitalSandboxZoneName)
     if oldSandboxForce then
         log("Force.Merge must merge Sandbox Forces: " .. oldSandboxForce.name .. " -> " .. newForceData.sandboxForceName)
         game.merge_forces(oldSandboxForce, newForceData.sandboxForceName)
