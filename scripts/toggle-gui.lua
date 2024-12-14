@@ -10,6 +10,7 @@ ToggleGUI.entitySelectionPlannerGenerator = ToggleGUI.pfx .. "entity-selection-p
 ToggleGUI.tileSelectionPlannerGenerator = ToggleGUI.pfx .. "tile-selection-planner-generator"
 ToggleGUI.daytimeSlider = ToggleGUI.pfx .. "daytime-slider"
 ToggleGUI.globalElectricNetworkCheckbox = ToggleGUI.pfx .. "global-eletric-network-checkbox"
+ToggleGUI.entranceButton = ToggleGUI.pfx .. "enter"
 
 ---@param player LuaPlayer
 function ToggleGUI.Init(player)
@@ -64,6 +65,21 @@ function ToggleGUI.Init(player)
         style = "frame_action_button",
         sprite = "tooltip-category-crafting-surface-conditions",
     }
+
+    local entranceFlow = innerFrame.add {
+        type = "flow",
+        name = "entranceFlow",
+        direction = "horizontal",
+        style = BPSB.pfx .. "centered-horizontal-flow",
+        visible = false,
+    }
+
+    entranceFlow.add {
+        type = "button",
+        name = ToggleGUI.entranceButton,
+        caption = { "gui." .. ToggleGUI.entranceButton },
+        tooltip = { "gui-description." .. ToggleGUI.entranceButton },
+    }.style.horizontally_stretchable = true
 
     local daylightFlow = innerFrame.add {
         type = "flow",
@@ -219,10 +235,13 @@ function ToggleGUI.Update(player)
 
         ToggleGUI.FindByName(player, ToggleGUI.daytimeSlider).slider_value = player.surface.daytime
         ToggleGUI.FindByName(player, ToggleGUI.globalElectricNetworkCheckbox).state = Sandbox.HasGlobalElectricalNetwork(player.surface)
+
+        ToggleGUI.FindByName(player, ToggleGUI.entranceButton).enabled = Sandbox.CanEnter(player)
     else
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, false)
         player.gui.left[ToggleGUI.name].visible = false
         ToggleGUI.FindByName(player, ToggleGUI.resetButton).enabled = false
+        ToggleGUI.FindByName(player, ToggleGUI.entranceButton).enabled = false
     end
 end
 
@@ -259,6 +278,9 @@ function ToggleGUI.OnGuiClick(event)
     local player = game.players[event.player_index]
     if event.element.name == ToggleGUI.toggleShortcut then
         Sandbox.Toggle(event.player_index)
+        return true
+    elseif event.element.name == ToggleGUI.entranceButton then
+        Sandbox.SwapToGod(player)
         return true
     elseif event.element.name == ToggleGUI.surfacePropsButton then
         SurfacePropsGUI.Init(player)

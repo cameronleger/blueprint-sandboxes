@@ -142,6 +142,31 @@ local function StorePreSandboxStateBeforeEntrance(player, playerData)
     end
 end
 
+-- Convert the Player to Remote-view, save their previous State, and view Selected Sandbox
+---@param player LuaPlayer
+function Sandbox.View(player)
+    local playerData = storage.players[player.index]
+    if Sandbox.IsPlayerInsideSandbox(player) then return end
+
+    local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
+    local surface = Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
+    if surface == nil then
+        log("Completely Unknown Sandbox Surface, cannot use")
+        return
+    end
+
+    -- Store the Player's previous State (that must be referenced to Exit)
+    StorePreSandboxStateBeforeEntrance(player, playerData)
+    Controllers.StoreRemoteView(player, playerData)
+
+    -- Harmlessly begin by Remotely Viewing the Sandbox
+    player.set_controller({
+        type = defines.controllers.remote,
+        surface = surface,
+        position = playerData.lastSandboxPositions[surface.name],
+    })
+end
+
 -- Convert the Player to God-mode, save their previous State, and enter Selected Sandbox
 ---@param player LuaPlayer
 function Sandbox.Enter(player)
@@ -154,7 +179,8 @@ function Sandbox.Enter(player)
         return
     end
 
-    if not Controllers.SafelyCloseRemoteView(player, playerData) then
+    Controllers.StoreRemoteView(player, playerData)
+    if not Controllers.SafelyCloseRemoteView(player) then
         player.print("You are using a remote view that cannot be safely closed, so you cannot enter a Sandbox. Return to your Character first.")
         return
     end
@@ -206,6 +232,7 @@ function Sandbox.Exit(player)
         playerData.preSandboxSurfaceName,
         playerData.preSandboxPosition or { 0, 0 }
     )
+    Controllers.SafelyCloseRemoteView(player)
 end
 
 -- Keep a Player's God-state, but change between Selected Sandboxes
@@ -370,10 +397,10 @@ end
 
 ---@param player LuaPlayer
 local function RestorePreSandboxController(player, playerData)
-    -- TODO: Only if it's not actually restored already (since they entered as remote view)
-    -- When exiting directly to a Remote View, we first need to restore the physical settings (if they exist)
-    if player.controller_type == defines.controllers.remote then
-        Controllers.SafelyCloseRemoteView(player, playerData)
+        -- When exiting directly to a Remote View, we first need to restore the physical settings (if they exist)
+    if Controllers.IsUsingRemoteView(player) and player.physical_controller_type ~= playerData.preSandboxController then
+        Controllers.StoreRemoteView(player, playerData)
+        Controllers.SafelyCloseRemoteView(player)
     end
     Controllers.RestoreLastController(player, playerData)
 
@@ -434,6 +461,53 @@ local function CleanStates(playerData)
     playerData.preSandboxController = nil
     playerData.preSandboxPosition = nil
     playerData.preSandboxSurfaceName = nil
+end
+
+-- Is it likely that Swap to God can work?
+---@param player LuaPlayer
+---@return boolean
+function Sandbox.CanEnter(player)
+    if player.physical_controller_type ~= defines.controllers.character then return false end
+    return Controllers.IsUsingRemoteView(player)
+end
+
+-- Convert the Player to God-mode, save their previous State, and enter Selected Sandbox
+---@param player LuaPlayer
+function Sandbox.SwapToGod(player)
+    local playerData = storage.players[player.index]
+    if not Sandbox.IsPlayerInsideSandbox(player) then return end
+
+    -- Remember where they left off
+    local surface = player.surface
+    playerData.lastSandboxPositions[surface.name] = player.position
+    StoreCursorBlueprint(player, playerData)
+
+    -- Get back to their real/physical controllers so we can save them
+    local canBeSafelyReplaced = Controllers.CanBeSafelyReplaced(player)
+    if canBeSafelyReplaced ~= true then
+        player.print("Your current character/controller is not stable, so you cannot enter a Sandbox: " .. canBeSafelyReplaced)
+        return
+    end
+    if not Controllers.SafelyCloseRemoteView(player) then
+        player.print("You are using a remote view that cannot be safely closed, so you cannot enter a Sandbox. Return to your Character first.")
+        return
+    end
+
+    -- Store the Player's previous State (that must be referenced to Exit)
+    StorePreSandboxStateBeforeEntrance(player, playerData)
+
+    -- Harmlessly detach the Player from their Character
+    local character = player.character
+    player.set_controller({ type = defines.controllers.god })
+    if character and not character.associated_player then
+        player.associate_character(character)
+    end
+
+    -- Harmlessly teleport their God-body back to the Sandbox
+    Teleport.ToPositionOnSurface(player, surface, playerData.lastSandboxPositions[surface.name] or { 0, 0 })
+
+    -- Restore states again
+    RestoreSandboxState(player, playerData)
 end
 
 -- Update whether the Player is inside a known Sandbox

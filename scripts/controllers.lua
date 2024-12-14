@@ -162,11 +162,10 @@ end
 -- If using Remote View, attempt to go back to the Character
 ---@param player LuaPlayer
 ---@return boolean success
-function Controllers.SafelyCloseRemoteView(player, playerData)
+function Controllers.SafelyCloseRemoteView(player)
     if not Controllers.IsUsingRemoteView(player) then
         return true
     end
-    Controllers.StoreRemoteView(player, playerData)
     if player.physical_controller_type == defines.controllers.character then
         local character = player.character
         -- Cannot close a Remote View without a real Character
@@ -210,9 +209,7 @@ function Controllers.RestoreLastController(player, playerData)
     if Controllers.IsUsingRemoteView(player)
         and player.physical_controller_type == defines.controllers.character
     then
-        if Controllers.SafelyCloseRemoteView(player, playerData) then
-            return true
-        end
+        return true
     end
 
     if Controllers.IsUsingEditor(player) then
