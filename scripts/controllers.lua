@@ -220,6 +220,9 @@ function Controllers.RestoreLastController(player, playerData)
 
         -- The Editor needs another layer of exiting otherwise
         player.toggle_map_editor()
+
+        -- It's possible there's nothing to do
+        if player.controller_type == defines.controllers.character then return true end
     end
 
     -- Hopeful situation: we directly know about the last valid character

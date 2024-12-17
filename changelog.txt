@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.1
+Date: 2024-12-17
+  Bugfixes:
+    - Prevent losing Character when activating Editor Mode from the Physical Surface while Remotely Viewing a Sandbox
+---------------------------------------------------------------------------------------------------
 Version: 2.5.0
 Date: 2024-12-17
   Changes:
