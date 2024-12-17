@@ -21,33 +21,25 @@ function ToggleGUI.Init(player)
         name = ToggleGUI.name,
         caption = { "gui." .. ToggleGUI.name },
         visible = false,
-        index = 0,
+        direction = "vertical",
         style = BPSB.pfx .. "toggle-frame",
     }
 
-    local innerFrame = frame.add {
+    local topLineFrame = frame.add {
         type = "frame",
-        name = "innerFrame",
-        direction = "vertical",
-        style = "inside_shallow_frame_with_padding_and_vertical_spacing",
-    }
-
-    local topLineFlow = innerFrame.add {
-        type = "flow",
-        name = "topLineFlow",
+        style = BPSB.pfx .. "shallow-semi-padded-frame",
         direction = "horizontal",
-        style = BPSB.pfx .. "centered-horizontal-flow",
     }
 
-    topLineFlow.add {
+    topLineFrame.add {
         type = "sprite-button",
         name = ToggleGUI.resetButton,
         tooltip = { "gui-description." .. ToggleGUI.resetButton },
-        style = "tool_button",
-        sprite = "utility/reset_white",
+        style = "tool_button_red",
+        sprite = "utility/reset",
     }
 
-    topLineFlow.add {
+    topLineFrame.add {
         type = "drop-down",
         name = ToggleGUI.selectedSandboxDropdown,
         tooltip = { "gui-description." .. ToggleGUI.selectedSandboxDropdown },
@@ -56,7 +48,7 @@ function ToggleGUI.Init(player)
         style = BPSB.pfx .. "sandbox-dropdown",
     }.style.horizontally_stretchable = true
 
-    topLineFlow.add {
+    topLineFrame.add {
         type = "sprite-button",
         name = ToggleGUI.surfacePropsButton,
         tooltip = { "gui-description." .. ToggleGUI.surfacePropsButton },
@@ -64,29 +56,29 @@ function ToggleGUI.Init(player)
         sprite = "tooltip-category-crafting-surface-conditions",
     }
 
-    local entranceFlow = innerFrame.add {
-        type = "flow",
-        name = "entranceFlow",
-        direction = "horizontal",
-        style = BPSB.pfx .. "centered-horizontal-flow",
-        visible = false,
+    local entranceFrame = frame.add {
+        type = "frame",
+        style = BPSB.pfx .. "shallow-semi-padded-frame",
+        direction = "vertical",
     }
+    entranceFrame.style.padding = 0
 
-    entranceFlow.add {
+    local entraceButton = entranceFrame.add {
         type = "button",
         name = ToggleGUI.entranceButton,
         caption = { "gui." .. ToggleGUI.entranceButton },
         tooltip = { "gui-description." .. ToggleGUI.entranceButton },
-    }.style.horizontally_stretchable = true
+    }
+    entraceButton.style.horizontally_stretchable = true
+    entraceButton.style.margin = 2
 
-    local selectorFlow = innerFrame.add {
-        type = "flow",
-        name = "selectorFlow",
+    local selectorFrame = frame.add {
+        type = "frame",
+        style = BPSB.pfx .. "shallow-semi-padded-frame",
         direction = "horizontal",
-        style = BPSB.pfx .. "centered-horizontal-flow",
     }
 
-    selectorFlow.add {
+    selectorFrame.add {
         type = "label",
         caption = { "gui." .. ToggleGUI.entitySelectionPlannerGenerator },
         tooltip = { "gui-description." .. ToggleGUI.entitySelectionPlannerGenerator },
@@ -97,7 +89,7 @@ function ToggleGUI.Init(player)
     if player.mod_settings[Settings.qualityEntityPlanners].value then
         entitySelectionType = "entity-with-quality"
     end
-    selectorFlow.add {
+    selectorFrame.add {
         type = "choose-elem-button",
         name = ToggleGUI.entitySelectionPlannerGenerator,
         tooltip = { "gui-description." .. ToggleGUI.entitySelectionPlannerGenerator },
@@ -118,14 +110,14 @@ function ToggleGUI.Init(player)
         },
     }
 
-    selectorFlow.add {
+    selectorFrame.add {
         type = "label",
         caption = { "gui." .. ToggleGUI.tileSelectionPlannerGenerator },
         tooltip = { "gui-description." .. ToggleGUI.tileSelectionPlannerGenerator },
         style = "caption_label",
     }
 
-    selectorFlow.add {
+    selectorFrame.add {
         type = "choose-elem-button",
         tooltip = { "gui-description." .. ToggleGUI.tileSelectionPlannerGenerator },
         name = ToggleGUI.tileSelectionPlannerGenerator,
@@ -190,6 +182,7 @@ function ToggleGUI.Update(player)
             resetButton.tooltip = { "gui-description." .. ToggleGUI.resetButton }
         end
 
+        ToggleGUI.FindByName(player, ToggleGUI.entranceButton).visible = Sandbox.CanEnter(player)
         ToggleGUI.FindByName(player, ToggleGUI.entranceButton).enabled = Sandbox.CanEnter(player)
     else
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, false)

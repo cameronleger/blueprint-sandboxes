@@ -14,6 +14,24 @@ data.raw["gui-style"]["default"][BPSB.pfx .. "toggle-frame"] = {
     horizontally_stretchable = "off",
 }
 
+data.raw["gui-style"]["default"][BPSB.pfx .. "shallow-semi-padded-frame"] = {
+    type = "frame_style",
+    parent = "inside_shallow_frame",
+    padding = 8,
+    horizontal_flow_style = {
+        type = "horizontal_flow_style",
+        parent = "horizontal_flow",
+        horizontal_spacing = 6,
+        vertical_align = "center",
+    },
+    vertical_flow_style = {
+        type = "vertical_flow_style",
+        parent = "vertical_flow",
+        vertical_spacing = 6,
+        horizontal_align = "center",
+    },
+}
+
 data.raw["gui-style"]["default"][BPSB.pfx .. "padded-horizontal-flow"] = {
     type = "horizontal_flow_style",
     parent = "horizontal_flow",

@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.0
+Date: 2024-12-17
+  Changes:
+    - Toggling the Sandbox now begins by Remotely Viewing it, for compatibility with more situations
+    - Entering the Sandbox is still possible for the same situations it was before
+    - Enabled Remote View within Sandboxs
+---------------------------------------------------------------------------------------------------
 Version: 2.4.0
 Date: 2024-12-14
   Changes:

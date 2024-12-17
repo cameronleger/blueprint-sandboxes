@@ -142,7 +142,11 @@ script.on_event(defines.events.on_surface_created, function(event)
 end)
 
 script.on_event(defines.events.on_surface_cleared, function(event)
-    Lab.Equip(game.surfaces[event.surface_index])
+    local surface = game.surfaces[event.surface_index]
+    if not Sandbox.IsSandbox(surface) then
+        return
+    end
+    Lab.Equip(surface)
 end)
 
 script.on_event(defines.events.on_chunk_generated, function(event)

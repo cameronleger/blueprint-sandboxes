@@ -551,7 +551,7 @@ function Sandbox.Toggle(player_index)
     elseif Sandbox.IsPlayerInsideSandbox(player) then
         Sandbox.Exit(player)
     else
-        Sandbox.Enter(player)
+        Sandbox.View(player)
     end
 end
 

@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 020400
+Migrate.version = 020500
 
 function Migrate.Run()
     if not storage.version then
@@ -27,6 +27,7 @@ function Migrate.Run()
         if storage.version < 020201 then Migrate.v2_2_1() end
         if storage.version < 020303 then Migrate.v2_3_3() end
         if storage.version < 020400 then Migrate.v2_4_0() end
+        if storage.version < 020500 then Migrate.v2_5_0() end
     end
 
     storage.version = Migrate.version
@@ -378,6 +379,33 @@ function Migrate.v2_4_0()
     end
 
     log("Migration 2.4.0 Finished")
+end
+
+function Migrate.v2_5_0()
+    --[[
+    2.5.0 allows Remote Viewing
+    ]]
+
+    log("Migration 2.5.0 Starting")
+
+    for _, permissions in pairs(game.permissions.groups) do
+        if Permissions.IsSandboxPermissions(permissions.name) then
+            permissions.set_allows_action(defines.input_action.remote_view_surface, true)
+            permissions.set_allows_action(defines.input_action.remote_view_entity, true)
+        end
+    end
+
+    for _, player in pairs(game.players) do
+        local playerData = storage.players[player.index]
+        if playerData and Sandbox.IsPlayerInsideSandbox(player) then
+            if playerData.preSandboxSurfaceList == nil then
+                playerData.preSandboxSurfaceList = player.game_view_settings.show_surface_list
+                player.game_view_settings.show_surface_list = false
+            end
+        end
+    end
+
+    log("Migration 2.5.0 Finished")
 end
 
 return Migrate
