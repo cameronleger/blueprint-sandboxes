@@ -242,7 +242,6 @@ function God.ShouldHandleEntity(entity)
     end
 
     return Lab.IsLab(entity.surface)
-            or SpaceExploration.IsSandbox(entity.surface)
             or (Factorissimo.IsFactory(entity.surface)
             and Factorissimo.IsFactoryInsideSandbox(entity.surface, entity.position))
 end
@@ -428,20 +427,6 @@ function God.HandleAllSandboxRequests(event)
 
     if (deleteRequestsPerTick + upgradeRequestsPerTick + createRequestsPerTick) > 0 then
         God.QueueUnhandledEntitiesInOccupiedSandboxes(deleteRequestsPerTick, upgradeRequestsPerTick, createRequestsPerTick)
-    end
-end
-
--- Charts each Sandbox that a Player is currently inside of
-function God.ChartAllOccupiedSandboxes()
-    if settings.global[Settings.scanSandboxes].value then
-        local charted = {}
-        for _, player in pairs(game.players) do
-            local hash = player.force.name .. player.surface.name
-            if Sandbox.IsSandbox(player.surface) and not charted[hash] then
-                player.force.chart_all(player.surface)
-                charted[hash] = true
-            end
-        end
     end
 end
 

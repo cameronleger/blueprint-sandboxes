@@ -1,6 +1,5 @@
 -- Required by basically everything immediately
 BPSB = require("scripts.bpsb")
-Events = require("scripts.events")
 Settings = require("scripts.settings")
 Debug = require("scripts.debug")
 Queue = require("scripts.queue")
@@ -14,6 +13,7 @@ RemoteView = require("scripts.remote-view")
 -- Required, but not ordered importantly
 Init = require("scripts.init")
 Chat = require("scripts.chat")
+Controllers = require("scripts.controllers")
 Equipment = require("scripts.equipment")
 Factorissimo = require("scripts.factorissimo")
 Force = require("scripts.force")
@@ -24,11 +24,6 @@ Migrate = require("scripts.migrate")
 Research = require("scripts.research")
 SelectionPlanner = require("scripts.selection-planner")
 Teleport = require("scripts.teleport")
-
--- Required by Sandbox
-SpaceExploration = require("scripts.space-exploration")
-
--- Requires SpaceExploration method immediately
 Sandbox = require("scripts.sandbox")
 
 -- GUIs, they likely depend on the above
@@ -48,14 +43,12 @@ end)
 
 script.on_event(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
-    log("on_player_created index: " .. event.player_index)
     Force.Init(player.force)
     Init.Player(player)
 end)
 
 script.on_event(defines.events.on_player_removed, function(event)
     local playerData = storage.players[event.player_index]
-    log("on_player_removed index: " .. event.player_index)
     Lab.DeleteLab(playerData.labName)
     if playerData.sandboxInventory then
         playerData.sandboxInventory.destroy()
@@ -67,7 +60,6 @@ script.on_event(defines.events.on_player_removed, function(event)
 end)
 
 script.on_event(defines.events.on_force_created, function(event)
-    log("on_force_created name: " .. event.force.name)
     Force.Init(event.force)
     if Sandbox.IsSandboxForce(event.force) then
         RemoteView.HideEverythingInSandboxes(event.force)
@@ -126,6 +118,11 @@ script.on_event(defines.events.on_research_reversed, Research.OnResearched)
 script.on_event(defines.events.on_research_moved, Research.OnResearchReordered)
 script.on_event(defines.events.on_research_started, Research.OnResearchStarted)
 
+script.on_event(defines.events.on_player_controller_changed, function(event)
+    local player = game.players[event.player_index]
+    ToggleGUI.Update(player)
+end)
+
 script.on_event(defines.events.on_player_changed_surface, function(event)
     local player = game.players[event.player_index]
     Sandbox.OnPlayerSurfaceChanged(player)
@@ -140,13 +137,16 @@ script.on_event(defines.events.on_surface_created, function(event)
         return
     end
     RemoteView.HideSandboxFromEveryone(surface)
-    local _ = Lab.AfterCreate(surface) or SpaceExploration.AfterCreate(surface)
-    local _ = Lab.Equip(surface) or SpaceExploration.Equip(surface)
+    Lab.AfterCreate(surface)
+    Lab.Equip(surface)
 end)
 
 script.on_event(defines.events.on_surface_cleared, function(event)
-    local _ = Lab.Equip(game.surfaces[event.surface_index])
-            or SpaceExploration.Equip(game.surfaces[event.surface_index])
+    local surface = game.surfaces[event.surface_index]
+    if not Sandbox.IsSandbox(surface) then
+        return
+    end
+    Lab.Equip(surface)
 end)
 
 script.on_event(defines.events.on_chunk_generated, function(event)
@@ -165,11 +165,6 @@ script.on_event(defines.events.on_pre_surface_deleted, function(event)
     if storage.labSurfaces[surface.name] then
         storage.labSurfaces[surface.name] = nil
     end
-    local surfaceData = storage.seSurfaces[surface.name]
-    if surfaceData then
-        local sandboxForceData = storage.sandboxForces[surfaceData.sandboxForceName]
-        SpaceExploration.PreDeleteSandbox(sandboxForceData, surface.name)
-    end
 end)
 
 script.on_event(defines.events.on_surface_renamed, function(event)
@@ -177,18 +172,6 @@ script.on_event(defines.events.on_surface_renamed, function(event)
     if storage.labSurfaces[event.old_name] then
         storage.labSurfaces[event.new_name] = storage.labSurfaces[event.old_name]
         storage.labSurfaces[event.old_name] = nil
-    end
-    local surfaceData = storage.seSurfaces[event.old_name]
-    if surfaceData then
-        local sandboxForceData = storage.sandboxForces[surfaceData.sandboxForceName]
-        if sandboxForceData.sePlanetaryLabZoneName == event.old_name then
-            sandboxForceData.sePlanetaryLabZoneName = event.new_name
-        end
-        if sandboxForceData.seOrbitalSandboxZoneName == event.old_name then
-            sandboxForceData.seOrbitalSandboxZoneName = event.new_name
-        end
-        storage.seSurfaces[event.new_name] = storage.seSurfaces[event.old_name]
-        storage.seSurfaces[event.old_name] = nil
     end
 end)
 
@@ -206,19 +189,6 @@ script.on_event(defines.events.on_player_selected_area, SelectionPlanner.OnAreaS
 script.on_event(defines.events.on_player_alt_selected_area, SelectionPlanner.OnAreaSelected)
 script.on_event(defines.events.on_player_reverse_selected_area, SelectionPlanner.OnAreaSelected)
 script.on_event(defines.events.on_player_alt_reverse_selected_area, SelectionPlanner.OnAreaSelected)
-
--- Internal
-
-script.on_event(Events.on_daylight_changed_event, function(event)
-    log("on_daylight_changed_event from player: " .. event.player_index)
-    for _, player in pairs(game.players) do
-        if player.index ~= event.player_index
-                and player.surface.name == event.surface_name
-        then
-            ToggleGUI.Update(player)
-        end
-    end
-end)
 
 -- Shortcuts
 
@@ -248,7 +218,6 @@ end)
 script.on_event(defines.events.on_gui_click, function (event)
     local _ = ToggleGUI.OnGuiClick(event) or SurfacePropsGUI.OnGuiClick(event) or SelectionPlanner.OnGuiClick(event)
 end)
-script.on_event(defines.events.on_gui_value_changed, ToggleGUI.OnGuiValueChanged)
 ---@param event EventData.on_gui_selection_state_changed
 script.on_event(defines.events.on_gui_selection_state_changed, function (event)
     local _ = ToggleGUI.OnGuiDropdown(event) or SurfacePropsGUI.OnGuiDropdown(event)
@@ -263,3 +232,6 @@ script.on_event(defines.events.on_gui_closed, function(event)
         Illusion.OnBlueprintGUIClosed(event)
     end
 end)
+
+-- Periodic
+script.on_nth_tick(RemoteView.chartAllSandboxesTick, RemoteView.ChartAllOccupiedSandboxes)

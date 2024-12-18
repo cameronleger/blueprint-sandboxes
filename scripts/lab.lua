@@ -4,8 +4,6 @@ local Lab = {}
 Lab.pfx = BPSB.pfx .. "lab-"
 local pfxLength = string.len(Lab.pfx)
 
-Lab.chartAllLabsTick = 300
-
 Lab.equipmentString = "0eNqNkd1ugzAMhd/F10kF6bq2eZVqQpAaZgkMSkI1hnj3OVRC1dT95M6x/Z2TkxmqdsTBE0ewM5DrOYC9zBCo4bJNd3EaECxQxA4UcNmlClt00ZPTyOibScs++rp0CIsC4it+gM0X9SenokZvrKFvH/fN8qYAOVIkvJtai6ngsavQi8AvGAVDH2Sz56QttEzBBFabJbn6BjL/eNcPwEz8VmNdoy8CfQoiz7bzRGm/KRHXxNLS7h1DfILfHVYBszuskdyni4AxEjchTXns+hsWo/RasYnXIoUrrehHXFJ6a9j24Y8V3NCHVcWc8pfj2RxfzyY77SWXL6PBsLw="
 
 -- A unique per-Player Lab Name
@@ -24,6 +22,28 @@ end
 function Lab.IsLab(thingWithName)
     return string.sub(thingWithName.name, 1, pfxLength) == Lab.pfx
     -- return not not storage.labSurfaces[thingWithName.name]
+end
+
+-- A human-readable Lab Name
+---@param labName string
+---@return LocalisedString
+function Lab.LocalisedNameFromLabName(labName)
+    local identifier = string.sub(labName, pfxLength + 3)
+    local type = string.sub(labName, pfxLength + 1, pfxLength + 1)
+    if type == "p" then
+        type = "[img=entity.character]"
+    elseif type == "f" then
+        type = "[img=utility.force_editor_icon]"
+    else
+        type = ""
+    end
+    return {
+        "",
+        "[img=item-group." .. BPSB.name .. "]",
+        " ",
+        identifier,
+        type,
+    }
 end
 
 -- Create a new Lab Surface, if necessary
@@ -47,7 +67,6 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
     storage.labSurfaces[labName] = {
         sandboxForceName = sandboxForce.name,
         equipmentBlueprints = Equipment.Init(Lab.equipmentString),
-        daytime = 0.95,
     }
     if not surface then
         surface = game.create_surface(labName, {
@@ -57,21 +76,6 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
     end
 
     return surface
-end
-
--- Set a Lab's Daytime to a specific value
----@param player LuaPlayer
----@param surface LuaSurface
-function Lab.SetDayTime(player, surface, daytime)
-    if Lab.IsLab(surface) then
-        surface.freeze_daytime = true
-        surface.daytime = daytime
-        storage.labSurfaces[surface.name].daytime = daytime
-        Events.SendDaylightChangedEvent(player.index, surface.name, daytime)
-        return true
-    else
-        return false
-    end
 end
 
 -- Delete a Lab Surface, if present
@@ -165,6 +169,7 @@ function Lab.AfterCreate(surface)
     surface.daytime = 0.95
     surface.show_clouds = false
     surface.generate_with_lab_tiles = true
+    surface.localised_name = Lab.LocalisedNameFromLabName(surface.name)
 
     return true
 end

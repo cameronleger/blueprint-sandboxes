@@ -1,6 +1,10 @@
 -- Recipes for hidden/infinity items, only unlocked in Lab
 function createLockedRecipeForHiddenItem(name)
     if data.raw.item[name] then
+        -- Allows it to show with the ghost cursor
+        data.raw.item[name].hidden = false
+
+        -- Allows it to show in the god controller (and ghost cursor)
         data:extend({
             {
                 type = "recipe",

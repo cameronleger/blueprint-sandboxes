@@ -52,20 +52,6 @@ data:extend({
     {
         type = "tips-and-tricks-item",
         category = category,
-        tag = "[img=utility/select_icon_white]",
-        name = pfxCategory .. "daylight",
-        indent = 1,
-        order = pfxOrder .. "d",
-        starting_status = "unlocked",
-        trigger = {
-            type = "unlock-recipe",
-            recipe = BPSB.pfx .. "electric-energy-interface",
-        },
-        image = BPSB.path .. "/graphics/daylight-slider.png",
-    },
-    {
-        type = "tips-and-tricks-item",
-        category = category,
         tag = "[img=space-location/nauvis]",
         name = pfxCategory .. "surface-properties",
         indent = 1,
@@ -100,7 +86,6 @@ data:extend({
             type = "unlock-recipe",
             recipe = BPSB.pfx .. "electric-energy-interface",
         },
-        image = BPSB.path .. "/graphics/recipes.png",
     },
     {
         type = "tips-and-tricks-item",
@@ -165,102 +150,6 @@ data:extend({
         },
     },
 })
-
-if mods["space-exploration"] then
-    category = BPSB.pfx .. "space-exploration"
-    pfxCategory = category .. "-"
-    data:extend({
-        {
-            type = "tips-and-tricks-item-category",
-            name = category,
-            order = pfxOrder .. "b",
-        },
-        {
-            type = "tips-and-tricks-item",
-            category = category,
-            tag = "[img=virtual-signal.se-spaceship] [img=item-group." .. BPSB.name .. "]",
-            name = pfxCategory .. "introduction",
-            order = pfxOrder .. "a",
-            is_title = true,
-            trigger = {
-                type = "and",
-                triggers = {
-                    {
-                        type = "unlock-recipe",
-                        recipe = BPSB.pfx .. "electric-energy-interface",
-                    }, {
-                        type = "unlock-recipe",
-                        recipe = "se-medpack",
-                    }
-                },
-            },
-        },
-        {
-            type = "tips-and-tricks-item",
-            category = category,
-            tag = "[img=virtual-signal.se-star]",
-            name = pfxCategory .. "inner-star-tech",
-            indent = 1,
-            order = pfxOrder .. "b",
-            dependencies = { pfxCategory .. "introduction" },
-            trigger = {
-                type = "unlock-recipe",
-                recipe = BPSB.pfx .. "electric-energy-interface",
-            },
-        },
-        {
-            type = "tips-and-tricks-item",
-            category = category,
-            tag = "[img=virtual-signal.se-planet]",
-            name = pfxCategory .. "planetary-lab",
-            indent = 1,
-            order = pfxOrder .. "c",
-            dependencies = { pfxCategory .. "introduction" },
-            trigger = {
-                type = "unlock-recipe",
-                recipe = BPSB.pfx .. "electric-energy-interface",
-            },
-        },
-        {
-            type = "tips-and-tricks-item",
-            category = category,
-            tag = "[img=virtual-signal.se-planet-orbit]",
-            name = pfxCategory .. "orbital-sandbox",
-            indent = 1,
-            order = pfxOrder .. "d",
-            dependencies = { pfxCategory .. "introduction" },
-            trigger = {
-                type = "unlock-recipe",
-                recipe = BPSB.pfx .. "electric-energy-interface",
-            },
-        },
-        {
-            type = "tips-and-tricks-item",
-            category = category,
-            tag = "[img=virtual-signal.se-remote-view]",
-            name = pfxCategory .. "remote-view",
-            indent = 1,
-            order = pfxOrder .. "e",
-            dependencies = { pfxCategory .. "introduction" },
-            trigger = {
-                type = "unlock-recipe",
-                recipe = BPSB.pfx .. "electric-energy-interface",
-            },
-        },
-        {
-            type = "tips-and-tricks-item",
-            category = category,
-            name = pfxCategory .. "mining",
-            indent = 1,
-            order = pfxOrder .. "f",
-            dependencies = { pfxCategory .. "introduction" },
-            trigger = {
-                type = "unlock-recipe",
-                recipe = BPSB.pfx .. "electric-energy-interface",
-            },
-        },
-    })
-end
 
 if mods["factorissimo-2-notnotmelon"] then
     category = BPSB.pfx .. "factorissimo"

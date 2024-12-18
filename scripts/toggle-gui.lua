@@ -8,8 +8,7 @@ ToggleGUI.surfacePropsButton = ToggleGUI.pfx .. "surface-props-button"
 ToggleGUI.resetButton = ToggleGUI.pfx .. "reset-button"
 ToggleGUI.entitySelectionPlannerGenerator = ToggleGUI.pfx .. "entity-selection-planner-generator"
 ToggleGUI.tileSelectionPlannerGenerator = ToggleGUI.pfx .. "tile-selection-planner-generator"
-ToggleGUI.daytimeSlider = ToggleGUI.pfx .. "daytime-slider"
-ToggleGUI.globalElectricNetworkCheckbox = ToggleGUI.pfx .. "global-eletric-network-checkbox"
+ToggleGUI.entranceButton = ToggleGUI.pfx .. "enter"
 
 ---@param player LuaPlayer
 function ToggleGUI.Init(player)
@@ -22,33 +21,25 @@ function ToggleGUI.Init(player)
         name = ToggleGUI.name,
         caption = { "gui." .. ToggleGUI.name },
         visible = false,
-        index = 0,
+        direction = "vertical",
         style = BPSB.pfx .. "toggle-frame",
     }
 
-    local innerFrame = frame.add {
+    local topLineFrame = frame.add {
         type = "frame",
-        name = "innerFrame",
-        direction = "vertical",
-        style = "inside_shallow_frame_with_padding_and_vertical_spacing",
-    }
-
-    local topLineFlow = innerFrame.add {
-        type = "flow",
-        name = "topLineFlow",
+        style = BPSB.pfx .. "shallow-semi-padded-frame",
         direction = "horizontal",
-        style = BPSB.pfx .. "centered-horizontal-flow",
     }
 
-    topLineFlow.add {
+    topLineFrame.add {
         type = "sprite-button",
         name = ToggleGUI.resetButton,
         tooltip = { "gui-description." .. ToggleGUI.resetButton },
-        style = "tool_button",
-        sprite = "utility/reset_white",
+        style = "tool_button_red",
+        sprite = "utility/reset",
     }
 
-    topLineFlow.add {
+    topLineFrame.add {
         type = "drop-down",
         name = ToggleGUI.selectedSandboxDropdown,
         tooltip = { "gui-description." .. ToggleGUI.selectedSandboxDropdown },
@@ -57,7 +48,7 @@ function ToggleGUI.Init(player)
         style = BPSB.pfx .. "sandbox-dropdown",
     }.style.horizontally_stretchable = true
 
-    topLineFlow.add {
+    topLineFrame.add {
         type = "sprite-button",
         name = ToggleGUI.surfacePropsButton,
         tooltip = { "gui-description." .. ToggleGUI.surfacePropsButton },
@@ -65,55 +56,29 @@ function ToggleGUI.Init(player)
         sprite = "tooltip-category-crafting-surface-conditions",
     }
 
-    local daylightFlow = innerFrame.add {
-        type = "flow",
-        name = "daylightFlow",
+    local entranceFrame = frame.add {
+        type = "frame",
+        style = BPSB.pfx .. "shallow-semi-padded-frame",
+        direction = "vertical",
+    }
+    entranceFrame.style.padding = 0
+
+    local entraceButton = entranceFrame.add {
+        type = "button",
+        name = ToggleGUI.entranceButton,
+        caption = { "gui." .. ToggleGUI.entranceButton },
+        tooltip = { "gui-description." .. ToggleGUI.entranceButton },
+    }
+    entraceButton.style.horizontally_stretchable = true
+    entraceButton.style.margin = 2
+
+    local selectorFrame = frame.add {
+        type = "frame",
+        style = BPSB.pfx .. "shallow-semi-padded-frame",
         direction = "horizontal",
-        style = BPSB.pfx .. "centered-horizontal-flow",
     }
 
-    daylightFlow.add {
-        type = "sprite",
-        tooltip = { "gui-description." .. ToggleGUI.daytimeSlider },
-        sprite = "utility/select_icon_white",
-        resize_to_sprite = false,
-        style = BPSB.pfx .. "sprite-like-tool-button",
-    }
-
-    daylightFlow.add {
-        type = "slider",
-        name = ToggleGUI.daytimeSlider,
-        value = 0.0,
-        minimum_value = 0.5,
-        maximum_value = 0.975,
-        value_step = 0.025,
-        style = BPSB.pfx .. "daylight-slider",
-    }.style.horizontally_stretchable = true
-
-    local globalElectricNetworkFlow = innerFrame.add {
-        type = "flow",
-        name = "globalElectricNetworkFlow",
-        direction = "horizontal",
-        style = BPSB.pfx .. "centered-horizontal-flow",
-    }
-
-    globalElectricNetworkFlow.add {
-        type = "checkbox",
-        name = ToggleGUI.globalElectricNetworkCheckbox,
-        caption = { "gui." .. ToggleGUI.globalElectricNetworkCheckbox },
-        tooltip = { "gui-description." .. ToggleGUI.globalElectricNetworkCheckbox },
-        state = false,
-        style = BPSB.pfx .. "left-padded-checkbox",
-    }
-
-    local selectorFlow = innerFrame.add {
-        type = "flow",
-        name = "selectorFlow",
-        direction = "horizontal",
-        style = BPSB.pfx .. "centered-horizontal-flow",
-    }
-
-    selectorFlow.add {
+    selectorFrame.add {
         type = "label",
         caption = { "gui." .. ToggleGUI.entitySelectionPlannerGenerator },
         tooltip = { "gui-description." .. ToggleGUI.entitySelectionPlannerGenerator },
@@ -124,7 +89,7 @@ function ToggleGUI.Init(player)
     if player.mod_settings[Settings.qualityEntityPlanners].value then
         entitySelectionType = "entity-with-quality"
     end
-    selectorFlow.add {
+    selectorFrame.add {
         type = "choose-elem-button",
         name = ToggleGUI.entitySelectionPlannerGenerator,
         tooltip = { "gui-description." .. ToggleGUI.entitySelectionPlannerGenerator },
@@ -133,6 +98,7 @@ function ToggleGUI.Init(player)
             { filter = "type", type = "resource" },
             { mode = "or", filter = "type", type = "asteroid" },
             { mode = "or", filter = "type", type = "tree" },
+            { mode = "or", filter = "type", type = "plant" },
             { mode = "or", filter = "type", type = "lightning" },
             { mode = "or", filter = "type", type = "unit" },
             { mode = "or", filter = "type", type = "segmented-unit" },
@@ -144,14 +110,14 @@ function ToggleGUI.Init(player)
         },
     }
 
-    selectorFlow.add {
+    selectorFrame.add {
         type = "label",
         caption = { "gui." .. ToggleGUI.tileSelectionPlannerGenerator },
         tooltip = { "gui-description." .. ToggleGUI.tileSelectionPlannerGenerator },
         style = "caption_label",
     }
 
-    selectorFlow.add {
+    selectorFrame.add {
         type = "choose-elem-button",
         tooltip = { "gui-description." .. ToggleGUI.tileSelectionPlannerGenerator },
         name = ToggleGUI.tileSelectionPlannerGenerator,
@@ -216,22 +182,13 @@ function ToggleGUI.Update(player)
             resetButton.tooltip = { "gui-description." .. ToggleGUI.resetButton }
         end
 
-        ToggleGUI.FindByName(player, ToggleGUI.daytimeSlider).slider_value = player.surface.daytime
-        ToggleGUI.FindByName(player, ToggleGUI.globalElectricNetworkCheckbox).state = Sandbox.HasGlobalElectricalNetwork(player.surface)
+        ToggleGUI.FindByName(player, ToggleGUI.entranceButton).visible = Sandbox.CanEnter(player)
+        ToggleGUI.FindByName(player, ToggleGUI.entranceButton).enabled = Sandbox.CanEnter(player)
     else
         player.set_shortcut_toggled(ToggleGUI.toggleShortcut, false)
         player.gui.left[ToggleGUI.name].visible = false
         ToggleGUI.FindByName(player, ToggleGUI.resetButton).enabled = false
-    end
-end
-
----@param event EventData.on_gui_value_changed
-function ToggleGUI.OnGuiValueChanged(event)
-    local player = game.players[event.player_index]
-    if event.element.name == ToggleGUI.daytimeSlider then
-        local daytime = event.element.slider_value
-        return Lab.SetDayTime(player, player.surface, daytime)
-                or SpaceExploration.SetDayTime(player, player.surface, daytime)
+        ToggleGUI.FindByName(player, ToggleGUI.entranceButton).enabled = false
     end
 end
 
@@ -259,25 +216,21 @@ function ToggleGUI.OnGuiClick(event)
     if event.element.name == ToggleGUI.toggleShortcut then
         Sandbox.Toggle(event.player_index)
         return true
+    elseif event.element.name == ToggleGUI.entranceButton then
+        Sandbox.SwapToGod(player)
+        return true
     elseif event.element.name == ToggleGUI.surfacePropsButton then
         SurfacePropsGUI.Init(player)
-        return true
-    elseif event.element.name == ToggleGUI.globalElectricNetworkCheckbox then
-        local newState = Sandbox.ToggleGlobalElectricalNetwork(game.players[event.player_index].surface)
-        ToggleGUI.FindByName(player, ToggleGUI.globalElectricNetworkCheckbox).state = newState
         return true
     elseif event.element.name == ToggleGUI.resetButton then
         if event.shift then
             return Lab.ResetEquipmentBlueprint(player.surface)
-                    or SpaceExploration.ResetEquipmentBlueprint(player.surface)
         else
             local blueprintString = Inventory.GetCursorBlueprintString(player)
             if blueprintString then
                 return Lab.SetEquipmentBlueprint(player.surface, blueprintString)
-                        or SpaceExploration.SetEquipmentBlueprint(player.surface, blueprintString)
             else
                 return Lab.Reset(player)
-                        or SpaceExploration.Reset(player)
             end
         end
         return true

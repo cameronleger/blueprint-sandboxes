@@ -1,4 +1,54 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.1
+Date: 2024-12-17
+  Bugfixes:
+    - Prevent losing Character when activating Editor Mode from the Physical Surface while Remotely Viewing a Sandbox
+---------------------------------------------------------------------------------------------------
+Version: 2.5.0
+Date: 2024-12-17
+  Changes:
+    - Toggling the Sandbox now begins by Remotely Viewing it, for compatibility with more situations
+    - Entering the Sandbox is still possible for the same situations it was before
+    - Enabled Remote View within Sandboxs
+---------------------------------------------------------------------------------------------------
+Version: 2.4.0
+Date: 2024-12-14
+  Changes:
+    - Daylight and Electrical inputs are moved into the Surface Properties GUI (now the Sandbox Settings GUI)
+    - Add more Daylight and Electrical related settings
+    - Removed "Chart all Labs" Setting; it's no longer optional
+    - Restored Remote Views now continue following the original Entity, if any
+    - Removed Space Exploration integration
+---------------------------------------------------------------------------------------------------
+Version: 2.3.5
+Date: 2024-12-13
+  Bugfixes:
+    - Much better detections for entering/exiting Sandboxes
+    - Special handling for Players changing Forces who haven't been seen yet
+---------------------------------------------------------------------------------------------------
+Version: 2.3.4
+Date: 2024-12-12
+  Bugfixes:
+    - Trees that are actually Plants are now included in the Entity spawners
+---------------------------------------------------------------------------------------------------
+Version: 2.3.3
+Date: 2024-12-11
+  Changes:
+    - Entering the Sandbox from the Editor will first attempt to close the Editor
+    - Localised names for Labs
+  Bugfixes:
+    - Entering/Exiting the Sandbox from the Editor is usually more successful
+    - Entering the Sandbox from the Remote View is usually more successful
+    - Catching "escapes" from Sandbox via Remote View, to enforce the proper exit routine
+---------------------------------------------------------------------------------------------------
+Version: 2.3.2
+Date: 2024-12-11
+  Changes:
+    - Entering the Sandbox from a Remote View will later return you to that same view, instead of your character
+    - Prevent seeing any other Surfaces in Remote View, if within a Sandbox
+  Bugfixes:
+    - Remote Views won't be automatically closed for Gods or Editors, to prevent losing their inventories
+---------------------------------------------------------------------------------------------------
 Version: 2.3.1
 Date: 2024-12-09
   Changes:

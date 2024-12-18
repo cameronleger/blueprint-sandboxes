@@ -1,6 +1,8 @@
 -- Code for Factorio's new Remote controller
 local RemoteView = {}
 
+RemoteView.chartAllSandboxesTick = 300
+
 -- When initialized, setup default hidden states
 function RemoteView.Init()
     for _, force in pairs(game.forces) do
@@ -51,52 +53,22 @@ function RemoteView.HideEverythingInSandboxes(sandboxForce)
     end
 end
 
--- Determine if the Remote View is being used
----@param player LuaPlayer
-function RemoteView.IsUsingRemoteView(player)
-    return player.controller_type == defines.controllers.remote
-end
-
--- If using Remote View, attempt to go back to the Character
----@param player LuaPlayer
-function RemoteView.EnsureSafeExit(player)
-    if not RemoteView.IsUsingRemoteView(player) then
-        return true
-    end
-    if player.physical_controller_type == defines.controllers.character then
-        local character = player.character
-        if not character then
-            -- Cannot close a Remote View without a real Character
-            return false
-        end
-        if character.surface.platform then
-            -- Being on a Platform means the Remote View must remain open
-            return false
-        end
-        if character.driving then
-            -- Somehow swapping to the Character while driving exits the vehicle
-            return false
-        end
-        
-        if character.surface_index ~= player.surface_index then
-            Teleport.ToPositionOnSurface(player, character.surface, character.position)
-        end
-        player.set_controller({
-            type = defines.controllers.character,
-            character = character,
-        })
-        return true
-    else
-        player.set_controller({
-            type = player.physical_controller_type,
-        })
-    end
-end
-
 ---@param surface LuaSurface
 ---@param force LuaForce
 function RemoteView.Hide(surface, force)
     force.set_surface_hidden(surface, true)
+end
+
+-- Charts each Sandbox that a Player is currently inside of
+function RemoteView.ChartAllOccupiedSandboxes()
+    local charted = {}
+    for _, player in pairs(game.players) do
+        local hash = player.force.name .. player.surface.name
+        if Sandbox.IsSandbox(player.surface) and not charted[hash] then
+            player.force.chart_all(player.surface)
+            charted[hash] = true
+        end
+    end
 end
 
 return RemoteView
