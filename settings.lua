@@ -44,17 +44,25 @@ data:extend({
         maximum_value = 10.0,
     },
     {
+        type = "string-setting",
+        name = Settings.preferredController,
+        setting_type = "runtime-per-user",
+        order = "a[player]-a",
+        default_value = "god",
+        allowed_values = {"god", "remote"},
+    },
+    {
         type = "bool-setting",
         name = Settings.craftToCursor,
         setting_type = "runtime-per-user",
-        order = "a[player]-a",
+        order = "a[player]-b",
         default_value = true,
     },
     {
         type = "bool-setting",
         name = Settings.qualityEntityPlanners,
         setting_type = "runtime-per-user",
-        order = "a[player]-b",
+        order = "a[player]-c",
         default_value = false,
     },
     {

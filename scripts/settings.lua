@@ -14,6 +14,7 @@ Settings.godAsyncUpgradeRequestsPerTick = BPSB.pfx .. "god-async-upgrade-per-tic
 Settings.godAsyncDeleteRequestsPerTick = BPSB.pfx .. "god-async-delete-per-tick"
 Settings.labsAbsorbPollution = BPSB.pfx .. "labs-absorb-pollution"
 Settings.qualityEntityPlanners = BPSB.pfx .. "quality-entity-planners"
+Settings.preferredController = BPSB.pfx .. "preferred-controller"
 
 function Settings.SetupConditionalHandlers()
     script.on_nth_tick(settings.global[Settings.godAsyncTick].value, God.HandleAllSandboxRequests)

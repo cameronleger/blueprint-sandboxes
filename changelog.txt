@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.2
+Date: 2024-12-18
+  Changes:
+    - Remotely Viewing Sandboxes is now an experimental setting; God is the current default
+    - Updated russian translation
+---------------------------------------------------------------------------------------------------
 Version: 2.5.1
 Date: 2024-12-17
   Bugfixes:

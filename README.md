@@ -22,17 +22,21 @@ To teach you the basics and provide many more details, the in-game Tips-and-Tric
 
 # Known Issues / Frequently Asked Questions
 
+### The Sandbox is not a Planet
+
+Many Factorio 2.0 features, capabilities, definitions, mechanics, etc. are directly coupled to the concept of a Planet: a real, physical location that may be travelled to. Heating on Aquilo, lightning on Fulgora, and music are commonly known examples. Planets also carry other features that are not desirable for Sandboxes: appearing in all Planetary-selection menus, allowing travel with Platforms, and limiting recipes based on planetary conditions, to name a few. Lastly, Planets _must_ be known ahead of time, statically, while the game is loading its prototypes.
+
+Sandboxes are meant to be quite different than that: ephemeral, dynamic, and personal. Each player has a Sandbox for themselves, and each Force/team does as well.
+
+Sandboxes and Planets are not compatible. The only reasonable approach I can imagine right now is to have an additional, singular Planetary Sandbox that aims to generally set as many parameters as possible to be widely useful, and everyone would have access to it. This is totally fine for single-player, but it has very different implications for multi-player games.
+
 ### Music disappears while in Sandbox
 
-This is an issue with Factorio's 2.0 music system (which only works for Planets and Platforms), and there's basically nothing this mod can do about it. I'm still providing feedback and attempting workarounds.
-
-### Map/Logistics/Pins locked while in Sandbox
-
-These features are disabled to prevent confusion and cheating. You are not on the same force as you are outside of the Sandbox; you do not have access to your normal buildings, building new ghosts would do nothing since your original force would not see them, and you would have full cheat-mode access to all other Planets and Platforms.
+This is an issue with Factorio's 2.0 music system (which only works for Planets and Platforms). See **The Sandbox is not a Planet**. There is a workaround that may solve this for you: there is a hidden setting in "the rest" (accessed by holding `ctrl` + `alt` while clicking "Settings" in the menu) called `ambient-music-based-on-physical-location`. If you cannot tell based on the name, this means that while you are in a Remote View (the default way of accessing the Sandbox), the music is still based on where your Character is. This naturally applies to the rest of the game as well, so it may not be to your taste.
 
 ### Cannot freeze due to cold, or place lightning collectors
 
-This is again an issue with Factorio's 2.0 surface-specific settings (which only works for Planets and Platforms), and there's basically nothing this mod can do about it. I'm still providing feedback and attempting workarounds.
+This is again an issue with Factorio's 2.0 surface-specific settings (which only works for Planets and Platforms). See **The Sandbox is not a Planet**.
 
 ### Cannot Undo in (Real World/Sandbox) after coming from (Sandbox/Real World)
 

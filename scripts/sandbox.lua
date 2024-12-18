@@ -551,7 +551,12 @@ function Sandbox.Toggle(player_index)
     elseif Sandbox.IsPlayerInsideSandbox(player) then
         Sandbox.Exit(player)
     else
-        Sandbox.View(player)
+        local preferredController = player.mod_settings[Settings.preferredController].value
+        if preferredController == "god" then
+            Sandbox.Enter(player)
+        elseif preferredController == "remote" then
+            Sandbox.View(player)
+        end
     end
 end
 
