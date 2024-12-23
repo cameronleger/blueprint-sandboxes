@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 020501
+Migrate.version = 020503
 
 function Migrate.Run()
     if not storage.version then
@@ -28,6 +28,7 @@ function Migrate.Run()
         if storage.version < 020303 then Migrate.v2_3_3() end
         if storage.version < 020400 then Migrate.v2_4_0() end
         if storage.version < 020500 then Migrate.v2_5_0() end
+        if storage.version < 020503 then Migrate.v2_5_3() end
     end
 
     storage.version = Migrate.version
@@ -406,6 +407,18 @@ function Migrate.v2_5_0()
     end
 
     log("Migration 2.5.0 Finished")
+end
+
+function Migrate.v2_5_3()
+    --[[
+    2.5.3 removes the in-progress equipment placement
+    ]]
+
+    log("Migration 2.5.3 Starting")
+    
+    storage.equipmentInProgress = nil
+
+    log("Migration 2.5.3 Finished")
 end
 
 return Migrate

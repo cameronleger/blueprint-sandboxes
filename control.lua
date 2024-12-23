@@ -149,17 +149,6 @@ script.on_event(defines.events.on_surface_cleared, function(event)
     Lab.Equip(surface)
 end)
 
-script.on_event(defines.events.on_chunk_generated, function(event)
-    local equipmentData = storage.equipmentInProgress[event.surface.name]
-    if equipmentData then
-        Equipment.BuildBlueprint(
-                equipmentData.stack,
-                equipmentData.surface,
-                equipmentData.forceName
-        )
-    end
-end)
-
 script.on_event(defines.events.on_pre_surface_deleted, function(event)
     local surface = game.surfaces[event.surface_index]
     if storage.labSurfaces[surface.name] then

@@ -183,8 +183,7 @@ function Lab.Equip(surface)
         return false
     end
 
-    log("Equipping Lab: " .. surface.name)
-
+    -- TODO: REWRITE BLUEPRINT STORAGE
     Equipment.Place(
             surfaceData.equipmentBlueprints[1],
             surface,
