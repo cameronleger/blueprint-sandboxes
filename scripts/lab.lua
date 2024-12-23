@@ -4,7 +4,7 @@ local Lab = {}
 Lab.pfx = BPSB.pfx .. "lab-"
 local pfxLength = string.len(Lab.pfx)
 
-Lab.equipmentString = "0eNqNkd1ugzAMhd/F10kF6bq2eZVqQpAaZgkMSkI1hnj3OVRC1dT95M6x/Z2TkxmqdsTBE0ewM5DrOYC9zBCo4bJNd3EaECxQxA4UcNmlClt00ZPTyOibScs++rp0CIsC4it+gM0X9SenokZvrKFvH/fN8qYAOVIkvJtai6ngsavQi8AvGAVDH2Sz56QttEzBBFabJbn6BjL/eNcPwEz8VmNdoy8CfQoiz7bzRGm/KRHXxNLS7h1DfILfHVYBszuskdyni4AxEjchTXns+hsWo/RasYnXIoUrrehHXFJ6a9j24Y8V3NCHVcWc8pfj2RxfzyY77SWXL6PBsLw="
+Lab.equipmentString = "0eNqFkdFqhDAQRf9lnuOi2WbB/EopQd3RDsRRkrjUSv69iQtSikvzNrlzz51MNmjtgrMjDqA3oG5iD/p9A08DNzbfcTMiaECLXXDUFcjohrVIDnR90yFEAcR3/AJdRXHibGkoDvc82d8OGT8EIAcKhM/gvVgNL2OLLiHFa4yAefLJOXFOS7RSwAq6kDHP8Qckxf8veQEs07zt0vfojKfvhKjK45wkXY8k4p44SUX3iT6c4C9qD5AXta/k2W08hkA8+NzlcJweaJak2TQm3g0FHJMU3IIxby/XeT3HPwp4oPN7irrJ+q2ulZLqdpVVjD/mj6gB"
 
 -- A unique per-Player Lab Name
 ---@param player LuaPlayer
@@ -97,6 +97,20 @@ end
 
 -- Set the Lab's equipment Blueprint for a Surface
 ---@param surface LuaSurface
+---@return string
+function Lab.GetEquipmentBlueprint(surface)
+    local surfaceData = storage.labSurfaces[surface.name]
+    if Lab.IsLab(surface) and surfaceData then
+        ---@type LuaItemStack
+        local blueprint = surfaceData.equipmentBlueprints[1]
+        return blueprint.export_stack()
+    else
+        return Lab.equipmentString
+    end
+end
+
+-- Set the Lab's equipment Blueprint for a Surface
+---@param surface LuaSurface
 function Lab.SetEquipmentBlueprint(surface, equipmentString)
     if Lab.IsLab(surface) then
         log("Setting Lab equipment: " .. surface.name)
@@ -104,27 +118,9 @@ function Lab.SetEquipmentBlueprint(surface, equipmentString)
                 storage.labSurfaces[surface.name].equipmentBlueprints,
                 equipmentString
         )
-        surface.print("The equipment Blueprint for this Lab has been changed")
         return true
     else
         log("Not a Lab, won't Set equipment: " .. surface.name)
-        return false
-    end
-end
-
--- Reset the Lab's equipment Blueprint for a Surface
----@param surface LuaSurface
-function Lab.ResetEquipmentBlueprint(surface)
-    if Lab.IsLab(surface) then
-        log("Resetting Lab equipment: " .. surface.name)
-        Equipment.Set(
-                storage.labSurfaces[surface.name].equipmentBlueprints,
-                Lab.equipmentString
-        )
-        surface.print("The equipment Blueprint for this Lab has been reset")
-        return true
-    else
-        log("Not a Lab, won't Reset equipment: " .. surface.name)
         return false
     end
 end

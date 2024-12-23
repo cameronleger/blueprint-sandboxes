@@ -32,6 +32,23 @@ data.raw["gui-style"]["default"][BPSB.pfx .. "shallow-semi-padded-frame"] = {
     },
 }
 
+data.raw["gui-style"]["default"][BPSB.pfx .. "tab-scroll-pane"] = {
+    type = "scroll_pane_style",
+    parent = "tab_scroll_pane",
+    left_padding = 18,
+    right_padding = 18,
+    horizontal_flow_style = {
+        type = "horizontal_flow_style",
+        parent = "horizontal_flow",
+        horizontal_spacing = 6,
+    },
+    vertical_flow_style = {
+        type = "vertical_flow_style",
+        parent = "vertical_flow",
+        vertical_spacing = 12,
+    },
+}
+
 data.raw["gui-style"]["default"][BPSB.pfx .. "padded-horizontal-flow"] = {
     type = "horizontal_flow_style",
     parent = "horizontal_flow",

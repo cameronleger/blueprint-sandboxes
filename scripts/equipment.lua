@@ -3,6 +3,7 @@ local Equipment = {}
 
 -- Initializes an Inventory for the default equipment Blueprint(s)
 ---@param default string
+---@return LuaInventory
 function Equipment.Init(default)
     local equipment = game.create_inventory(1)
     Equipment.Set(equipment, default)

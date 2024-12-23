@@ -2,7 +2,8 @@
 Version: 2.5.3
 Date: 2024-12-23
   Changes:
-    - Much simpler and more robust equipment placement, enabled via Factorio bug-fixes
+    - Much simpler and more robust Equipment placement, enabled via Factorio bug-fixes
+    - Equipment blueprint interactions moved from the reset button to Sandbox settings
 ---------------------------------------------------------------------------------------------------
 Version: 2.5.2
 Date: 2024-12-18

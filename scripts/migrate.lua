@@ -38,6 +38,7 @@ function Migrate.RecreateGuis()
     for _, player in pairs(game.players) do
         ToggleGUI.Destroy(player)
         ToggleGUI.Init(player)
+        SurfacePropsGUI.Destroy(player)
     end
 end
 
@@ -415,7 +416,7 @@ function Migrate.v2_5_3()
     ]]
 
     log("Migration 2.5.3 Starting")
-    
+
     storage.equipmentInProgress = nil
 
     log("Migration 2.5.3 Finished")

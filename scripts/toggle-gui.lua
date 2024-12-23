@@ -223,17 +223,7 @@ function ToggleGUI.OnGuiClick(event)
         SurfacePropsGUI.Init(player)
         return true
     elseif event.element.name == ToggleGUI.resetButton then
-        if event.shift then
-            return Lab.ResetEquipmentBlueprint(player.surface)
-        else
-            local blueprintString = Inventory.GetCursorBlueprintString(player)
-            if blueprintString then
-                return Lab.SetEquipmentBlueprint(player.surface, blueprintString)
-            else
-                return Lab.Reset(player)
-            end
-        end
-        return true
+        return Lab.Reset(player)
     end
     return false
 end

@@ -19,8 +19,10 @@ SurfacePropsGUI.propertiesWithNoRuntimeEffect = {
     ["day-night-cycle"] = true,
 }
 
-SurfacePropsGUI.electricalTab = SurfacePropsGUI.pfx .. "electrical-tab"
+SurfacePropsGUI.miscTab = SurfacePropsGUI.pfx .. "miscellaneous-tab"
 SurfacePropsGUI.globalElectricNetworkCheckbox = SurfacePropsGUI.pfx .. "global-eletric-network-checkbox"
+SurfacePropsGUI.equipmentBlueprintInput = SurfacePropsGUI.pfx .. "equipment-blueprint-input"
+SurfacePropsGUI.equipmentBlueprintTag = SurfacePropsGUI.pfx .. "equipment-blueprint"
 
 SurfacePropsGUI.cancel = SurfacePropsGUI.pfx .. "cancel"
 SurfacePropsGUI.confirm = SurfacePropsGUI.pfx .. "confirm"
@@ -93,7 +95,7 @@ local function AddDayNightTab(pane, surface)
     local innerFrame = pane.add {
         type = "scroll-pane",
         direction = "vertical",
-        style = "tab_scroll_pane",
+        style = BPSB.pfx .. "tab-scroll-pane",
     }
 
     local daylightFlow = innerFrame.add {
@@ -101,8 +103,6 @@ local function AddDayNightTab(pane, surface)
         direction = "horizontal",
         style = BPSB.pfx .. "centered-horizontal-flow",
     }
-    daylightFlow.style.left_margin = 10
-    daylightFlow.style.right_margin = 10
 
     daylightFlow.add {
         type = "checkbox",
@@ -136,7 +136,7 @@ local function AddSurfacePropertiesTab(pane, surface)
     local innerFrame = pane.add {
         type = "scroll-pane",
         direction = "vertical",
-        style = "tab_scroll_pane",
+        style = BPSB.pfx .. "tab-scroll-pane",
     }
     innerFrame.style.padding = 0
 
@@ -215,16 +215,16 @@ end
 
 ---@param pane LuaGuiElement
 ---@param surface LuaSurface
-local function AddElectricalTab(pane, surface)
+local function AddMiscTab(pane, surface)
     local tab = pane.add {
         type = "tab",
-        caption = { "gui." .. SurfacePropsGUI.electricalTab }
+        caption = { "gui." .. SurfacePropsGUI.miscTab }
     }
 
     local innerFrame = pane.add {
         type = "scroll-pane",
         direction = "vertical",
-        style = "tab_scroll_pane",
+        style = BPSB.pfx .. "tab-scroll-pane",
     }
 
     local globalElectricNetworkFlow = innerFrame.add {
@@ -232,8 +232,6 @@ local function AddElectricalTab(pane, surface)
         direction = "horizontal",
         style = BPSB.pfx .. "centered-horizontal-flow",
     }
-    globalElectricNetworkFlow.style.left_margin = 10
-    globalElectricNetworkFlow.style.right_margin = 10
 
     globalElectricNetworkFlow.add {
         type = "checkbox",
@@ -241,6 +239,32 @@ local function AddElectricalTab(pane, surface)
         caption = { "gui." .. SurfacePropsGUI.globalElectricNetworkCheckbox },
         tooltip = { "gui-description." .. SurfacePropsGUI.globalElectricNetworkCheckbox },
         state = surface.has_global_electric_network,
+    }
+
+    innerFrame.add {
+        type = "line",
+    }
+
+    local equipmentBlueprintFlow = innerFrame.add {
+        type = "flow",
+        direction = "horizontal",
+        style = BPSB.pfx .. "centered-horizontal-flow",
+    }
+
+    equipmentBlueprintFlow.add {
+        type = "label",
+        caption = { "gui." .. SurfacePropsGUI.equipmentBlueprintInput },
+        tooltip = { "gui-description." .. SurfacePropsGUI.equipmentBlueprintInput },
+    }
+
+    local currentBlueprintString = Lab.GetEquipmentBlueprint(surface)
+    equipmentBlueprintFlow.add {
+        type = "sprite-button",
+        name = SurfacePropsGUI.equipmentBlueprintInput,
+        sprite = "item/blueprint",
+        tooltip = { "gui-description." .. SurfacePropsGUI.equipmentBlueprintInput },
+        toggled = currentBlueprintString ~= Lab.equipmentString,
+        tags = { [SurfacePropsGUI.equipmentBlueprintTag] = currentBlueprintString },
     }
 
     pane.add_tab(tab, innerFrame)
@@ -274,7 +298,7 @@ function SurfacePropsGUI.Init(player)
     }
     AddDayNightTab(tabs, surface)
     AddSurfacePropertiesTab(tabs, surface)
-    AddElectricalTab(tabs, surface)
+    AddMiscTab(tabs, surface)
 
     local actionsFlow = frame.add {
         type = "flow",
@@ -408,6 +432,9 @@ function SurfacePropsGUI.Apply(player)
     else
         sandboxSurface.destroy_global_electric_network()
     end
+
+    local equipmentBlueprintString = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.equipmentBlueprintInput).tags[SurfacePropsGUI.equipmentBlueprintTag]
+    Lab.SetEquipmentBlueprint(sandboxSurface, equipmentBlueprintString)
 end
 
 ---@param event EventData.on_gui_selection_state_changed
@@ -432,6 +459,22 @@ function SurfacePropsGUI.OnGuiClick(event)
         SurfacePropsGUI.Destroy(player)
     elseif event.element.name == SurfacePropsGUI.propertyPresetReset then
         SurfacePropsGUI.LoadPreset(player)
+    elseif event.element.name == SurfacePropsGUI.equipmentBlueprintInput then
+        if event.button == defines.mouse_button_type.right then
+            event.element.tags = { [SurfacePropsGUI.equipmentBlueprintTag] = Lab.equipmentString }
+            event.element.toggled = false
+        else
+            local blueprintString = Inventory.GetCursorBlueprintString(player)
+            if blueprintString then
+                event.element.tags = { [SurfacePropsGUI.equipmentBlueprintTag] = blueprintString }
+                event.element.toggled = blueprintString ~= Lab.equipmentString
+            else
+                local equipmentString = event.element.tags[SurfacePropsGUI.equipmentBlueprintTag]
+                player.cursor_stack.import_stack(equipmentString)
+                player.cursor_stack_temporary = true
+            end
+        end
+        return true
     end
 end
 
