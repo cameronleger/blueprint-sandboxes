@@ -6,24 +6,13 @@ function Factorissimo.enabled()
     return not not remote.interfaces[Factorissimo.name]
 end
 
-Factorissimo.surfacePfx = "factory-floor-"
-local surfacePfxLength = string.len(Factorissimo.surfacePfx)
-
-function Factorissimo.GetAllFactories()
-    if Factorissimo.enabled() then
-        return remote.call(Factorissimo.name, "get_global", { "factories" })
-    else
-        return {}
-    end
-end
-
 -- Whether the Surface is a Factory
 function Factorissimo.IsFactory(thingWithName)
     if not Factorissimo.enabled() then
         return false
     end
 
-    return string.sub(thingWithName.name, 1, surfacePfxLength) == Factorissimo.surfacePfx
+    return remote.call(Factorissimo.name, "is_factorissimo_surface", thingWithName)
 end
 
 -- Whether the Surface is a Factory inside of a Sandbox
@@ -52,7 +41,11 @@ end
 -- Find a Factory's Outside Surface recursively
 ---@param surface LuaSurface
 ---@param position MapPosition
-function Factorissimo.GetOutsideSurfaceForFactory(surface, position)
+function Factorissimo.GetOutsideSurfaceForFactory(surface, position, recursion_depth)
+    if recursion_depth and recursion_depth > 100 then -- its possible for a factory to contain itself.
+        return nil
+    end
+
     if not Factorissimo.IsFactory(surface) then
         return nil
     end
@@ -66,7 +59,7 @@ function Factorissimo.GetOutsideSurfaceForFactory(surface, position)
         return Factorissimo.GetOutsideSurfaceForFactory(factory.outside_surface, {
             x = factory.outside_door_x,
             y = factory.outside_door_y,
-        })
+        }, (recursion_depth or 0) + 1)
     else
         return factory.outside_surface
     end
