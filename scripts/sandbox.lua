@@ -536,7 +536,7 @@ function Sandbox.Toggle(player_index)
     local playerData = storage.players[player.index]
 
     if Factorissimo.IsFactoryInsideSandbox(player.surface, player.position) then
-        player.print("You are inside of a Factory, so you cannot change Sandboxes")
+        player.print{"messages.factorissimo-cannot-change-sandbox"}
         return
     end
 
