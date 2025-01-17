@@ -8,6 +8,7 @@ SurfacePropsGUI.forcedDaytimeCheckbox = SurfacePropsGUI.pfx .. "forced-daytime"
 SurfacePropsGUI.daytimeSlider = SurfacePropsGUI.pfx .. "daytime-slider"
 
 SurfacePropsGUI.propertyTab = SurfacePropsGUI.pfx .. "property-tab"
+SurfacePropsGUI.propertyIgnored = SurfacePropsGUI.pfx .. "property-ignore-conditions"
 SurfacePropsGUI.propertyPresets = {}
 SurfacePropsGUI.propertyPresetDefault = SurfacePropsGUI.pfx .. "property-preset-default"
 SurfacePropsGUI.propertyPresetDropDown = SurfacePropsGUI.pfx .. "property-preset-drop-down"
@@ -133,14 +134,12 @@ local function AddSurfacePropertiesTab(pane, surface)
         caption = { "gui." .. SurfacePropsGUI.propertyTab }
     }
 
-    local innerFrame = pane.add {
-        type = "scroll-pane",
+    local paneFlow = pane.add {
+        type = "flow",
         direction = "vertical",
-        style = BPSB.pfx .. "tab-scroll-pane",
     }
-    innerFrame.style.padding = 0
 
-    local planetPresetFlow = innerFrame.add {
+    local planetPresetFlow = paneFlow.add {
         type = "frame",
         direction = "horizontal",
         style = "subheader_frame",
@@ -171,6 +170,20 @@ local function AddSurfacePropertiesTab(pane, surface)
         tooltip = { "gui-description." .. SurfacePropsGUI.propertyPresetReset },
         style = "tool_button_red",
         sprite = "utility/reset",
+    }
+
+    local innerFrame = paneFlow.add {
+        type = "scroll-pane",
+        direction = "vertical",
+        style = BPSB.pfx .. "tab-scroll-pane",
+    }
+
+    innerFrame.add {
+        type = "checkbox",
+        name = SurfacePropsGUI.propertyIgnored,
+        caption = { "gui." .. SurfacePropsGUI.propertyIgnored },
+        tooltip = { "gui-description." .. SurfacePropsGUI.propertyIgnored },
+        state = surface.ignore_surface_conditions,
     }
 
     innerFrame.add {
@@ -210,7 +223,7 @@ local function AddSurfacePropertiesTab(pane, surface)
         end
     end
 
-    pane.add_tab(tab, innerFrame)
+    pane.add_tab(tab, paneFlow)
 end
 
 ---@param pane LuaGuiElement
@@ -408,6 +421,9 @@ function SurfacePropsGUI.Apply(player)
 
     local daytime = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.daytimeSlider).slider_value
     sandboxSurface.daytime = daytime
+
+    local ignoreSurfaceConditions = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.propertyIgnored).state
+    sandboxSurface.ignore_surface_conditions = ignoreSurfaceConditions
 
     local propertiesTable = SurfacePropsGUI.FindByName(player, SurfacePropsGUI.propertyTable)
     if not propertiesTable then

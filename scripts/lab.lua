@@ -165,6 +165,7 @@ function Lab.AfterCreate(surface)
     surface.daytime = 0.95
     surface.show_clouds = false
     surface.generate_with_lab_tiles = true
+    surface.ignore_surface_conditions = true
     surface.localised_name = Lab.LocalisedNameFromLabName(surface.name)
 
     return true

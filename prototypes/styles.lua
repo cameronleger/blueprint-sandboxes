@@ -134,5 +134,4 @@ data.raw["gui-style"]["default"][BPSB.pfx .. "surface-property-description"] = {
     type = "label_style",
     single_line = false,
     maximal_width = 300,
-    margin = 12,
 }
