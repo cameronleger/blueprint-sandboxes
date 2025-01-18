@@ -27,7 +27,5 @@ script.on_event(defines.events.on_player_created, function(event)
   player.toggle_map_editor()
   game.tick_paused = false
 
-  player.print("Welcome to the Universe of Sandboxes! Every Planet will be Lab Tiles, but otherwise has all its normal properties.")
-  player.print("Use the Editor to fundamentally change the landscape, if you need to. Exiting the Editor will swap to the lesser God-mode.")
-  player.print("Without a Character, when you use the Remote View to see another Surface and then exit it, Factorio will place you on that Surface. Use this to interact more directly and without radar coverage restrictions.")
+  player.print{"messages.universe-of-sandboxes-intro"}
 end)

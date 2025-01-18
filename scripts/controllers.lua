@@ -54,30 +54,31 @@ end
 
 ---@param player LuaPlayer
 ---@param reason string
+---@return LocalisedString
 local function LogUnstablePlayer(player, reason)
     log("Player " .. player.name .. " is not stable because: " .. reason)
-    return reason
+    return {"messages.sandbox-unsafe-to-replace-controller-" .. reason}
 end
 
 -- Determine if the current state is stable enough to revert back to later on
 ---@param player LuaPlayer
 ---@param skipRetry true | nil
----@return true | string stable
+---@return true | LocalisedString stable
 function Controllers.CanBeSafelyReplaced(player, skipRetry)
     if player.controller_type == defines.controllers.cutscene then
-        return LogUnstablePlayer(player, "watching a cutscene")
+        return LogUnstablePlayer(player, "watching-a-cutscene")
     end
 
     -- Jetpacks are a different, temporary type of character, and we're not fully integrated with those types of mods
     if player.character and player.character.name == "character-jetpack" then
-        return LogUnstablePlayer(player, "using a jetpack")
+        return LogUnstablePlayer(player, "using-a-jetpack")
     end
 
     -- Using the Editor, so the real state isn't accessible
     if Controllers.IsUsingEditor(player) then
         player.toggle_map_editor()
         if skipRetry then
-            return LogUnstablePlayer(player, "using the editor")
+            return LogUnstablePlayer(player, "using-the-editor")
         else
             return Controllers.CanBeSafelyReplaced(player, true)
         end
@@ -85,12 +86,12 @@ function Controllers.CanBeSafelyReplaced(player, skipRetry)
 
     -- Has an important stashed controller that might be lost (like in the remote view, but while an editor)
     if player.stashed_controller_type and player.stashed_controller_type ~= defines.controllers.editor then
-        return LogUnstablePlayer(player, "primary controller is stashed")
+        return LogUnstablePlayer(player, "controller-stashed")
     end
 
     -- Some funny business will occur soon: transferring surfaces, controller swapping, etc
     if Controllers.IsRidingRocket(player) then
-        return LogUnstablePlayer(player, "riding a rocket")
+        return LogUnstablePlayer(player, "riding-a-rocket")
     end
 
     -- Some Remote Views are more stable than others
@@ -99,17 +100,17 @@ function Controllers.CanBeSafelyReplaced(player, skipRetry)
         if player.physical_controller_type ~= nil
             and player.physical_controller_type ~= defines.controllers.character
         then
-            return LogUnstablePlayer(player, "physical controller is not a physical character while using remote view")
+            return LogUnstablePlayer(player, "remote-view-while-not-physical")
         end
 
         -- The character might be recreated/teleported soon, but swapping back to it does not "insert" them into the platform anyway
         if player.physical_surface.platform ~= nil then
-            return LogUnstablePlayer(player, "riding a platform")
+            return LogUnstablePlayer(player, "riding-a-platform")
         end
 
         -- Swapping back to this character will place them on the surface, not in the vehicle
         if player.driving or (player.character and player.character.driving) then
-            return LogUnstablePlayer(player, "driving while remotely viewing")
+            return LogUnstablePlayer(player, "remote-view-while-driving")
         end
     end
 
@@ -238,7 +239,7 @@ function Controllers.RestoreLastController(player, playerData)
     local characters = player.get_associated_characters()
     if #characters > 0 then
         if #characters > 1 then
-            player.print("Warning: you have multiple associated characters but the Sandbox does not know exactly which one you wanted")
+            player.print{"messages.choose-first-associated-character"}
         end
         for _, character in ipairs(characters) do
             if character.valid and not character.player then
@@ -265,7 +266,7 @@ function Controllers.RestoreLastController(player, playerData)
         and playerData.preSandboxSurfaceName
         and game.surfaces[playerData.preSandboxSurfaceName]
     then
-        player.print("Unfortunately, your previous Character was lost, so it had to be recreated.")
+        player.print{"messages.character-lost-but-recreated"}
         player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
         local recreated = game.surfaces[playerData.preSandboxSurfaceName].create_entity {
             name = "character",
@@ -281,7 +282,7 @@ function Controllers.RestoreLastController(player, playerData)
     end
 
     -- Otherwise, we need a completely clean slate :(
-    player.print("Unfortunately, your previous Character was completely lost, so you must start anew.")
+    player.print{"messages.character-lost"}
     player.teleport({ 0, 0 }, "nauvis")
     local recreated = game.surfaces["nauvis"].create_entity {
         name = "character",

@@ -156,13 +156,13 @@ function Sandbox.Enter(player)
 
     local canBeSafelyReplaced = Controllers.CanBeSafelyReplaced(player)
     if canBeSafelyReplaced ~= true then
-        player.print("Your current character/controller is not stable, so you cannot enter a Sandbox: " .. canBeSafelyReplaced)
+        player.print({"", {"messages.sandbox-unsafe-to-replace-controller"}, ": ", canBeSafelyReplaced})
         return
     end
 
     Controllers.StoreRemoteView(player, playerData)
     if not Controllers.SafelyCloseRemoteView(player) then
-        player.print("You are using a remote view that cannot be safely closed, so you cannot enter a Sandbox. Return to your Character first.")
+        player.print{"messages.sandbox-unsafe-to-close-remote-view"}
         return
     end
 
@@ -202,7 +202,7 @@ function Sandbox.Exit(player)
 
     if not Controllers.IsUsingRemoteView(player) and not playerData.preSandboxSurfaceName then
         log(player.name .. " has no last known Surface, so they cannot exit the Sandbox normally")
-        player.print("You must not have come into the Sandbox in an expected way, because it does not know where you came from. What happens next might be unexpected.")
+        player.print{"messages.sandbox-exiting-without-known-entrace"}
         Controllers.RestoreLastController(player, playerData)
         return
     end
@@ -262,7 +262,7 @@ function Sandbox.OnPlayerForceChanged(player)
         local labForce = Force.GetOrCreateSandboxForce(force)
         if Sandbox.IsPlayerInsideSandbox(player) then
             if Sandbox.GetSandboxChoiceFor(player, player.surface) ~= Sandbox.player then
-                player.print("Your Force changed, so you have been removed from a Sandbox that you are no longer allowed in")
+                player.print{"messages.sandbox-force-changed-while-in-sandbox"}
                 playerData.preSandboxForceName = force.name
                 Sandbox.Exit(player)
             else
@@ -462,11 +462,11 @@ function Sandbox.SwapToGod(player)
     -- Get back to their real/physical controllers so we can save them
     local canBeSafelyReplaced = Controllers.CanBeSafelyReplaced(player)
     if canBeSafelyReplaced ~= true then
-        player.print("Your current character/controller is not stable, so you cannot enter a Sandbox: " .. canBeSafelyReplaced)
+        player.print({"", {"messages.sandbox-unsafe-to-replace-controller"}, ": ", canBeSafelyReplaced})
         return
     end
     if not Controllers.SafelyCloseRemoteView(player) then
-        player.print("You are using a remote view that cannot be safely closed, so you cannot enter a Sandbox. Return to your Character first.")
+        player.print{"messages.sandbox-unsafe-to-close-remote-view"}
         return
     end
 
@@ -504,7 +504,7 @@ function Sandbox.OnPlayerSurfaceChanged(player)
 
         if not Controllers.IsSandboxSupported(player) then
             log(player.name .. " entered a Sandbox with the Controller ID " .. player.controller_type .. "; bailing out.")
-            player.print("WARNING: You have entered a Sandbox in an odd way, and using an unsupported Controller. You are on your own.")
+            player.print{"messages.sandbox-entrace-from-unsupported-controller"}
         end
 
         StorePreSandboxStateOnArrival(player, playerData)

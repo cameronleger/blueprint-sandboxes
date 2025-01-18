@@ -201,7 +201,6 @@ function ToggleGUI.OnGuiDropdown(event)
             storage.players[player.index].selectedSandbox = event.element.selected_index
             Sandbox.Toggle(event.player_index)
         else
-            player.print("That Sandbox is not possible.")
             event.element.selected_index = storage.players[player.index].selectedSandbox
             ToggleGUI.Update(player)
         end

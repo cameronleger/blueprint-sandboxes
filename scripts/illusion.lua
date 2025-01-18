@@ -168,11 +168,8 @@ function Illusion.HandleBlueprintEvent(player, potentialItemStacks)
         log("Cannot handle Blueprint update: no entities in Blueprint (caused by selecting new contents)")
         local playerData = storage.players[player.index]
         local lastWarningForNewContents = playerData.lastWarningForNewContents or 0
-        if game.tick - lastWarningForNewContents > (216000) then -- 1 hour
-            player.print("WARNING: Known issues in Factorio prevent mods from seeing or updating Blueprints when using 'Select new contents'.")
-            player.print("This mod requires that ability to swap the Fake Illusions for their Real Entities in your Blueprints.")
-            player.print("If you are including any Fake Illusions in this Blueprint, they likely will NOT be replaced, especially if the source Blueprint is within the Library instead of your Inventory.")
-            player.print("This message will only appear periodically. See the mod's page for more details.")
+        if game.tick - lastWarningForNewContents > (2) then -- 1 hour
+            player.print{"messages.blueprint-selected-new-contents-from-library"}
             playerData.lastWarningForNewContents = game.tick
         end
         return

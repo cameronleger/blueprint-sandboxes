@@ -436,8 +436,6 @@ function SurfacePropsGUI.Apply(player)
             local propValue = tonumber(child.text)
             if propValue ~= nil then
                 sandboxSurface.set_property(propId, propValue)
-            else
-                player.print("Not applying your edits because an invalid value was found for " .. propId)
             end
         end
     end

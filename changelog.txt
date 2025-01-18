@@ -4,6 +4,7 @@ Date: 2025-01-17
   Changes:
     - Added a setting for Factorio to ignore surface conditions
     - New Labs will ignore surface conditions by default
+    - Localised all messages printed within the game
 ---------------------------------------------------------------------------------------------------
 Version: 2.5.4
 Date: 2025-01-06

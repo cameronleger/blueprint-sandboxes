@@ -21,7 +21,7 @@ function Inventory.GetCursorBlueprintString(player)
         then
             blueprint = player.cursor_stack.export_stack()
         else
-            player.print("There was a Blueprint in your cursor, but Factorio incorrectly describes it as invalid. This is most likely because it's currently in the Blueprint Library (a known bug in Factorio).")
+            player.print{"messages.blueprint-in-cursor-from-library"}
         end
     end
     return blueprint
@@ -62,7 +62,7 @@ function Inventory.Prune(player)
     end
 
     if inventory.count_empty_stacks() == 0 then
-        player.print("Your inventory is almost full. Please throw some items away.")
+        player.print{"messages.god-inventory-almost-full"}
         player.surface.spill_item_stack({
             position = player.position,
             stack = inventory[#inventory],
