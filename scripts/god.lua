@@ -71,7 +71,7 @@ function God.InsertRequests(entity)
                     if inventory and inventory.valid and inventory.index == position.inventory then
                         local stack = inventory[position.stack + 1]
                         if stack.count > 0 then
-                            stack.count = stack.count - decrement
+                            stack.count = math.max(0, stack.count - decrement)
                         end
                     end
                 end
