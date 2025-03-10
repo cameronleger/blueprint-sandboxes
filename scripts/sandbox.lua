@@ -156,13 +156,19 @@ function Sandbox.Enter(player)
 
     local canBeSafelyReplaced = Controllers.CanBeSafelyReplaced(player)
     if canBeSafelyReplaced ~= true then
-        player.print({"", {"messages.sandbox-unsafe-to-replace-controller"}, ": ", canBeSafelyReplaced})
+        player.create_local_flying_text({
+            text = {"", {"messages.sandbox-unsafe-to-replace-controller"}, ": ", canBeSafelyReplaced},
+            position = player.position,
+        })
         return
     end
 
     Controllers.StoreRemoteView(player, playerData)
     if not Controllers.SafelyCloseRemoteView(player) then
-        player.print{"messages.sandbox-unsafe-to-close-remote-view"}
+        player.create_local_flying_text({
+            text = {"messages.sandbox-unsafe-to-close-remote-view"},
+            position = player.position,
+        })
         return
     end
 
@@ -176,8 +182,16 @@ function Sandbox.Enter(player)
     -- Store the Player's previous State (that must be referenced to Exit)
     StorePreSandboxStateBeforeEntrance(player, playerData)
 
-    -- Harmlessly detach the Player from their Character
     local character = player.character
+    -- Stop walking to prevent character from moving while in Sandbox
+    if character and character.walking_state.walking then
+        character.walking_state = {
+            walking = false,
+            direction = character.walking_state.direction,
+        }
+    end
+
+    -- Harmlessly detach the Player from their Character
     player.set_controller({ type = defines.controllers.god })
     if character and not character.associated_player then
         player.associate_character(character)
@@ -200,7 +214,9 @@ function Sandbox.Exit(player)
     -- Remember where they left off
     playerData.lastSandboxPositions[player.surface.name] = player.position
 
-    if not Controllers.IsUsingRemoteView(player) and not playerData.preSandboxSurfaceName then
+    local preSandboxSurface = playerData.preSandboxSurfaceName and game.surfaces[playerData.preSandboxSurfaceName]
+    if not Controllers.IsUsingRemoteView(player) and not preSandboxSurface then
+        playerData.preSandboxSurfaceName = nil
         log(player.name .. " has no last known Surface, so they cannot exit the Sandbox normally")
         player.print{"messages.sandbox-exiting-without-known-entrace"}
         Controllers.RestoreLastController(player, playerData)
@@ -282,19 +298,25 @@ end
 ---@param surface LuaSurface
 function Sandbox.GetSandboxChoiceFor(player, surface)
     local playerData = storage.players[player.index]
-    if surface.name == playerData.labName then
+    if playerData.labName and surface.name == playerData.labName then
         return Sandbox.player
-    elseif surface.name == storage.sandboxForces[playerData.sandboxForceName].labName then
+    end
+
+    local sandboxForce = storage.sandboxForces[playerData.sandboxForceName]
+    if sandboxForce and surface.name == sandboxForce.labName then
         return Sandbox.force
-    elseif Factorissimo.IsFactory(surface) then
+    end
+
+    if Factorissimo.IsFactory(surface) then
         local outsideSurface = Factorissimo.GetOutsideSurfaceForFactory(
-                surface,
-                player.position
+            surface,
+            player.position
         )
         if outsideSurface then
             return Sandbox.GetSandboxChoiceFor(player, outsideSurface)
         end
     end
+
     return nil
 end
 
@@ -462,11 +484,17 @@ function Sandbox.SwapToGod(player)
     -- Get back to their real/physical controllers so we can save them
     local canBeSafelyReplaced = Controllers.CanBeSafelyReplaced(player)
     if canBeSafelyReplaced ~= true then
-        player.print({"", {"messages.sandbox-unsafe-to-replace-controller"}, ": ", canBeSafelyReplaced})
+        player.create_local_flying_text({
+            text = {"", {"messages.sandbox-unsafe-to-replace-controller"}, ": ", canBeSafelyReplaced},
+            position = player.position,
+        })
         return
     end
     if not Controllers.SafelyCloseRemoteView(player) then
-        player.print{"messages.sandbox-unsafe-to-close-remote-view"}
+        player.create_local_flying_text({
+            text = {"messages.sandbox-unsafe-to-close-remote-view"},
+            position = player.position,
+        })
         return
     end
 
@@ -504,7 +532,10 @@ function Sandbox.OnPlayerSurfaceChanged(player)
 
         if not Controllers.IsSandboxSupported(player) then
             log(player.name .. " entered a Sandbox with the Controller ID " .. player.controller_type .. "; bailing out.")
-            player.print{"messages.sandbox-entrace-from-unsupported-controller"}
+            player.create_local_flying_text({
+                text = {"messages.sandbox-entrace-from-unsupported-controller"},
+                position = player.position,
+            })
         end
 
         StorePreSandboxStateOnArrival(player, playerData)
@@ -536,7 +567,10 @@ function Sandbox.Toggle(player_index)
     local playerData = storage.players[player.index]
 
     if Factorissimo.IsFactoryInsideSandbox(player.surface, player.position) then
-        player.print{"messages.factorissimo-cannot-change-sandbox"}
+        player.create_local_flying_text({
+            text = {"messages.factorissimo-cannot-change-sandbox"},
+            position = player.position,
+        })
         return
     end
 

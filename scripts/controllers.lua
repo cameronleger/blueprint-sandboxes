@@ -114,6 +114,11 @@ function Controllers.CanBeSafelyReplaced(player, skipRetry)
         end
     end
 
+    -- Moving vehicles would continue moving
+    if player.driving and player.vehicle and player.vehicle.speed ~= 0 then
+        return LogUnstablePlayer(player, "in-moving-vehicle")
+    end
+
     return true
 end
 
@@ -203,26 +208,18 @@ end
 ---@param player LuaPlayer
 ---@return boolean restored
 function Controllers.RestoreLastController(player, playerData)
-    -- It's possible there's nothing to do
+    -- Early returns for simple cases
     if player.controller_type == defines.controllers.character then return true end
-
-    -- The Remote View is an easy exit
-    if Controllers.IsUsingRemoteView(player)
-        and player.physical_controller_type == defines.controllers.character
-    then
+    if Controllers.IsUsingRemoteView(player) and player.physical_controller_type == defines.controllers.character then
         return true
     end
 
     if Controllers.IsUsingEditor(player) then
         -- The Editor might be how they came in
-        if playerData.preSandboxController == nil then
-            return true
-        end
-
+        if playerData.preSandboxController == nil then return true end
         -- The Editor needs another layer of exiting otherwise
         player.toggle_map_editor()
-
-        -- It's possible there's nothing to do
+        -- Then it's possible there's nothing to do
         if player.controller_type == defines.controllers.character then return true end
     end
 
@@ -260,35 +257,34 @@ function Controllers.RestoreLastController(player, playerData)
         return true
     end
 
-    -- We might at-least have a Surface to go back to
-    if playerData.preSandboxController == defines.controllers.character
-        and playerData.preSandboxPosition
-        and playerData.preSandboxSurfaceName
-        and game.surfaces[playerData.preSandboxSurfaceName]
-    then
-        player.print{"messages.character-lost-but-recreated"}
-        player.teleport(playerData.preSandboxPosition, playerData.preSandboxSurfaceName)
-        local recreated = game.surfaces[playerData.preSandboxSurfaceName].create_entity {
-            name = "character",
-            position = playerData.preSandboxPosition,
-            force = playerData.preSandboxForceName or "player",
-            raise_built = true,
-        }
-        player.set_controller({
-            type = defines.controllers.character,
-            character = recreated
-        })
-        return true
+    local surface = playerData.preSandboxSurfaceName and game.surfaces[playerData.preSandboxSurfaceName] or game.surfaces["nauvis"]
+    local position = playerData.preSandboxPosition or { 0, 0 }
+
+    -- Try to find an existing character at the position
+    local nearbyCharacters = surface.find_entities_filtered{
+        name = "character",
+        position = position,
+        radius = 1
+    }
+    for _, character in ipairs(nearbyCharacters) do
+        if character.valid and not character.player then
+            player.set_controller({
+                type = defines.controllers.character,
+                character = character
+            })
+            return true
+        end
     end
 
-    -- Otherwise, we need a completely clean slate :(
+    -- Create new and empty character at last known position or default location
     player.print{"messages.character-lost"}
-    player.teleport({ 0, 0 }, "nauvis")
-    local recreated = game.surfaces["nauvis"].create_entity {
+    player.teleport(position, surface)
+    local recreated = surface.create_entity {
         name = "character",
-        position = { 0, 0 },
+        position = position,
         force = playerData.preSandboxForceName or "player",
         raise_built = true,
+        move_stuck_players = true
     }
     player.set_controller({
         type = defines.controllers.character,

@@ -62,7 +62,10 @@ function Inventory.Prune(player)
     end
 
     if inventory.count_empty_stacks() == 0 then
-        player.print{"messages.god-inventory-almost-full"}
+        player.create_local_flying_text({
+            text = {"messages.god-inventory-almost-full"},
+            position = player.position,
+        })
         player.surface.spill_item_stack({
             position = player.position,
             stack = inventory[#inventory],

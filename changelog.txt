@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.6.3
+Date: 2025-03-10
+  Changes:
+    - Several denied messages are printed on the player instead of the chat
+    - Transitioning into the Sandbox stops the player's walking state
+    - Transitioning into the Sandbox is no longer possible while driving fast
+  Bugfixes:
+    - Improved character re-association
+    - Illusion-related warnings had an invalid periodic value and printed too often
+    - Various small fixes for unexpected removals of data
+---------------------------------------------------------------------------------------------------
 Version: 2.6.2
 Date: 2025-01-19
   Bugfixes:

@@ -168,7 +168,7 @@ function Illusion.HandleBlueprintEvent(player, potentialItemStacks)
         log("Cannot handle Blueprint update: no entities in Blueprint (caused by selecting new contents)")
         local playerData = storage.players[player.index]
         local lastWarningForNewContents = playerData.lastWarningForNewContents or 0
-        if game.tick - lastWarningForNewContents > (2) then -- 1 hour
+        if lastWarningForNewContents == 0 or game.tick - lastWarningForNewContents > (864000) then -- 4 hours
             player.print{"messages.blueprint-selected-new-contents-from-library"}
             playerData.lastWarningForNewContents = game.tick
         end
