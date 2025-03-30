@@ -4,6 +4,8 @@ Date: 2025-03-30
   Changes:
     - Include new Infinity Cargo Wagon
     - Stripped unnecessary alpha channels
+  Bugfixes:
+    - Fixed crashes when placing entities that may not have some optional information
 ---------------------------------------------------------------------------------------------------
 Version: 2.6.3
 Date: 2025-03-10

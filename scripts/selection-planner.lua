@@ -70,21 +70,25 @@ local function GetEntityDensity(prototype, dense)
         if dense then multiplier = 2 end
         density = multiplier * math.max(
             5000,
-            prototype.autoplace_specification.placement_density,
-            prototype.minimum_resource_amount,
-            prototype.normal_resource_amount
+            (prototype.autoplace_specification and prototype.autoplace_specification.placement_density) or 0,
+            prototype.minimum_resource_amount or 0,
+            prototype.normal_resource_amount or 0
         )
         local max_richness = 0
         for _, planet in pairs(game.planets) do
-            local autoplace_controls = planet.prototype.map_gen_settings.autoplace_controls
-            if autoplace_controls and autoplace_controls[prototype.name] then
-                max_richness = math.max(max_richness, autoplace_controls[prototype.name].richness)
+            if planet.prototype.map_gen_settings then
+                local autoplace_controls = planet.prototype.map_gen_settings.autoplace_controls
+                if autoplace_controls and autoplace_controls[prototype.name] then
+                    max_richness = math.max(max_richness, autoplace_controls[prototype.name].richness)
+                end
             end
         end
         for _, surface in pairs(game.surfaces) do
-            local autoplace_controls = surface.map_gen_settings.autoplace_controls
-            if autoplace_controls and autoplace_controls[prototype.name] then
-                max_richness = math.max(max_richness, autoplace_controls[prototype.name].richness)
+            if surface.map_gen_settings then
+                local autoplace_controls = surface.map_gen_settings.autoplace_controls
+                if autoplace_controls and autoplace_controls[prototype.name] then
+                    max_richness = math.max(max_richness, autoplace_controls[prototype.name].richness)
+                end
             end
         end
         if max_richness <= 0 then max_richness = 1 end
