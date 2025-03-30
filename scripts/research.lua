@@ -51,6 +51,7 @@ function Research.EnableSandboxSpecificResearch(force)
     enable(BPSB.pfx .. "electric-energy-interface")
     enable(BPSB.pfx .. "infinity-chest")
     enable(BPSB.pfx .. "infinity-pipe")
+    enable(BPSB.pfx .. "infinity-cargo-wagon")
 
     EditorExtensionsCheats.EnableTestingRecipes(force)
 end

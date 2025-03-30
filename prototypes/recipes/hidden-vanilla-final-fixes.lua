@@ -32,8 +32,12 @@ data.raw.item["infinity-chest"].order = "a-c"
 data.raw.item["infinity-pipe"].subgroup = BPSB.pfx .. "infinity"
 data.raw.item["infinity-pipe"].order = "a-d"
 
+data.raw.item["infinity-cargo-wagon"].subgroup = BPSB.pfx .. "infinity"
+data.raw.item["infinity-cargo-wagon"].order = "a-e"
+
 -- Allow anyone to use Infinity Filters
 data.raw["electric-energy-interface"]["electric-energy-interface"].gui_mode = "all"
 data.raw["heat-interface"]["heat-interface"].gui_mode = "all"
 data.raw["infinity-container"]["infinity-chest"].gui_mode = "all"
 data.raw["infinity-pipe"]["infinity-pipe"].gui_mode = "all"
+data.raw["infinity-cargo-wagon"]["infinity-cargo-wagon"].gui_mode = "all"
