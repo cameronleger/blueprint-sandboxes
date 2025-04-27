@@ -35,9 +35,26 @@ function Research.SyncQueue(originalForce, sandboxForce)
     end
 end
 
+-- Check if any Players on a Force are inside of a Sandbox
+---@param force LuaForce
+---@return boolean
+local function IsAnyPlayerInSandbox(force)
+    local anyPlayersInSandbox = false
+    for _, player in pairs(force.players) do
+        if Sandbox.IsPlayerInsideSandbox(player) then
+            anyPlayersInSandbox = true
+            break
+        end
+    end
+    return anyPlayersInSandbox
+end
+
 -- Enable the Infinity Input/Output Recipes
 ---@param force LuaForce
-function Research.EnableSandboxSpecificResearch(force)
+function Research.EnableSandboxSpecificResearchIfNecessary(force)
+    local anyPlayersInSandbox = IsAnyPlayerInSandbox(force)
+    if not anyPlayersInSandbox then return end
+
     log("Unlocking hidden Recipes for: " .. force.name)
     function enable(name)
         if force.recipes[name] then force.recipes[name].enabled = true end
@@ -56,64 +73,83 @@ function Research.EnableSandboxSpecificResearch(force)
     EditorExtensionsCheats.EnableTestingRecipes(force)
 end
 
+-- Enable the Infinity Input/Output Recipes
+---@param force LuaForce
+function Research.DisableSandboxSpecificResearchIfNecessary(force)
+    local anyPlayersInSandbox = IsAnyPlayerInSandbox(force)
+    if anyPlayersInSandbox then return end
+
+    log("Locking hidden Recipes for: " .. force.name)
+    function disable(name)
+        if force.recipes[name] then force.recipes[name].enabled = false end
+    end
+
+    disable(BPSB.pfx .. "loader")
+    disable(BPSB.pfx .. "fast-loader")
+    disable(BPSB.pfx .. "express-loader")
+    disable(BPSB.pfx .. "turbo-loader")
+    disable(BPSB.pfx .. "heat-interface")
+    disable(BPSB.pfx .. "electric-energy-interface")
+    disable(BPSB.pfx .. "infinity-chest")
+    disable(BPSB.pfx .. "infinity-pipe")
+    disable(BPSB.pfx .. "infinity-cargo-wagon")
+
+    EditorExtensionsCheats.DisableTestingRecipes(force)
+end
+
 -- For all Forces with Sandboxes, Sync their Research
 function Research.SyncAllForces()
     for _, force in pairs(game.forces) do
-        if not Sandbox.IsSandboxForce(force) then
-            local sandboxForce = game.forces[Sandbox.NameFromForce(force)]
-            if sandboxForce then
-                Research.Sync(force, sandboxForce)
-                Research.SyncQueue(force, sandboxForce)
-            end
-        end
+        if Sandbox.IsSandboxForce(force) then return end
+        local sandboxForce = Force.GetSandboxForce(force)
+        if not sandboxForce then return end
+        Research.Sync(force, sandboxForce)
+        Research.SyncQueue(force, sandboxForce)
     end
 end
 
 -- As a Force's Research Queue changes, keep the Force's Sandboxes in-sync
 ---@param event EventData.on_research_moved
 function Research.OnResearchReordered(event)
-    if not settings.global[Settings.allowAllTech].value then
-        if not Sandbox.IsSandboxForce(event.force) then
-            local sandboxForce = game.forces[Sandbox.NameFromForce(event.force)]
-            if sandboxForce then
-                log("Research queue reordered: " .. event.force.name .. " -> " .. sandboxForce.name)
-                Research.SyncQueue(event.force, sandboxForce)
-            end
-        end
-    end
+    if settings.global[Settings.allowAllTech].value then return end
+    if Sandbox.IsSandboxForce(event.force) then return end
+    local sandboxForce = Force.GetSandboxForce(event.force)
+    if not sandboxForce then return end
+    log("Research queue reordered: " .. event.force.name .. " -> " .. sandboxForce.name)
+    Research.SyncQueue(event.force, sandboxForce)
 end
 
 -- As a Force's Research changes, keep the Force's Sandboxes in-sync
 ---@param event EventData.on_research_finished | EventData.on_research_reversed
 function Research.OnResearched(event)
-    if not settings.global[Settings.allowAllTech].value then
-        local force = event.research.force
-        if not Sandbox.IsSandboxForce(force) then
-            local sandboxForce = game.forces[Sandbox.NameFromForce(force)]
-            if sandboxForce then
-                log("New Research: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
-                sandboxForce.technologies[event.research.name].researched = force.technologies[event.research.name].researched
-                sandboxForce.technologies[event.research.name].level = force.technologies[event.research.name].level
-                sandboxForce.play_sound { path = "utility/research_completed" }
-                Research.SyncQueue(force, sandboxForce)
-            end
-        end
+    if settings.global[Settings.allowAllTech].value then return end
+    local force = event.research.force
+    if Sandbox.IsSandboxForce(force) then return end
+    local sandboxForce = Force.GetSandboxForce(force)
+    if not sandboxForce then return end
+    log("New Research: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
+    local sandboxTech = sandboxForce.technologies[event.research.name]
+    local normalTech = force.technologies[event.research.name]
+    if sandboxTech.researched ~= normalTech.researched then
+        sandboxTech.researched = normalTech.researched
     end
+    if sandboxTech.level ~= normalTech.level then
+        sandboxTech.level = normalTech.level
+    end
+    sandboxForce.play_sound { path = "utility/research_completed" }
+    Research.SyncQueue(force, sandboxForce)
 end
 
 -- As a Force's Research Queue changes, show it in the Force's Sandboxes
 ---@param event EventData.on_research_started
 function Research.OnResearchStarted(event)
-    if not settings.global[Settings.allowAllTech].value then
-        local force = event.research.force
-        if not Sandbox.IsSandboxForce(force) then
-            local sandboxForce = game.forces[Sandbox.NameFromForce(force)]
-            if sandboxForce then
-                log("New Research Queued: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
-                Research.SyncQueue(force, sandboxForce)
-            end
-        end
-    end
+    if settings.global[Settings.allowAllTech].value then return end
+    local force = event.research.force
+    if Sandbox.IsSandboxForce(force) then return end
+    local sandboxForce = Force.GetSandboxForce(force)
+    if not sandboxForce then return end
+    log("New Research Queued: " .. event.research.name .. " from " .. force.name .. " -> " .. sandboxForce.name)
+    Research.SyncQueue(force, sandboxForce)
 end
 
 return Research

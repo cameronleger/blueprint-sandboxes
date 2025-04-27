@@ -2,6 +2,7 @@
 local Sandbox = {}
 
 Sandbox.pfx = BPSB.pfx .. "sb-"
+local pfxLength = string.len(Sandbox.pfx)
 
 -- GUI Dropdown items for Sandboxes
 Sandbox.choices = {
@@ -22,8 +23,7 @@ end
 -- Whether the Force is specific to Blueprint Sandboxes
 ---@param force LuaForce
 function Sandbox.IsSandboxForce(force)
-    -- return string.sub(force.name, 1, pfxLength) == Sandbox.pfx
-    return not not storage.sandboxForces[force.name]
+    return string.sub(force.name, 1, pfxLength) == Sandbox.pfx
 end
 
 -- Whether something is any type of Sandbox
@@ -52,15 +52,16 @@ end
 -- Which Surface Name to use for this Player based on their Selected Sandbox
 ---@param player LuaPlayer
 ---@return LuaSurface | nil
-function Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
+function Sandbox.GetOrCreateSandboxSurface(player)
     local playerData = storage.players[player.index]
 
     if playerData.selectedSandbox == Sandbox.player
     then
-        return Lab.GetOrCreateSurface(playerData.labName, sandboxForce)
+        return Lab.GetOrCreateSurface(playerData.labName, playerData.forceName, playerData.sandboxForceName)
     elseif playerData.selectedSandbox == Sandbox.force
     then
-        return Lab.GetOrCreateSurface(storage.sandboxForces[sandboxForce.name].labName, sandboxForce)
+        local sandboxForceData = storage.sandboxForces[playerData.sandboxForceName]
+        return Lab.GetOrCreateSurface(sandboxForceData.labName, playerData.forceName, playerData.sandboxForceName)
     else
         log("Impossible Choice for Sandbox: " .. playerData.selectedSandbox)
         return
@@ -129,8 +130,7 @@ function Sandbox.View(player)
     local playerData = storage.players[player.index]
     if Sandbox.IsPlayerInsideSandbox(player) then return end
 
-    local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
-    local surface = Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
+    local surface = Sandbox.GetOrCreateSandboxSurface(player)
     if surface == nil then
         log("Completely Unknown Sandbox Surface, cannot use")
         return
@@ -172,8 +172,7 @@ function Sandbox.Enter(player)
         return
     end
 
-    local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
-    local surface = Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
+    local surface = Sandbox.GetOrCreateSandboxSurface(player)
     if surface == nil then
         log("Completely Unknown Sandbox Surface, cannot use")
         return
@@ -242,8 +241,7 @@ function Sandbox.Transfer(player)
         return
     end
 
-    local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
-    local surface = Sandbox.GetOrCreateSandboxSurface(player, sandboxForce)
+    local surface = Sandbox.GetOrCreateSandboxSurface(player)
     if surface == nil then
         log("Completely Unknown Sandbox Surface, cannot use")
         return
@@ -259,8 +257,7 @@ end
 function Sandbox.OnPlayerForceChanged(player)
     local playerData = storage.players[player.index]
     if not playerData then return end
-    ---@type LuaForce
-    local force = player.force
+    local force = player.force --[[@as LuaForce]]
     if not Sandbox.IsSandboxForce(force)
             and playerData.forceName ~= force.name
     then
@@ -268,27 +265,22 @@ function Sandbox.OnPlayerForceChanged(player)
         playerData.forceName = force.name
 
         local sandboxForceName = Sandbox.NameFromForce(force)
-
         playerData.sandboxForceName = sandboxForceName
         local labData = storage.labSurfaces[playerData.labName]
         if labData then
             labData.sandboxForceName = sandboxForceName
         end
 
-        local labForce = Force.GetOrCreateSandboxForce(force)
-        if Sandbox.IsPlayerInsideSandbox(player) then
-            if Sandbox.GetSandboxChoiceFor(player, player.surface) ~= Sandbox.player then
-                player.print{"messages.sandbox-force-changed-while-in-sandbox"}
-                playerData.preSandboxForceName = force.name
-                Sandbox.Exit(player)
-            else
-                player.force = labForce
-            end
+        local labSurface = game.surfaces[playerData.labName]
+        if labSurface then
+            local labForce = Force.GetOrCreateSandboxForce(force)
+            Lab.AssignEntitiesToForce(labSurface, labForce)
         end
 
-        local labSurface = game.surfaces[Lab.NameFromPlayer(player)]
-        if labSurface then
-            Lab.AssignEntitiesToForce(labSurface, labForce)
+        if Isolation.IsFull() and Sandbox.IsPlayerInsideSandbox(player) then
+            player.print{"messages.sandbox-force-changed-while-in-sandbox"}
+            playerData.preSandboxForceName = force.name
+            Sandbox.Exit(player)
         end
     end
 end
@@ -323,7 +315,7 @@ end
 ---@param player LuaPlayer
 local function StorePreSandboxStateOnArrival(player, playerData)
     if playerData.preSandboxForceName == nil then
-        if Sandbox.IsSandboxForce(player.force) then
+        if Sandbox.IsSandboxForce(player.force --[[@as LuaForce]]) then
             log(player.name .. " entered a Sandbox as the Sandbox Force; assuming the player force")
             playerData.preSandboxForceName = "player"
         else
@@ -352,31 +344,38 @@ local function StorePreSandboxStateOnArrival(player, playerData)
 end
 
 ---@param player LuaPlayer
-local function EnableSandboxFeatures(player, playerData)
-    -- Swap to the new Force; it has different bonuses!
-    local sandboxForce = Force.GetOrCreateSandboxForce(game.forces[playerData.forceName])
-    player.force = sandboxForce
+local function EnableSandboxFeatures(player)
+    if Isolation.IsFull() then
+        -- Swap to the new Force; it has different bonuses!
+        local mainForce = Force.GetPlayerMainForce(player)
+        local sandboxForce = Force.GetOrCreateSandboxForce(mainForce)
+        player.force = sandboxForce
 
-    -- Since the Sandbox might have Cheat Mode enabled, EditorExtensions won't receive an Event for this otherwise
-    if player.cheat_mode then player.cheat_mode = false end
-    -- Enable Cheat mode _afterwards_, since EditorExtensions will alter the Force (now the Sandbox Force) based on this
-    player.cheat_mode = true
 
-    -- Harmlessly ensure our own Recipes are enabled
-    Research.EnableSandboxSpecificResearch(sandboxForce)
+        -- Since the Sandbox might have Cheat Mode enabled, EditorExtensions won't receive an Event for this otherwise
+        if player.cheat_mode then player.cheat_mode = false end
+        -- Enable Cheat mode _afterwards_, since EditorExtensions will alter the Force (now the Sandbox Force) based on this
+        player.cheat_mode = true
+    end
+
+    -- Ensure our own Recipes are enabled
+    local appropriateForce = Force.GetAppropriateForceForSandbox(player)
+    Research.EnableSandboxSpecificResearchIfNecessary(appropriateForce)
 end
 
 ---@param player LuaPlayer
 local function EnforceSandboxPermissions(player)
-    -- Set some Permissions so the Player cannot affect their other Surfaces
-    local newPermissions = Permissions.GetOrCreate(player)
-    if newPermissions then
-        log("Setting new Player Permissions: " .. player.name .. " -> " .. newPermissions.name)
-        player.permission_group = newPermissions
-    end
+    if Isolation.IsFull() then
+        -- Set some Permissions so the Player cannot affect their other Surfaces
+        local newPermissions = Permissions.GetOrCreate(player)
+        if newPermissions then
+            log("Setting new Player Permissions: " .. player.name .. " -> " .. newPermissions.name)
+            player.permission_group = newPermissions
+        end
 
-    -- This list allows creating platforms (which is blocked by permissions) and no other surfaces (since this isn't their force)
-    player.game_view_settings.show_surface_list = false
+        -- This list allows creating platforms (which is blocked by permissions) and no other surfaces (since this isn't their force)
+        player.game_view_settings.show_surface_list = false
+    end
 end
 
 ---@param player LuaPlayer
@@ -433,12 +432,18 @@ local function RestorePreSandboxPermissions(player, playerData)
     end
 
     -- Swap to their original Permissions
-    if playerData.preSandboxPermissionGroupId then
-        log("Restoring Player Permissions: " .. player.name .. " -> " .. playerData.preSandboxPermissionGroupId)
-        player.permission_group = game.permissions.get_group(playerData.preSandboxPermissionGroupId)
+    local playerPermissions = player.permission_group
+    local storedPermissionsId = playerData.preSandboxPermissionGroupId
+    if storedPermissionsId then
+        if not playerPermissions or playerPermissions.group_id ~= storedPermissionsId then
+            log("Restoring Player Permissions: " .. player.name .. " -> " .. storedPermissionsId)
+            player.permission_group = game.permissions.get_group(storedPermissionsId)
+        end
     else
-        log("Removing Player Permissions: " .. player.name)
-        player.permission_group = nil
+        if playerPermissions and Permissions.IsSandboxPermissions(playerPermissions.name) then
+            log("Removing Player Permissions: " .. player.name)
+            player.permission_group = nil
+        end
     end
 
     -- Swap to their original surface-list setting
@@ -446,6 +451,9 @@ local function RestorePreSandboxPermissions(player, playerData)
     if player.game_view_settings.show_surface_list ~= desiredSurfaceList then
         player.game_view_settings.show_surface_list = desiredSurfaceList
     end
+
+    -- Potentially lock the Research again
+    Research.DisableSandboxSpecificResearchIfNecessary(player.force --[[@as LuaForce]])
 end
 
 local function CleanStates(playerData)
@@ -466,6 +474,7 @@ end
 ---@param player LuaPlayer
 ---@return boolean
 function Sandbox.CanEnter(player)
+    if Isolation.IsNone() then return false end
     if player.physical_controller_type ~= defines.controllers.character then return false end
     return Controllers.IsUsingRemoteView(player)
 end
@@ -539,7 +548,7 @@ function Sandbox.OnPlayerSurfaceChanged(player)
         end
 
         StorePreSandboxStateOnArrival(player, playerData)
-        EnableSandboxFeatures(player, playerData)
+        EnableSandboxFeatures(player)
         EnforceSandboxPermissions(player)
         RestoreSandboxState(player, playerData)
         player.force.chart_all(player.surface)
@@ -585,10 +594,9 @@ function Sandbox.Toggle(player_index)
     elseif Sandbox.IsPlayerInsideSandbox(player) then
         Sandbox.Exit(player)
     else
-        local preferredController = player.mod_settings[Settings.preferredController].value
-        if preferredController == "god" then
+        if Isolation.IsFull() then
             Sandbox.Enter(player)
-        elseif preferredController == "remote" then
+        elseif Isolation.IsNone() then
             Sandbox.View(player)
         end
     end

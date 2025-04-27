@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 020604
+Migrate.version = 030000
 
 function Migrate.Run()
     if not storage.version then
@@ -17,7 +17,6 @@ function Migrate.Run()
         if storage.version < 010704 then Migrate.v1_7_4() end
         if storage.version < 011000 then Migrate.v1_10_0() end
         if storage.version < 011101 then Migrate.v1_11_1() end
-        if storage.version < 011103 then Migrate.v1_11_3() end
         if storage.version < 011500 then Migrate.v1_15_0() end
         if storage.version < 011604 then Migrate.v1_16_4() end
         if storage.version < 011606 then Migrate.v1_16_6() end
@@ -29,6 +28,7 @@ function Migrate.Run()
         if storage.version < 020400 then Migrate.v2_4_0() end
         if storage.version < 020500 then Migrate.v2_5_0() end
         if storage.version < 020503 then Migrate.v2_5_3() end
+        if storage.version < 030000 then Migrate.v3_0_0() end
     end
 
     storage.version = Migrate.version
@@ -192,39 +192,6 @@ function Migrate.v1_11_1()
     log("Migration 1.11.1 Finished")
 end
 
-function Migrate.v1_11_3_surface(surfaceName)
-    local surface = game.surfaces[surfaceName]
-    if not surface then
-        return
-    end
-
-    local entitiesToSwap = surface.find_entities_filtered({ name = Illusion.realNameFilters, })
-    for _, entity in pairs(entitiesToSwap) do
-        Illusion.ReplaceIfNecessary(entity)
-    end
-
-    local ghostsToSwap = surface.find_entities_filtered({ ghost_name = Illusion.realNameFilters, })
-    for _, entity in pairs(ghostsToSwap) do
-        Illusion.ReplaceIfNecessary(entity)
-    end
-end
-
-function Migrate.v1_11_3()
-    --[[
-    1.11.0 did not include a migration of real-to-illusion Entities,
-    but it was found that some older Entities combined with Space Exploration 0.6
-    could cause a crash.
-    ]]
-
-    log("Migration 1.11.3 Starting")
-
-    for surfaceName, _ in pairs(storage.labSurfaces) do
-        Migrate.v1_11_3_surface(surfaceName)
-    end
-
-    log("Migration 1.11.3 Finished")
-end
-
 function Migrate.v1_15_0()
     --[[
     1.15.0 introduced a default Equipment Inventory for each Sandbox
@@ -276,9 +243,9 @@ function Migrate.v2_0_0()
 
     Force.SyncAllForces()
     for _, force in pairs(game.forces) do
-        RemoteView.HideAllSandboxes(force)
+        RemoteView.DetermineVisibilityOfAllSandboxes(force)
         if Sandbox.IsSandboxForce(force) then
-            RemoteView.HideEverythingInSandboxes(force)
+            RemoteView.HideEverythingFromSandboxForce(force)
             force.rechart()
         end
     end
@@ -308,7 +275,7 @@ function Migrate.v2_1_6()
 
     log("Migration 2.1.6 Starting")
 
-    RemoteView.Init()
+    RemoteView.SyncSurfaceVisibility()
 
     log("Migration 2.1.6 Finished")
 end
@@ -336,7 +303,7 @@ function Migrate.v2_2_1()
     ]]
 
     log("Migration 2.2.1 Starting")
-    
+
     for index, player in pairs(game.players) do
         local character = storage.players[index].preSandboxCharacter
         if character and character.valid
@@ -420,6 +387,52 @@ function Migrate.v2_5_3()
     storage.equipmentInProgress = nil
 
     log("Migration 2.5.3 Finished")
+end
+
+function Migrate.v3_0_0()
+    --[[
+    3.0.0 prevents some things from being placed within Sandboxes, and adds isolations
+    ]]
+
+    log("Migration 3.0.0 Starting")
+
+    -- Maintain the legacy setting that did not exist
+    settings.global[Settings.isolationLevel] = { value = Isolation.full }
+
+    -- Remove all Research Labs, and update names
+    local invalidTypes = {}
+    for type, _ in pairs(God.preventEntitiesByType) do
+        table.insert(invalidTypes, type)
+    end
+    for _, surface in pairs(game.surfaces) do
+        if Lab.IsLab(surface) then
+            -- Update names
+            surface.localised_name = Lab.LocalisedNameFromLabName(surface.name)
+
+            -- Remove all Research Labs
+            local invalids = surface.find_entities_filtered({ type = invalidTypes })
+            for _, invalid in pairs(invalids) do
+                if invalid.valid then
+                    invalid.destroy({ raise_destroy = true })
+                end
+            end
+        end
+    end
+
+    -- Add forceName to all labSurfaces
+    for _, surfaceData in pairs(storage.labSurfaces) do
+        if surfaceData.sandboxForceName then
+            local sandboxForceData = storage.sandboxForces[surfaceData.sandboxForceName]
+            if sandboxForceData and sandboxForceData.forceName then
+                surfaceData.forceName = sandboxForceData.forceName
+            end
+        end
+    end
+
+    -- Other misc updates
+    RemoteView.SyncSurfaceVisibility()
+
+    log("Migration 3.0.0 Finished")
 end
 
 return Migrate

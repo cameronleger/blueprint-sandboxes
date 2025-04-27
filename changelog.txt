@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2025-04-27
+  Changes:
+    - Introducing Isolation-level setting: allows more/less integration with the rest of the game world
+    - The new default Isolation is None; existing games must opt-in from the Full option
+    - Infinity recipes now require one of themselves to prevent easy crafting outside of Sandboxes, just in case
+    - Illusions (fake entities for working around mod incompatibilities) are no more
+    - Labs can no longer be placed in Sandboxes
+    - Greatly improved support for adding this mod back to a save where it had been previously removed
+    - Updated icons to match similar icons from Factorio
+  Bugfixes:
+    - Fixed character crafting nearly infinitely in the background while Remote Viewing Sandboxes
+---------------------------------------------------------------------------------------------------
 Version: 2.6.4
 Date: 2025-03-30
   Changes:

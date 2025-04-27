@@ -1,17 +1,18 @@
 -- Custom Extensions to the God-Controller
 local God = {}
 
+God.preventEntitiesByType = {
+    ["lab"] = true,
+}
+
 God.onBuiltEntityFilters = {
     { filter = "type", type = "tile-ghost" },
     { filter = "type", type = "entity-ghost" },
     { filter = "type", type = "item-request-proxy" },
 }
 
-for realEntityName, illusionName in pairs(Illusion.realToIllusionMap) do
-    table.insert(
-        God.onBuiltEntityFilters,
-        { filter = "name", name = realEntityName }
-    )
+for type, _ in pairs(God.preventEntitiesByType) do
+    table.insert(God.onBuiltEntityFilters, { filter = "type", type = type })
 end
 
 -- TODO: Perhaps this can be determined by flags?
@@ -105,7 +106,6 @@ end
 -- Immediately Revive a Ghost Entity
 ---@param entity LuaEntity
 function God.Create(entity)
-    Illusion.ReplaceIfNecessary(entity)
     if entity.valid then
         if entity.type == "tile-ghost" then
             -- Tiles are simple Revives
@@ -141,14 +141,6 @@ function God.Upgrade(entity)
     then
         local targetEntity, targetQuality = entity.get_upgrade_target()
 
-        if Illusion.IsIllusion(entity.name) and
-            Illusion.GetActualName(entity.name) == targetEntity.name
-         then
-            log("Cancelling an Upgrade from an Illusion to its Real Entity: " .. entity.name)
-            entity.cancel_upgrade(entity.force)
-            return
-        end
-
         local options = {
             name = targetEntity.name,
             position = entity.position,
@@ -179,10 +171,11 @@ end
 -- Ensure the God's Inventory is kept in-sync
 ---@param event EventData.on_player_main_inventory_changed
 function God.OnInventoryChanged(event)
+    if Isolation.IsNone() then return end
     local player = game.players[event.player_index]
-    local playerData = storage.players[event.player_index]
-    if Sandbox.IsPlayerInsideSandbox(player) then
+    if Sandbox.IsPlayerInsideSandbox(player) and Inventory.ShouldPersist(player.controller_type) then
         Inventory.Prune(player)
+        local playerData = storage.players[event.player_index]
         playerData.sandboxInventory = Inventory.Persist(
                 player.get_main_inventory(),
                 playerData.sandboxInventory
@@ -195,6 +188,8 @@ end
 function God.OnPlayerCraftedItem(event)
     local player = game.players[event.player_index]
     if Sandbox.IsPlayerInsideSandbox(player)
+            and Controllers.IsGod(player)
+            and Isolation.IsFull()
             and player.cursor_stack
             and player.cursor_stack.valid
             and event.item_stack.valid
@@ -227,23 +222,39 @@ end
 ---@param entity LuaEntity
 function God.ShouldHandleEntity(entity)
     if not entity.valid then return false end
+
+    if not (Lab.IsLab(entity.surface)
+            or (Factorissimo.IsFactory(entity.surface)
+                and Factorissimo.IsFactoryInsideSandbox(entity.surface, entity.position)))
+    then
+        return false
+    end
+
+    local isEntityGhost = entity.type == "entity-ghost"
+    if God.preventEntitiesByType[entity.type] or (isEntityGhost and God.preventEntitiesByType[entity.ghost_type]) then
+        local player = entity.last_user --[[@as LuaPlayer | nil]]
+        if player then
+            player.create_local_flying_text({
+                text = {"messages.cannot-build-in-sandbox"},
+                position = player.position,
+            })
+        end
+        entity.destroy({ raise_destroy = true })
+        return false
+    end
+
     if not settings.global[Settings.godBuilding].value then
         return false
     end
 
-    if entity.force.name ~= "neutral"
-            and not Sandbox.IsSandboxForce(entity.force) then
-        return false
-    end
+    local name = entity.name
+    if isEntityGhost then name = entity.ghost_name end
 
-    local name = Illusion.GhostOrRealName(entity)
     if God.skipHandlingEntities[name] then
         return false
     end
 
-    return Lab.IsLab(entity.surface)
-            or (Factorissimo.IsFactory(entity.surface)
-            and Factorissimo.IsFactoryInsideSandbox(entity.surface, entity.position))
+    return true
 end
 
 -- Ensure new Orders are handled

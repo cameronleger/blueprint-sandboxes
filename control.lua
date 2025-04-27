@@ -5,7 +5,7 @@ Debug = require("scripts.debug")
 Queue = require("scripts.queue")
 
 -- Required by some
-Illusion = require("scripts.illusion")
+Isolation = require("scripts.isolation")
 EditorExtensionsCheats = require("scripts.editor-extensions-cheats")
 Permissions = require("scripts.permissions")
 RemoteView = require("scripts.remote-view")
@@ -43,7 +43,7 @@ end)
 
 script.on_event(defines.events.on_player_created, function(event)
     local player = game.players[event.player_index]
-    Force.Init(player.force)
+    Force.Init(player.force --[[@as LuaForce]])
     Init.Player(player)
 end)
 
@@ -62,9 +62,9 @@ end)
 script.on_event(defines.events.on_force_created, function(event)
     Force.Init(event.force)
     if Sandbox.IsSandboxForce(event.force) then
-        RemoteView.HideEverythingInSandboxes(event.force)
+        RemoteView.HideEverythingFromSandboxForce(event.force)
     else
-        RemoteView.HideAllSandboxes(event.force)
+        RemoteView.DetermineVisibilityOfAllSandboxes(event.force)
     end
 end)
 
@@ -72,6 +72,7 @@ end)
 
 script.on_load(function()
     Settings.SetupConditionalHandlers()
+    Isolation.StoreCurrentLevel()
     SurfacePropsGUI.InitPresets()
 end)
 
@@ -85,14 +86,14 @@ script.on_configuration_changed(function(event)
     Research.SyncAllForces()
     for _, force in pairs(game.forces) do
         if Sandbox.IsSandboxForce(force) then
-            Research.EnableSandboxSpecificResearch(force)
+            Research.EnableSandboxSpecificResearchIfNecessary(force)
         end
     end
 end)
 
 script.on_event(defines.events.on_player_changed_force, function(event)
     local player = game.players[event.player_index]
-    Force.Init(player.force)
+    Force.Init(player.force --[[@as LuaForce]])
     Sandbox.OnPlayerForceChanged(player)
 end)
 
@@ -131,12 +132,12 @@ end)
 
 script.on_event(defines.events.on_surface_created, function(event)
     local surface = game.surfaces[event.surface_index]
-    RemoteView.HideFromAllSandboxes(surface)
+    RemoteView.HideSurfaceFromAllSandboxes(surface)
 
     if not Sandbox.IsSandbox(surface) then
         return
     end
-    RemoteView.HideSandboxFromEveryone(surface)
+    RemoteView.DetermineVisibilityForEveryone(surface)
     Lab.AfterCreate(surface)
     Lab.Equip(surface)
 end)
@@ -170,9 +171,6 @@ script.on_event(defines.events.on_built_entity, God.OnBuiltEntity, God.onBuiltEn
 script.on_event(defines.events.script_raised_built, God.OnBuiltEntity, God.onBuiltEntityFilters)
 script.on_event(defines.events.on_player_crafted_item, God.OnPlayerCraftedItem)
 script.on_event(defines.events.on_player_main_inventory_changed, God.OnInventoryChanged)
-
--- TODO: Changed file:///home/cameron/src/factorio/factorio_expansion/doc-html/events.html#on_player_setup_blueprint
-script.on_event(defines.events.on_player_setup_blueprint, Illusion.OnBlueprintSetup)
 
 script.on_event(defines.events.on_player_selected_area, SelectionPlanner.OnAreaSelected)
 script.on_event(defines.events.on_player_alt_selected_area, SelectionPlanner.OnAreaSelected)
@@ -213,14 +211,20 @@ script.on_event(defines.events.on_gui_selection_state_changed, function (event)
 end)
 script.on_event(defines.events.on_gui_elem_changed, SelectionPlanner.OnPrototypeSelected)
 
-script.on_event(defines.events.on_gui_closed, function(event)
-    if (event.gui_type == defines.gui_type.blueprint_library) then
-        -- We know this won't work, but we'll do it to print a message anyway
-        Illusion.OnBlueprintGUIClosed(event)
-    elseif (event.gui_type == defines.gui_type.item) then
-        Illusion.OnBlueprintGUIClosed(event)
-    end
-end)
-
 -- Periodic
 script.on_nth_tick(RemoteView.chartAllSandboxesTick, RemoteView.ChartAllOccupiedSandboxes)
+
+-- Tests
+if script.active_mods["factorio-test"] then
+    require("__factorio-test__/init")({
+        "tests/new-game",
+        -- "tests/isolation-full",
+        "tests/isolation-none",
+        -- "tests/isolation-transition",
+        "tests/new-game-post",
+
+        -- "tests/existing-game",
+
+        "tests/god-building",
+    })
+end

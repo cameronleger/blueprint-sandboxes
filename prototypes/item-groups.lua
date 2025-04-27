@@ -3,8 +3,8 @@ data:extend({
     {
         type = "item-group",
         name = BPSB.name,
-        icon = BPSB.path .. "/graphics/icon-x64.png",
-        icon_size = 64,
+        icon = BPSB.path .. "/graphics/icon-x56.png",
+        icon_size = 56,
         order = "z",
     },
     {

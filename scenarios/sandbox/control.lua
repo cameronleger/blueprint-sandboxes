@@ -1,4 +1,6 @@
 script.on_init(function()
+  settings.global[Settings.isolationLevel] = { value = Isolation.full }
+
   for _, surface in pairs(game.surfaces) do
     surface.generate_with_lab_tiles = true
     surface.clear()
@@ -8,7 +10,7 @@ script.on_init(function()
     surface = planet.create_surface()
     surface.generate_with_lab_tiles = true
   end
-  
+
   for _, force in pairs(game.forces) do
     force.research_all_technologies()
   end

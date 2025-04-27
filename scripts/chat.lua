@@ -4,16 +4,17 @@ local Chat = {}
 -- Proxy Chats between Sandbox Force <-> Original Force
 ---@param event EventData.on_console_chat
 function Chat.OnChat(event)
+    if Isolation.IsNone() then return end
     if event.player_index == nil then
         return
     end
     local player = game.players[event.player_index]
-    local playerData = storage.players[event.player_index]
 
     if Sandbox.IsPlayerInsideSandbox(player) then
-        game.forces[playerData.forceName].print(player.name .. ": " .. event.message, player.chat_color)
+        local mainForce = Force.GetPlayerMainForce(player)
+        mainForce.print(player.name .. ": " .. event.message, player.chat_color)
     else
-        local sandboxForce = game.forces[playerData.sandboxForceName]
+        local sandboxForce = Force.GetPlayerSandboxForce(player)
         if sandboxForce ~= nil then
             sandboxForce.print(player.name .. ": " .. event.message, player.chat_color)
         end

@@ -76,6 +76,7 @@ function Force.Merge(oldForceName, newForce)
             if Sandbox.IsPlayerInsideSandbox(player) then
                 log("Force.Merge must manually change Sandbox Player's Force: " .. player.name .. " -> " .. newForce.name)
                 player.force = newForce
+                Sandbox.Exit(player)
             end
         end
     end
@@ -95,7 +96,7 @@ end
 -- Configure Sandbox Force
 ---@param force LuaForce
 ---@param sandboxForce LuaForce
-function Force.ConfigureSandboxForce(force, sandboxForce)
+local function ConfigureSandboxForce(force, sandboxForce)
     log("Syncing Forces: " .. force.name .. " -> " .. sandboxForce.name)
     -- TODO: Ideally, lock the Space Platform; but Cheat Mode forcefully enables
 
@@ -111,10 +112,7 @@ function Force.ConfigureSandboxForce(force, sandboxForce)
     end
 
     -- Counteract Space Exploration's slow Mining Speed for Gods
-    sandboxForce.manual_mining_speed_modifier = settings.global[Settings.extraMiningSpeed].value
-
-    -- Make research faster/slower based on play-style
-    sandboxForce.laboratory_speed_modifier = settings.global[Settings.extraLabSpeed].value
+    sandboxForce.manual_mining_speed_modifier = settings.global[Settings.extraMiningSpeed].value --[[@as number]]
 
     -- You should have a little more space too
     sandboxForce.character_inventory_slots_bonus =
@@ -130,15 +128,55 @@ function Force.GetOrCreateSandboxForce(force)
     local sandboxForceName = storage.forces[force.name].sandboxForceName
     local sandboxForce = game.forces[sandboxForceName]
     if sandboxForce then
-        Force.ConfigureSandboxForce(force, sandboxForce)
+        ConfigureSandboxForce(force, sandboxForce)
         return sandboxForce
     end
 
     log("Creating a new Sandbox Force: " .. force.name .. " -> " .. sandboxForceName)
     sandboxForce = game.create_force(sandboxForceName)
-    Force.ConfigureSandboxForce(force, sandboxForce)
+    ConfigureSandboxForce(force, sandboxForce)
     Research.Sync(force, sandboxForce)
     return sandboxForce
+end
+
+-- Sandbox Force for a Force
+---@param force LuaForce
+---@return LuaForce | nil
+function Force.GetSandboxForce(force)
+    if Sandbox.IsSandboxForce(force) then return force end
+    local forceData = storage.forces[force.name]
+    if not forceData then return end
+    return game.forces[forceData.sandboxForceName]
+end
+
+-- Force for a Player, even if they're on the Sandbox Force for now
+---@param player LuaPlayer
+---@return LuaForce
+function Force.GetPlayerMainForce(player)
+    local playerData = storage.players[player.index]
+    return game.forces[playerData.forceName] or player.force
+end
+
+-- Sandbox Force for a Player, if it exists, even if they're on the Sandbox Force for now
+---@param player LuaPlayer
+---@return LuaForce | nil
+function Force.GetPlayerSandboxForce(player)
+    local playerData = storage.players[player.index]
+    return game.forces[playerData.sandboxForceName]
+end
+
+-- Force or Sandbox Force, depending on Isolation
+---@param player LuaPlayer
+---@return LuaForce
+function Force.GetAppropriateForceForSandbox(player)
+    local force = player.force --[[@as LuaForce]]
+    if Isolation.IsFull() then
+        local mainForce = Force.GetPlayerMainForce(player)
+        force = Force.GetOrCreateSandboxForce(mainForce)
+    elseif Isolation.IsNone() then
+        force = Force.GetPlayerMainForce(player)
+    end
+    return force
 end
 
 -- For all Forces with Sandboxes, Configure them again
@@ -147,7 +185,7 @@ function Force.SyncAllForces()
         if not Sandbox.IsSandboxForce(force) then
             local sandboxForce = game.forces[Sandbox.NameFromForce(force)]
             if sandboxForce then
-                Force.ConfigureSandboxForce(force, sandboxForce)
+                ConfigureSandboxForce(force, sandboxForce)
             end
         end
     end

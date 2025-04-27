@@ -2,13 +2,13 @@ local PlannerIcons = {}
 
 ---@param prototype data.ResourceEntityPrototype | data.TilePrototype
 function PlannerIcons.CreateLayeredIcon(prototype)
-    local backgroundIconSize = 64
+    local backgroundIconSize = 56
     local overallLayeredIconScale = 0.5
     local prototypeIconSize = prototype.icon_size or 64
 
     local layeredIcons = {
         {
-            icon = BPSB.path .. "/graphics/wrapper-x64.png",
+            icon = BPSB.path .. "/graphics/wrapper-x56.png",
             icon_size = backgroundIconSize,
             tint = { r = 0.5, g = 0.5, b = 0.5, a = 0.5 },
         },

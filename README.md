@@ -1,4 +1,4 @@
-## Blueprint Sandboxes
+# Blueprint Sandboxes
 
 Temporary Editor-lite permissions in Lab-like environments for designing and experimenting.
 
@@ -9,7 +9,7 @@ To that end, it supports personal and team Sandbox Surfaces which enable: God-mo
 To teach you the basics and provide many more details, the in-game Tips-and-Tricks are used; the first is visible after a few seconds, and the rest after you start using the Sandbox. The rest of this is considered a non-exhaustive summary - if you want to know more, see those Tips/Tricks!
 
 * Multiple Sandboxes: your own and one for your force/team.
-* Blueprint Intput/Output: Copy/Paste, Blueprint Library, and in-Cursor.
+* Blueprint Input/Output: Copy/Paste, Blueprint Library, and in-Cursor.
 * Item Input/Output: Infinity chests and loaders are available.
 * God-mode: Fly around and construct/deconstruct much faster.
 * Persistent Inventory: Your Inventory is saved and restored when exiting/entering.
@@ -19,6 +19,91 @@ To teach you the basics and provide many more details, the in-game Tips-and-Tric
 * Entity Generation: Place interesting entities like resources, trees, enemies, etc.
 * Tile Placement: Place any kind of tiles wherever you want, or revert back to lab tiles.
 * Default Equipment: You can decide what an empty Sandbox starts with.
+
+# Isolation Levels
+
+The Isolation Level setting controls how integrated the Sandboxes are with your game. There are important benefits and drawbacks to each.
+
+- **Full** is the historical default, and aims to segregate the Sandboxes from the rest of the game as much as possible. This requires scripting to add back some helpful things that have been lost by this approach. The approach of using Forces and Controllers fundamentally affects what is and isn't possible with this setting.
+- **None** is a newer setting made possible by the Remote View in 2.0, and it only aims to prevent blatant cheating in the Sandbox that could affect the rest of the game.
+
+This is a summary of the important differences between the two:
+
+| Scenario | Isolation: Full | Isolation: None |
+| -------- | ---- | ---- |
+| Safety | Various dangers | Entirely safe |
+| Simplicity | Complex | Simple |
+| Accessibility | Limitations | Always |
+| Visibility | Personal / Force | Force |
+| Remote Viewing | Not possible | Fully integrated |
+| Technologies | Somewhat synced via Lua | Synchronized |
+| Research | Disabled | Disabled |
+| All-tech setting | Can be used | Cannot be used |
+| Alerts | Separate | Synchronized |
+| Chat | Forwarded via Lua | Synchronized |
+| Character | Swapped to God-mode | Remains yours |
+| Achievements | Can trigger | Will trigger |
+| Milestones | Separate | Synchronized |
+| Statistics | Separate | Included in Global |
+| Logistics / Train Groups | Separate | Synchronized |
+| Infinite Containers / Loaders | Only visible in Sandbox | Visible to all force members |
+| Undo / Redo | Resets when entering/exiting | Works as expected |
+
+## Details
+
+- Research
+  - **Isolation: Full**:
+  Since the Sandbox uses a separate Force, it has an independent research tree. The overall tree and queue is synchronized via Lua, and you are prevented from making changes to the Sandbox's queue. Incremental progress is not synchronized. You may use the setting that unlocks all research while in the Sandbox. You cannot place research labs in Sandboxes.
+  - **Isolation: None**:
+  The tree and queue will always be exactly the same in and out of the Sandbox. You cannot place research labs in Sandboxes.
+
+- Remote Viewing
+  - **Isolation: Full**:
+  Sandboxes cannot be viewed from outside of themselves, and nothing can be viewed while inside of a Sandbox.
+  - **Isolation: None**:
+  Viewing Sandboxes from outside of themselves is the primary method of "using" them, so they are fully integrated with the Remote View. This also means your teammates can see, view, and use each other's Sandboxes.
+
+- Alerts
+  - **Isolation: Full**:
+  Alerts outside of the Sandbox cannot be seen while inside of the Sandbox, and vice-versa.
+  - **Isolation: None**:
+  Alerts are not affected: alerts in and out of the Sandbox are always visible.
+
+- Chat
+  - **Isolation: Full**:
+  Lua is used to "forward" messages from outside and inside of the Sandbox to the relevant players.
+  - **Isolation: None**:
+  Chats are not affected: chats in and out of the Sandbox are always visible.
+
+- Character -> God
+  - **Isolation: Full**:
+  Sandboxes can only be interacted with through this separate "controller" that gives you a larger inventory and more direct access to machines. It's not always possible to "safely" swap to this controller, so it's not always possible to enter the Sandbox. Your character is in danger of dying or being lost while in a Sandbox.
+  - **Isolation: None**:
+  The God controller is replaced with the Remote View, so it's always possible to see/use a Sandbox. You're never detached from your character, so it's extremely safe. You don't have an inventory, so you will always be using ghosts to imply interactions.
+
+- Achievements / Milestones / Statistics
+  - **Isolation: Full**:
+  Achievements are per player or game, so it's possible to trigger achievements from the Sandbox. Milestones and Statistics are separated.
+  - **Isolation: None**:
+  Achievements and Milestones are linked. Statistics are always included when viewing them "globally."
+
+- Infinite Containers / Loaders / Extensions
+  - **Isolation: Full**:
+  Only visible/usable while in the Sandbox.
+  - **Isolation: None**:
+  Visible to all players on the same force if any one of them is in the Sandbox, but they are not actually craftable.
+
+- Logistics / Train Groups
+  - **Isolation: Full**:
+  These groups are separate and not synchronized.
+  - **Isolation: None**:
+  These groups are always the same inside and outside of Sandboxes.
+
+- Undo / Redo
+  - **Isolation: Full**:
+  Entering and existing Sandboxes "resets" the queues, so you may not be able to undo things you've done before entering.
+  - **Isolation: None**:
+  You can undo / redo as you would expect.
 
 # Known Issues / Frequently Asked Questions
 
@@ -49,18 +134,6 @@ When Resetting the Sandbox and the game crashes with any other mod listed in the
 ### Crafting in Sandbox works towards Lazy Bastard
 
 Crafting Counts cannot be segregated in the way that you want - this does not work for Lazy Bastard.
-
-### Selecting new contents for some Blueprints will include Illusions instead of Real Entities
-
-There is a significant flaw in Factorio's handling of Blueprints that have already been created when you want to "select new contents" for them; to quote a Factorio dev, it's "kind of a giant hack in my opinion and I don't see it getting re-worked any time soon." This is the only real acknowledgement of this issue, whereas all other responses seem to deflect or feign ignorance. As far as I have found, this is the only (and for our purposes, quite a large) shortcoming of the otherwise excellent Modding API.
-
-In short, this mod has _no_ access or capability to adjust a Blueprint when you are "selecting new contents." This capability is necessary to swap our Fake Illusions (script-less Entities that replace other, more complicated ones for various reasons) with their Real Counterparts. This cannot be overcome without Factorio itself being fixed by the development team. That said, there is _potentially_ a hackish and unnecessary workaround when you do this to a Blueprint in your Inventory.
-
-I have found at least three existing discussions on this topic, for reference:
-
-* [New contents for blueprint broken vs. new blueprint](https://forums.factorio.com/viewtopic.php?f=29&t=88793)
-* [Blueprints missing entity list when reused](https://forums.factorio.com/viewtopic.php?f=7&t=99323)
-* [Updated blueprint has no entities during on_player_setup_blueprint](https://forums.factorio.com/viewtopic.php?f=48&t=88100)
 
 ### Blueprint Library sourced Blueprints will not transfer via Cursor
 

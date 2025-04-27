@@ -11,7 +11,7 @@ data:extend({
     {
         type = "tips-and-tricks-item",
         category = category,
-        tag = "[img=item-group." .. BPSB.name .. "]",
+        tag = "[img=shortcut." .. ToggleGUI.toggleShortcut .. "]",
         name = pfxCategory .. "introduction",
         order = pfxOrder .. "a",
         is_title = true,
@@ -25,9 +25,21 @@ data:extend({
     {
         type = "tips-and-tricks-item",
         category = category,
-        name = pfxCategory .. "multiple-sandboxes",
+        name = pfxCategory .. "isolation",
         indent = 1,
         order = pfxOrder .. "b",
+        starting_status = "unlocked",
+        trigger = {
+            type = "unlock-recipe",
+            recipe = BPSB.pfx .. "electric-energy-interface",
+        },
+    },
+    {
+        type = "tips-and-tricks-item",
+        category = category,
+        name = pfxCategory .. "multiple-sandboxes",
+        indent = 1,
+        order = pfxOrder .. "c",
         starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
@@ -41,7 +53,7 @@ data:extend({
         tag = "[img=utility/reset_white]",
         name = pfxCategory .. "reset-v2",
         indent = 1,
-        order = pfxOrder .. "c",
+        order = pfxOrder .. "d",
         starting_status = "unlocked",
         trigger = {
             type = "unlock-recipe",
@@ -137,18 +149,6 @@ data:extend({
             ]]
         },
     },
-    {
-        type = "tips-and-tricks-item",
-        category = category,
-        name = pfxCategory .. "illusions",
-        indent = 1,
-        order = pfxOrder .. "j",
-        starting_status = "unlocked",
-        trigger = {
-            type = "unlock-recipe",
-            recipe = BPSB.pfx .. "electric-energy-interface",
-        },
-    },
 })
 
 if mods["factorissimo-2-notnotmelon"] then
@@ -163,7 +163,7 @@ if mods["factorissimo-2-notnotmelon"] then
         {
             type = "tips-and-tricks-item",
             category = category,
-            tag = "[img=item.factory-1] [img=item-group." .. BPSB.name .. "]",
+            tag = "[img=item.factory-1] [img=shortcut." .. ToggleGUI.toggleShortcut .. "]",
             name = pfxCategory .. "introduction",
             order = pfxOrder .. "a",
             is_title = true,

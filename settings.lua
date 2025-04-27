@@ -1,26 +1,35 @@
 BPSB = require("scripts.bpsb")
 Settings = require("scripts.settings")
+Isolation = require("scripts.isolation")
 
 data:extend({
+    {
+        type = "string-setting",
+        name = Settings.isolationLevel,
+        setting_type = "runtime-global",
+        order = "a[common]-a",
+        default_value = Isolation.none,
+        allowed_values = {Isolation.none, Isolation.full},
+    },
     {
         type = "bool-setting",
         name = Settings.allowAllTech,
         setting_type = "runtime-global",
-        order = "a[common]-a",
+        order = "a[common]-b",
         default_value = false,
     },
     {
         type = "bool-setting",
         name = Settings.onlyAdminsForceReset,
         setting_type = "runtime-global",
-        order = "a[common]-b",
+        order = "a[common]-c",
         default_value = false,
     },
     {
         type = "int-setting",
         name = Settings.bonusInventorySlots,
         setting_type = "runtime-global",
-        order = "a[common]-c",
+        order = "a[common]-d",
         default_value = 30,
         minimum_value = 0,
         maximum_value = 300,
@@ -29,27 +38,10 @@ data:extend({
         type = "int-setting",
         name = Settings.extraMiningSpeed,
         setting_type = "runtime-global",
-        order = "a[common]-d",
+        order = "a[common]-e",
         default_value = 1000000000,
         minimum_value = 0,
         maximum_value = 1000000000,
-    },
-    {
-        type = "double-setting",
-        name = Settings.extraLabSpeed,
-        setting_type = "runtime-global",
-        order = "a[common]-e",
-        default_value = -0.999,
-        minimum_value = -0.999,
-        maximum_value = 10.0,
-    },
-    {
-        type = "string-setting",
-        name = Settings.preferredController,
-        setting_type = "runtime-per-user",
-        order = "a[player]-a",
-        default_value = "god",
-        allowed_values = {"god", "remote"},
     },
     {
         type = "bool-setting",

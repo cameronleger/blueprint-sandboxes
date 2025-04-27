@@ -23,12 +23,12 @@ function Factorissimo.IsFactoryInsideSandbox(surface, position)
         return false
     end
 
-    local factory = Factorissimo.GetFactory(surface, position)
-    if not factory then
+    local outsideSurface = Factorissimo.GetOutsideSurfaceForFactory(surface, position)
+    if not outsideSurface then
         return false
     end
 
-    return Sandbox.IsSandboxForce(factory.force)
+    return Sandbox.IsSandbox(outsideSurface)
 end
 
 -- Find a Factory given a Surface and Position (if possible)

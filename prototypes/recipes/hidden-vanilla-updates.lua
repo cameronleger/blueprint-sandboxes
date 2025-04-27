@@ -13,7 +13,7 @@ function createLockedRecipeForHiddenItem(name)
                 hidden_in_factoriopedia = true,
                 energy_required = 1,
                 enabled = false,
-                ingredients = {},
+                ingredients = {{ type = "item", name = name, amount = 1 }},
                 results = {{ type = "item", name = name, amount = 1 }},
                 hide_from_signal_gui = true,
             }

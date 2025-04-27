@@ -6,8 +6,8 @@ data:extend({
         name = SelectionPlanner.forTiles,
         icons = {
             {
-                icon = BPSB.path .. "/graphics/wrapper-x64.png",
-                icon_size = 64,
+                icon = BPSB.path .. "/graphics/wrapper-x56.png",
+                icon_size = 56,
                 tint = { r = 0.5, g = 0.5, b = 0.5, a = 0.5 },
                 scale = 1,
             },
@@ -53,8 +53,8 @@ data:extend({
         name = SelectionPlanner.forEntities,
         icons = {
             {
-                icon = BPSB.path .. "/graphics/wrapper-x64.png",
-                icon_size = 64,
+                icon = BPSB.path .. "/graphics/wrapper-x56.png",
+                icon_size = 56,
                 tint = { r = 0.5, g = 0.5, b = 0.5, a = 0.5 },
                 scale = 1,
             },

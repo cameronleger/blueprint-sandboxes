@@ -21,7 +21,6 @@ end
 -- Whether the Surface (or Force) is specific to a Lab
 function Lab.IsLab(thingWithName)
     return string.sub(thingWithName.name, 1, pfxLength) == Lab.pfx
-    -- return not not storage.labSurfaces[thingWithName.name]
 end
 
 -- A human-readable Lab Name
@@ -29,17 +28,15 @@ end
 ---@return LocalisedString
 function Lab.LocalisedNameFromLabName(labName)
     local identifier = string.sub(labName, pfxLength + 3)
+
     local type = string.sub(labName, pfxLength + 1, pfxLength + 1)
-    if type == "p" then
-        type = "[img=entity.character]"
-    elseif type == "f" then
-        type = "[img=utility.force_editor_icon]"
-    else
-        type = ""
-    end
+    if type == "p" then type = "[img=" .. BPSB.pfx .. "player]"
+    elseif type == "f" then type = "[img=" .. BPSB.pfx .. "force]"
+    else type = "" end
+
     return {
         "",
-        "[img=item-group." .. BPSB.name .. "]",
+        "[img=shortcut." .. ToggleGUI.toggleShortcut .. "]",
         " ",
         identifier,
         type,
@@ -47,8 +44,10 @@ function Lab.LocalisedNameFromLabName(labName)
 end
 
 -- Create a new Lab Surface, if necessary
----@param sandboxForce LuaForce
-function Lab.GetOrCreateSurface(labName, sandboxForce)
+---@param labName string
+---@param forceName string
+---@param sandboxForceName string
+function Lab.GetOrCreateSurface(labName, forceName, sandboxForceName)
     local surface = game.surfaces[labName]
 
     if not Lab.IsLab({ name = labName }) then
@@ -65,7 +64,8 @@ function Lab.GetOrCreateSurface(labName, sandboxForce)
 
     log("Creating Lab: " .. labName)
     storage.labSurfaces[labName] = {
-        sandboxForceName = sandboxForce.name,
+        forceName = forceName,
+        sandboxForceName = sandboxForceName,
         equipmentBlueprints = Equipment.Init(Lab.equipmentString),
     }
     if not surface then
@@ -141,8 +141,7 @@ end
 -- Set some important Surface settings for a Lab
 ---@param surface LuaSurface
 function Lab.AfterCreate(surface)
-    local surfaceData = storage.labSurfaces[surface.name]
-    if not surfaceData then
+    if not Lab.IsLab(surface) then
         log("Not a Lab, won't handle Creation: " .. surface.name)
         return false
     end
@@ -180,11 +179,17 @@ function Lab.Equip(surface)
         return false
     end
 
-    -- TODO: REWRITE BLUEPRINT STORAGE
+    local forceName = nil
+    if Isolation.IsFull() then
+        forceName = Force.GetOrCreateSandboxForce(game.forces[surfaceData.forceName]).name
+    else
+        forceName = surfaceData.forceName
+    end
+
     Equipment.Place(
             surfaceData.equipmentBlueprints[1],
             surface,
-            surfaceData.sandboxForceName
+            forceName
     )
 
     return true
@@ -194,8 +199,7 @@ end
 ---@param surface LuaSurface
 ---@param force LuaForce
 function Lab.AssignEntitiesToForce(surface, force)
-    local surfaceData = storage.labSurfaces[surface.name]
-    if not surfaceData then
+    if not Lab.IsLab(surface) then
         log("Not a Lab, won't Reassign: " .. surface.name)
         return false
     end
@@ -203,7 +207,7 @@ function Lab.AssignEntitiesToForce(surface, force)
     log("Reassigning Lab to: " .. surface.name .. " -> " .. force.name)
 
     for _, entity in pairs(surface.find_entities_filtered {
-        force = surfaceData.sandboxForceName,
+        force = force,
         invert = true,
     }) do
         entity.force = force
