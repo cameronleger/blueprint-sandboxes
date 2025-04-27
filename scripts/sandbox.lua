@@ -375,6 +375,14 @@ local function EnforceSandboxPermissions(player)
 
         -- This list allows creating platforms (which is blocked by permissions) and no other surfaces (since this isn't their force)
         player.game_view_settings.show_surface_list = false
+    elseif Isolation.IsNone() then
+        local visibleNonSandboxSurfaces = 0
+        for _, surface in pairs(game.surfaces) do
+            if not Sandbox.IsSandbox(surface) and not player.force.get_surface_hidden(surface) then
+                visibleNonSandboxSurfaces = visibleNonSandboxSurfaces + 1
+            end
+        end
+        player.game_view_settings.show_surface_list = visibleNonSandboxSurfaces > 1
     end
 end
 

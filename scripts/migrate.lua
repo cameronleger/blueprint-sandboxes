@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 030000
+Migrate.version = 030001
 
 function Migrate.Run()
     if not storage.version then
@@ -29,6 +29,7 @@ function Migrate.Run()
         if storage.version < 020500 then Migrate.v2_5_0() end
         if storage.version < 020503 then Migrate.v2_5_3() end
         if storage.version < 030000 then Migrate.v3_0_0() end
+        if storage.version < 030001 then Migrate.v3_0_1() end
     end
 
     storage.version = Migrate.version
@@ -433,6 +434,29 @@ function Migrate.v3_0_0()
     RemoteView.SyncSurfaceVisibility()
 
     log("Migration 3.0.0 Finished")
+end
+
+function Migrate.v3_0_1()
+    --[[
+    3.0.1 fixes some surface visibility issues
+    ]]
+
+    log("Migration 3.0.1 Starting")
+
+    if Migrate.version == 030001 then
+        for _, force in pairs(game.forces) do
+            if not Sandbox.IsSandboxForce(force) then
+                for _, surface in pairs(game.surfaces) do
+                    local shouldShow = true
+                    if Sandbox.IsSandbox(surface) then shouldShow = false end
+                    if shouldShow then force.set_surface_hidden(surface, false) end
+                end
+            end
+        end
+    end
+    RemoteView.SyncSurfaceVisibility()
+
+    log("Migration 3.0.1 Finished")
 end
 
 return Migrate

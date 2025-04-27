@@ -36,8 +36,9 @@ end
 ---@param force LuaForce
 ---@return boolean
 local function DetermineVisibilityOfSandbox(surface, force)
-    local shouldShow = false
+    local shouldShow = not force.get_surface_hidden(surface)
     if Sandbox.IsSandbox(surface) then
+        shouldShow = false
         if Isolation.IsNone() then
             local surfaceData = storage.labSurfaces[surface.name]
             if surfaceData then

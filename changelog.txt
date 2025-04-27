@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.0.1
+Date: 2025-04-27
+  Changes:
+    - The Surfaces list is only enabled in Sandboxes when multiple non-Sandbox Surfaces exist
+  Bugfixes:
+    - Fixed accidental hiding of some non-Sandbox Surfaces
+---------------------------------------------------------------------------------------------------
 Version: 3.0.0
 Date: 2025-04-27
   Changes:
