@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 030001
+Migrate.version = 030002
 
 function Migrate.Run()
     if not storage.version then

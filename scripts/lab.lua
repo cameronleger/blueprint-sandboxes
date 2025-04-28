@@ -210,7 +210,7 @@ function Lab.AssignEntitiesToForce(surface, force)
         force = force,
         invert = true,
     }) do
-        entity.force = force
+        if entity.valid then entity.force = force end
     end
 
     return true
