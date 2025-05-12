@@ -36,6 +36,7 @@ require('scripts.remote-interface')
 
 script.on_init(function()
     Init.FirstTimeInit()
+    Isolation.StoreCurrentLevel()
     Settings.SetupConditionalHandlers()
     SurfacePropsGUI.InitPresets()
     RemoteView.Init()
