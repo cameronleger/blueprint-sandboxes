@@ -1,6 +1,4 @@
 script.on_init(function()
-  settings.global[Settings.isolationLevel] = { value = Isolation.full }
-
   for _, surface in pairs(game.surfaces) do
     surface.generate_with_lab_tiles = true
     surface.clear()
