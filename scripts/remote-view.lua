@@ -1,7 +1,7 @@
 -- Code for Factorio's new Remote controller
 local RemoteView = {}
 
-RemoteView.chartAllSandboxesTick = 300
+RemoteView.chartAllSandboxesTick = 120
 
 -- When initialized, setup default hidden states
 function RemoteView.Init()
@@ -92,12 +92,25 @@ function RemoteView.HideEverythingFromSandboxForce(sandboxForce)
     end
 end
 
--- Charts each Sandbox that a Player is currently inside of
-function RemoteView.ChartAllOccupiedSandboxes()
+---@param player LuaPlayer
+---@return number The number of chunks to generate in each direction
+local function CalculateChunkRadiusFromZoom(player)
+    local resolution = player.display_resolution
+    local visibleTilesWidth = resolution.width / player.zoom / 32
+    local visibleTilesHeight = resolution.height / player.zoom / 32
+    local chunksWidth = math.ceil(visibleTilesWidth / 32)
+    local chunksHeight = math.ceil(visibleTilesHeight / 32)
+    return math.min(8, math.max(chunksWidth, chunksHeight) / 2)
+end
+
+-- Charts and generates chunks for all players in sandboxes
+function RemoteView.ChartAndGenerateOccupiedSandboxes()
     local charted = {}
     for _, player in pairs(game.players) do
         local hash = player.force.name .. player.surface.name
         if Sandbox.IsSandbox(player.surface) and not charted[hash] then
+            local chunkRadius = CalculateChunkRadiusFromZoom(player)
+            player.surface.request_to_generate_chunks(player.position, chunkRadius)
             player.force.chart_all(player.surface)
             charted[hash] = true
         end

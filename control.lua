@@ -213,7 +213,7 @@ end)
 script.on_event(defines.events.on_gui_elem_changed, SelectionPlanner.OnPrototypeSelected)
 
 -- Periodic
-script.on_nth_tick(RemoteView.chartAllSandboxesTick, RemoteView.ChartAllOccupiedSandboxes)
+script.on_nth_tick(RemoteView.chartAllSandboxesTick, RemoteView.ChartAndGenerateOccupiedSandboxes)
 
 -- Tests
 if script.active_mods["factorio-test"] then
