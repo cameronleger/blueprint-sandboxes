@@ -25,6 +25,7 @@ Research = require("scripts.research")
 SelectionPlanner = require("scripts.selection-planner")
 Teleport = require("scripts.teleport")
 Sandbox = require("scripts.sandbox")
+SpaceExploration = require("scripts.space-exploration")
 
 -- GUIs, they likely depend on the above
 SurfacePropsGUI = require("scripts.surface-props-gui")

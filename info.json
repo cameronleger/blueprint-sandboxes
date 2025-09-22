@@ -1,6 +1,6 @@
 {
   "name": "blueprint-sandboxes",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "factorio_version": "2.0",
   "title": "Blueprint Sandboxes",
   "author": "somethingtohide",
@@ -10,8 +10,8 @@
     "base >= 2.0.46",
     "? EditorExtensions >= 2.3.0",
     "? factorissimo-2-notnotmelon",
-    "! space-exploration",
     "! Factorissimo2",
-    "! Factorissimo2-Space-Age-Port"
+    "! Factorissimo2-Space-Age-Port",
+    "? space-exploration >= 0.7.0"
   ]
 }
