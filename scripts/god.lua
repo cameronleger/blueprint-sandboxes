@@ -84,7 +84,10 @@ function God.InsertRequests(entity)
                 for _, position in pairs(plan.items.in_inventory) do
                     local inventory = entity.proxy_target.get_inventory(position.inventory)
                     local increment = position.count or 1
-                    if inventory and inventory.valid and inventory.index == position.inventory then
+                    if inventory and inventory.valid
+                    and inventory.index == position.inventory
+                    and #inventory > position.stack
+                    then
                         local stack = inventory[position.stack + 1]
                         if stack.count > 0 then
                             stack.count = stack.count + increment
