@@ -10,8 +10,12 @@ function Research.Sync(originalForce, sandboxForce)
         log("Researching everything for: " .. sandboxForce.name)
     else
         for tech, _ in pairs(prototypes.technology) do
-            sandboxForce.technologies[tech].researched = originalForce.technologies[tech].researched
-            sandboxForce.technologies[tech].level = originalForce.technologies[tech].level
+            local originalTech = originalForce.technologies[tech]
+            local sandboxTech = sandboxForce.technologies[tech]
+            if sandboxTech.researched ~= originalTech.researched then
+                sandboxTech.researched = originalTech.researched
+            end
+            sandboxTech.level = originalTech.level
             -- TODO: Consider file:///home/cameron/src/factorio/factorio_expansion/doc-html/classes/LuaTechnology.html#saved_progress
         end
         log("Copied all Research from: " .. originalForce.name .. " -> " .. sandboxForce.name)
