@@ -138,15 +138,10 @@ function Lab.Reset(player)
     return true
 end
 
--- Set some important Surface settings for a Lab
+-- Remote calls to exclude a Lab from mods that manually generate features
 ---@param surface LuaSurface
-function Lab.AfterCreate(surface)
-    if not Lab.IsLab(surface) then
-        log("Not a Lab, won't handle Creation: " .. surface.name)
-        return false
-    end
-
-    log("Handling Creation of Lab: " .. surface.name)
+function Lab.ExcludeFromMods(surface)
+    log("Excluding surface from other mods: " .. surface.name)
 
     if remote.interfaces["RSO"] then
         pcall(remote.call, "RSO", "ignoreSurface", surface.name)
@@ -159,6 +154,19 @@ function Lab.AfterCreate(surface)
     if remote.interfaces["AbandonedRuins"] then
         pcall(remote.call, "AbandonedRuins", "exclude_surface", surface.name)
     end
+end
+
+-- Set some important Surface settings for a Lab
+---@param surface LuaSurface
+function Lab.AfterCreate(surface)
+    if not Lab.IsLab(surface) then
+        log("Not a Lab, won't handle Creation: " .. surface.name)
+        return false
+    end
+
+    log("Handling Creation of Lab: " .. surface.name)
+
+    Lab.ExcludeFromMods(surface)
 
     surface.freeze_daytime = true
     surface.daytime = 0.95

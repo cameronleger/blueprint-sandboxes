@@ -91,6 +91,11 @@ script.on_configuration_changed(function(event)
             Research.EnableSandboxSpecificResearchIfNecessary(force)
         end
     end
+    for _, surface in pairs(game.surfaces) do
+        if Sandbox.IsSandbox(surface) then
+            Lab.ExcludeFromMods(surface)
+        end
+    end
 end)
 
 script.on_event(defines.events.on_player_changed_force, function(event)
