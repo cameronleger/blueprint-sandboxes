@@ -139,34 +139,16 @@ end
 -- Immediately turn one Entity into another
 ---@param entity LuaEntity
 function God.Upgrade(entity)
-    if entity.valid
-            and entity.to_be_upgraded()
-    then
-        local targetEntity, targetQuality = entity.get_upgrade_target()
+    if entity.valid and entity.to_be_upgraded() then
+        local result = entity.apply_upgrade()
 
-        local options = {
-            name = targetEntity.name,
-            position = entity.position,
-            direction = entity.direction,
-            quality = targetQuality,
-            force = entity.force,
-            fast_replace = true,
-            spill = false,
-            raise_built = true,
-        }
-
-        -- Otherwise it fails to place "output" sides (it defaults to "input")
-        if entity.type == "underground-belt" then
-            options.type = entity.belt_to_ground_type
-        end
-
-        local result = entity.surface.create_entity(options)
-
-        if result == nil and entity.valid then
-            log("Upgrade Failed, Cancelling: " .. entity.name)
-            entity.cancel_upgrade(entity.force)
-        else
-            log("Upgrade Failed, Old Entity Gone too!")
+        if result == nil then
+            if entity.valid then
+                log("Upgrade Failed, Cancelling: " .. entity.name)
+                entity.cancel_upgrade(entity.force)
+            else
+                log("Upgrade Failed, Old Entity Gone too!")
+            end
         end
     end
 end
