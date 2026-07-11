@@ -47,6 +47,7 @@ This is a summary of the important differences between the two:
 | Statistics | Separate | Included in Global |
 | Logistics / Train Groups | Separate | Synchronized |
 | Infinite Containers / Loaders | Only visible in Sandbox | Visible to all force members |
+| Spidertron Remotes | Resets when entering/exiting | Works as expected |
 | Undo / Redo | Resets when entering/exiting | Works as expected |
 
 ## Details
@@ -98,6 +99,12 @@ This is a summary of the important differences between the two:
   These groups are separate and not synchronized.
   - **Isolation: None**:
   These groups are always the same inside and outside of Sandboxes.
+
+- Spidertron Remotes
+  - **Isolation: Full**:
+  Entering and existing Sandboxes "resets" the remotes, so you must reselect any Spidertrons before using the remote again.
+  - **Isolation: None**:
+  You can use the remotes as you would expect.
 
 - Undo / Redo
   - **Isolation: Full**:

@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
-Version: 3.2.3
-Date: ????-??-??
+Version: 3.3.0
+Date: 2026-07-11
+  Changes:
+    - Support for Factorio 2.1
   Bugfixes:
     - Upgrade entities using LuaEntity#apply_upgrade(), which makes custom entities from other mods
       work (fixes https://github.com/hgschmie/factorio-miniloader-redux/issues/35)
