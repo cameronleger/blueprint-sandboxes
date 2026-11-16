@@ -8,11 +8,13 @@ local pfxLength = string.len(Sandbox.pfx)
 Sandbox.choices = {
     { "sandbox." .. Sandbox.pfx .. "player-lab" },
     { "sandbox." .. Sandbox.pfx .. "force-lab" },
+    { "sandbox." .. Sandbox.pfx .. "space-lab" },
 }
 
 -- Constants to represent indexes for Sandbox.choices
 Sandbox.player = 1
 Sandbox.force = 2
+Sandbox.space = 3
 
 -- A unique per-Force Sandbox Name
 ---@param force LuaForce
@@ -43,6 +45,8 @@ function Sandbox.IsEnabled(selectedSandbox)
         return true
     elseif selectedSandbox == Sandbox.force then
         return true
+    elseif selectedSandbox == Sandbox.space then
+        return true
     else
         log("Impossible Choice for Sandbox: " .. selectedSandbox)
         return false
@@ -62,6 +66,11 @@ function Sandbox.GetOrCreateSandboxSurface(player)
     then
         local sandboxForceData = storage.sandboxForces[playerData.sandboxForceName]
         return Lab.GetOrCreateSurface(sandboxForceData.labName, playerData.forceName, playerData.sandboxForceName)
+    elseif playerData.selectedSandbox == Sandbox.space
+    then
+        -- Saves from before Space Labs existed have no name stored yet
+        playerData.spaceLabName = playerData.spaceLabName or Lab.SpaceNameFromPlayer(player)
+        return Lab.GetOrCreateSurface(playerData.spaceLabName, playerData.forceName, playerData.sandboxForceName)
     else
         log("Impossible Choice for Sandbox: " .. playerData.selectedSandbox)
         return
@@ -271,10 +280,17 @@ function Sandbox.OnPlayerForceChanged(player)
             labData.sandboxForceName = sandboxForceName
         end
 
-        local labSurface = game.surfaces[playerData.labName]
-        if labSurface then
-            local labForce = Force.GetOrCreateSandboxForce(force)
-            Lab.AssignEntitiesToForce(labSurface, labForce)
+        local spaceLabData = storage.labSurfaces[playerData.spaceLabName]
+        if spaceLabData then
+            spaceLabData.sandboxForceName = sandboxForceName
+        end
+
+        for _, name in pairs({ playerData.labName, playerData.spaceLabName }) do
+            local labSurface = game.surfaces[name]
+            if labSurface then
+                local labForce = Force.GetOrCreateSandboxForce(force)
+                Lab.AssignEntitiesToForce(labSurface, labForce)
+            end
         end
 
         if Isolation.IsFull() and Sandbox.IsPlayerInsideSandbox(player) then
@@ -292,6 +308,10 @@ function Sandbox.GetSandboxChoiceFor(player, surface)
     local playerData = storage.players[player.index]
     if playerData.labName and surface.name == playerData.labName then
         return Sandbox.player
+    end
+
+    if playerData.spaceLabName and surface.name == playerData.spaceLabName then
+        return Sandbox.space
     end
 
     local sandboxForce = storage.sandboxForces[playerData.sandboxForceName]

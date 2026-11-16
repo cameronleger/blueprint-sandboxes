@@ -4,6 +4,36 @@ local Lab = {}
 Lab.pfx = BPSB.pfx .. "lab-"
 local pfxLength = string.len(Lab.pfx)
 
+-- Space Labs carry an extra leading prefix purely so that Space Exploration classifies the
+-- Surface as being in space. SE has no API to register a Zone for a foreign Surface, but its
+-- is_surface_space() falls back to `string.starts(surface.name, "Space Factory")` (its
+-- Factorissimo compatibility path), so the name is the only lever available. Without this, SE
+-- swaps every space machine built here to its hidden "-grounded" variant, which has all of the
+-- "space-" crafting categories stripped, and no space recipe can be selected.
+Lab.spacePfx = "Space Factory " .. Lab.pfx
+local spacePfxLength = string.len(Lab.spacePfx)
+
+-- A Space Lab is floored with Space Exploration's empty space instead of Lab Tiles, so that
+-- scaffolding and plating can be laid on it exactly as in orbit. Lab Tiles are ground, and SE's
+-- platform items refuse to be placed on ground.
+Lab.spaceTile = "se-space"
+Lab.spaceFloorTile = "se-space-platform-scaffold"
+
+-- Tiles that only exist in space. SE turns any of these into dirt, or cancels them outright,
+-- when it hears about them being placed on a Surface without a Zone, which a Lab never has.
+Lab.spaceOnlyTiles = {
+    ["se-space"] = true,
+    ["se-asteroid"] = true,
+    ["se-space-platform-scaffold"] = true,
+    ["se-space-platform-plating"] = true,
+}
+
+-- Whether Space Labs can be floored with space at all
+function Lab.HasSpaceTiles()
+    return prototypes.tile[Lab.spaceTile] ~= nil
+            and prototypes.tile[Lab.spaceFloorTile] ~= nil
+end
+
 Lab.equipmentString = "0eNqFkdFqhDAQRf9lnuOi2WbB/EopQd3RDsRRkrjUSv69iQtSikvzNrlzz51MNmjtgrMjDqA3oG5iD/p9A08DNzbfcTMiaECLXXDUFcjohrVIDnR90yFEAcR3/AJdRXHibGkoDvc82d8OGT8EIAcKhM/gvVgNL2OLLiHFa4yAefLJOXFOS7RSwAq6kDHP8Qckxf8veQEs07zt0vfojKfvhKjK45wkXY8k4p44SUX3iT6c4C9qD5AXta/k2W08hkA8+NzlcJweaJak2TQm3g0FHJMU3IIxby/XeT3HPwp4oPN7irrJ+q2ulZLqdpVVjD/mj6gB"
 
 -- A unique per-Player Lab Name
@@ -18,26 +48,47 @@ function Lab.NameFromForce(force)
     return Lab.pfx .. "f-" .. force.name
 end
 
+-- A unique per-Player Space Lab Name
+---@param player LuaPlayer
+function Lab.SpaceNameFromPlayer(player)
+    return Lab.spacePfx .. "s-" .. player.name
+end
+
+-- Whether the Surface (or Force) is a Space Lab
+function Lab.IsSpaceLab(thingWithName)
+    return string.sub(thingWithName.name, 1, spacePfxLength) == Lab.spacePfx
+end
+
 -- Whether the Surface (or Force) is specific to a Lab
 function Lab.IsLab(thingWithName)
     return string.sub(thingWithName.name, 1, pfxLength) == Lab.pfx
+            or Lab.IsSpaceLab(thingWithName)
 end
 
 -- A human-readable Lab Name
 ---@param labName string
 ---@return LocalisedString
 function Lab.LocalisedNameFromLabName(labName)
-    local identifier = string.sub(labName, pfxLength + 3)
+    -- Space Labs are prefixed, so every offset below shifts by that much
+    local offset = pfxLength
+    if Lab.IsSpaceLab({ name = labName }) then offset = spacePfxLength end
 
-    local type = string.sub(labName, pfxLength + 1, pfxLength + 1)
+    local identifier = string.sub(labName, offset + 3)
+
+    local type = string.sub(labName, offset + 1, offset + 1)
+    local marker = ""
     if type == "p" then type = "[img=" .. BPSB.pfx .. "player]"
     elseif type == "f" then type = "[img=" .. BPSB.pfx .. "force]"
+    elseif type == "s" then
+        type = "[img=" .. BPSB.pfx .. "player]"
+        marker = { "", { "sandbox." .. BPSB.pfx .. "sb-space-marker" }, " " }
     else type = "" end
 
     return {
         "",
         "[img=shortcut." .. ToggleGUI.toggleShortcut .. "]",
         " ",
+        marker,
         identifier,
         type,
     }
@@ -178,6 +229,30 @@ function Lab.AfterCreate(surface)
     return true
 end
 
+-- Replace the freshly generated Lab Tiles of a Space Lab with empty space
+--
+-- Only Lab Tiles are touched, so anything already laid down -- the scaffold pad under the
+-- equipment, or a Blueprint's own tiles -- survives even if this event arrives after them.
+---@param event EventData.on_chunk_generated
+function Lab.OnChunkGenerated(event)
+    local surface = event.surface
+    if not (surface and surface.valid and Lab.IsSpaceLab(surface)) then return end
+    if not Lab.HasSpaceTiles() then return end
+
+    local tiles = {}
+    for _, tile in pairs(surface.find_tiles_filtered {
+        area = event.area,
+        name = { "lab-dark-1", "lab-dark-2" },
+    }) do
+        tiles[#tiles + 1] = { name = Lab.spaceTile, position = tile.position }
+    end
+
+    if #tiles > 0 then
+        -- No event: SE would otherwise see space tiles on a Surface with no Zone and undo them
+        surface.set_tiles(tiles, true, true, true, false)
+    end
+end
+
 -- Add some helpful initial Entities to a Lab
 ---@param surface LuaSurface
 function Lab.Equip(surface)
@@ -194,10 +269,17 @@ function Lab.Equip(surface)
         forceName = surfaceData.forceName
     end
 
+    -- Nothing stands on empty space, so the equipment needs a platform under it
+    local floorTile = nil
+    if Lab.IsSpaceLab(surface) and Lab.HasSpaceTiles() then
+        floorTile = Lab.spaceFloorTile
+    end
+
     Equipment.Place(
             surfaceData.equipmentBlueprints[1],
             surface,
-            forceName
+            forceName,
+            floorTile
     )
 
     return true

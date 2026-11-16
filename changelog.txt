@@ -1,11 +1,54 @@
 ---------------------------------------------------------------------------------------------------
-Version: 3.3.0
-Date: 2026-07-11
+Version: 3.3.1
+Date: 2026-09-29
   Changes:
-    - Support for Factorio 2.1
+    - Support for Factorio 2.1 (upstream 3.3.0 merged onto the 3.2.9 fork)
   Bugfixes:
-    - Upgrade entities using LuaEntity#apply_upgrade(), which makes custom entities from other mods
-      work (fixes https://github.com/hgschmie/factorio-miniloader-redux/issues/35)
+    - Upgrade entities using LuaEntity#apply_upgrade() (from upstream 3.3.0)
+---------------------------------------------------------------------------------------------------
+Version: 3.2.9
+Date: 2026-09-24
+  Bugfixes:
+    - Rocket silos and other zone-gated Space Exploration structures can now be placed by hand in a
+      Sandbox, not only as Ghosts
+    - Fixed a crash a few seconds after loading a save with a launch pad in a Sandbox, caused by
+      the cargo rocket construction helper picking it up during its rescan
+---------------------------------------------------------------------------------------------------
+Version: 3.2.8
+Date: 2026-09-24
+  Features:
+    - The Space Sandbox is now floored with empty space, and Space Platform Scaffolding and Plating
+      can be laid on it by hand or from a Blueprint. The starting equipment sits on a scaffold pad.
+      Reset an existing Space Sandbox to give it the new floor.
+---------------------------------------------------------------------------------------------------
+Version: 3.2.7
+Date: 2026-09-01
+  Bugfixes:
+    - Rocket silos and other zone-gated Space Exploration structures now place in a Sandbox
+      instead of being cancelled and spilled onto the floor as an item
+---------------------------------------------------------------------------------------------------
+Version: 3.2.6
+Date: 2026-09-01
+  Bugfixes:
+    - Fixed a crash when opening a cargo landing pad inside a Sandbox
+    - Hand-placed companion proxies now get their hidden entity before the build event
+---------------------------------------------------------------------------------------------------
+Version: 3.2.5
+Date: 2026-09-01
+  Changes:
+    - Cargo landing pads now actually build in a Sandbox instead of being skipped
+    - Hidden companion entities are created before a Ghost is revived, and cleaned up if it fails
+---------------------------------------------------------------------------------------------------
+Version: 3.2.4
+Date: 2026-09-01
+  Bugfixes:
+    - Fixed a save-ending crash when pasting a cargo landing pad into a Sandbox
+    - A third-party mod erroring while a Ghost is revived no longer takes down the save
+---------------------------------------------------------------------------------------------------
+Version: 3.2.3
+Date: 2026-08-31
+  Features:
+    - Added a third Sandbox, "Personal (Space)", whose Surface Space Exploration treats as orbit
 ---------------------------------------------------------------------------------------------------
 Version: 3.2.2
 Date: 2025-11-25

@@ -1,6 +1,6 @@
 local Migrate = {}
 
-Migrate.version = 030202
+Migrate.version = 030206
 
 function Migrate.Run()
     if not storage.version then
@@ -30,6 +30,8 @@ function Migrate.Run()
         if storage.version < 020503 then Migrate.v2_5_3() end
         if storage.version < 030000 then Migrate.v3_0_0() end
         if storage.version < 030001 then Migrate.v3_0_1() end
+        if storage.version < 030203 then Migrate.v3_2_3() end
+        if storage.version < 030206 then Migrate.v3_2_6() end
     end
 
     storage.version = Migrate.version
@@ -457,6 +459,52 @@ function Migrate.v3_0_1()
     RemoteView.SyncSurfaceVisibility()
 
     log("Migration 3.0.1 Finished")
+end
+
+function Migrate.v3_2_3()
+    --[[
+    3.2.3 adds a per-Player Space Lab, which Space Exploration treats as being in orbit
+    ]]
+
+    log("Migration 3.2.3 Starting")
+
+    for playerIndex, playerData in pairs(storage.players) do
+        local player = game.players[playerIndex]
+        if player and not playerData.spaceLabName then
+            playerData.spaceLabName = Lab.SpaceNameFromPlayer(player)
+        end
+    end
+
+    Migrate.RecreateGuis()
+
+    log("Migration 3.2.3 Finished")
+end
+
+function Migrate.v3_2_6()
+    --[[
+    3.2.6 stops companion proxies already standing in a Lab from being opened
+    ]]
+
+    log("Migration 3.2.6 Starting")
+
+    local proxyNames = {}
+    for proxyName, _ in pairs(God.companionEntities) do
+        if prototypes.entity[proxyName] then
+            table.insert(proxyNames, proxyName)
+        end
+    end
+
+    if #proxyNames > 0 then
+        for _, surface in pairs(game.surfaces) do
+            if Lab.IsLab(surface) then
+                for _, entity in pairs(surface.find_entities_filtered { name = proxyNames }) do
+                    God.MakeProxyUnopenable(entity)
+                end
+            end
+        end
+    end
+
+    log("Migration 3.2.6 Finished")
 end
 
 return Migrate

@@ -1,6 +1,6 @@
 {
   "name": "blueprint-sandboxes",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "factorio_version": "2.1",
   "title": "Blueprint Sandboxes",
   "author": "somethingtohide",
@@ -12,6 +12,7 @@
     "? factorissimo-2-notnotmelon",
     "! Factorissimo2",
     "! Factorissimo2-Space-Age-Port",
-    "? space-exploration >= 0.7.0"
+    "? space-exploration >= 0.7.0",
+    "? se-cargo-rocket-construction-helper"
   ]
 }

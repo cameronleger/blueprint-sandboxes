@@ -30,17 +30,38 @@ is inverted, so it may break in the future if that API changes.
 ---@param stack LuaItemStack
 ---@param surface LuaSurface
 ---@param forceName ForceID
-function Equipment.Place(stack, surface, forceName)
+---@param floorTile string? Tile to lay under the Blueprint first, for Surfaces nothing can stand on
+function Equipment.Place(stack, surface, forceName, floorTile)
     if stack.is_blueprint then
-        Equipment.Prepare(stack, surface)
+        local radius = Equipment.Prepare(stack, surface)
+        if floorTile then
+            Equipment.LayFloor(surface, radius, floorTile)
+        end
         Equipment.BuildBlueprint(stack, surface, forceName)
         return true
     end
 end
 
+-- Lays a square of floor centred on the origin, with a little room around the Blueprint
+---@param surface LuaSurface
+---@param radius number
+---@param floorTile string
+function Equipment.LayFloor(surface, radius, floorTile)
+    local extent = math.ceil(radius) + 2
+    local tiles = {}
+    for x = -extent, extent - 1 do
+        for y = -extent, extent - 1 do
+            tiles[#tiles + 1] = { name = floorTile, position = { x, y } }
+        end
+    end
+    -- No event, for the same reason as Lab.OnChunkGenerated
+    surface.set_tiles(tiles, true, true, true, false)
+end
+
 -- Prepares a Surface for an Equipment Blueprint
 ---@param stack LuaItemStack
 ---@param surface LuaSurface
+---@return number radius How far from the origin the Blueprint reaches
 function Equipment.Prepare(stack, surface)
     -- We need to know how many Chunks must be generated to fit this Blueprint
     local radius = 0
@@ -67,6 +88,8 @@ function Equipment.Prepare(stack, surface)
     local chunkRadius = 1 + math.ceil(radius / 32)
     surface.request_to_generate_chunks({ x = 0, y = 0 }, chunkRadius)
     surface.force_generate_chunk_requests()
+
+    return radius
 end
 
 -- Applies an Equipment Blueprint to a Surface

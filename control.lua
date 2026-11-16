@@ -52,6 +52,9 @@ end)
 script.on_event(defines.events.on_player_removed, function(event)
     local playerData = storage.players[event.player_index]
     Lab.DeleteLab(playerData.labName)
+    if playerData.spaceLabName then
+        Lab.DeleteLab(playerData.spaceLabName)
+    end
     if playerData.sandboxInventory then
         playerData.sandboxInventory.destroy()
     end
@@ -96,6 +99,8 @@ script.on_configuration_changed(function(event)
             Lab.ExcludeFromMods(surface)
         end
     end
+    -- Must run after other mods' own rescans, which is why they are optional dependencies
+    God.DetachFromRescans()
 end)
 
 script.on_event(defines.events.on_player_changed_force, function(event)
@@ -176,6 +181,16 @@ script.on_event(defines.events.on_marked_for_deconstruction, God.OnMarkedForDeco
 script.on_event(defines.events.on_marked_for_upgrade, God.OnMarkedForUpgrade)
 script.on_event(defines.events.on_built_entity, God.OnBuiltEntity, God.onBuiltEntityFilters)
 script.on_event(defines.events.script_raised_built, God.OnBuiltEntity, God.onBuiltEntityFilters)
+
+-- Proxies that own a hidden companion Entity need that companion to already exist when the build
+-- event fires, and the owning mod's handler may run before ours. on_pre_build is early enough.
+-- The proxy itself is handled inside God.OnBuiltEntity, whose filters already include it.
+script.on_event(defines.events.on_pre_build, God.OnPreBuild)
+
+-- Space Labs are floored with empty space, and hand-laid space tiles have to survive SE's own
+-- handler, which runs first and cancels them. See God.GuardSpaceTileInventory.
+script.on_event(defines.events.on_chunk_generated, Lab.OnChunkGenerated)
+script.on_event(defines.events.on_player_built_tile, God.OnBuiltTile)
 script.on_event(defines.events.on_player_crafted_item, God.OnPlayerCraftedItem)
 script.on_event(defines.events.on_player_main_inventory_changed, God.OnInventoryChanged)
 

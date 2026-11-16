@@ -9,10 +9,12 @@ function Init.Player(player)
     end
 
     local playerLabName = Lab.NameFromPlayer(player)
+    local playerSpaceLabName = Lab.SpaceNameFromPlayer(player)
     local sandboxForceName = Sandbox.NameFromForce(player.force --[[@as LuaForce]])
     storage.players[player.index] = {
         forceName = player.force.name,
         labName = playerLabName,
+        spaceLabName = playerSpaceLabName,
         sandboxForceName = sandboxForceName,
         selectedSandbox = Sandbox.player,
         sandboxInventory = nil,
@@ -52,9 +54,10 @@ function Init.FirstTimeInit()
                 local forceName = nil
                 local sandboxForceName = nil
 
-                -- Check if this is a player lab
+                -- Check if this is a player lab (or that player's space lab)
                 for _, playerData in pairs(storage.players) do
-                    if playerData.labName == surface.name then
+                    if playerData.labName == surface.name
+                            or playerData.spaceLabName == surface.name then
                         forceName = playerData.forceName
                         sandboxForceName = playerData.sandboxForceName
                         break
